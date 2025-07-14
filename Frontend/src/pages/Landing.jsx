@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
 
@@ -28,7 +28,7 @@ const Landing = () => {
     const fetchDrafts = async () => {
       try {
         setLoading(true);
-        const response = await authFetch(`http://localhost:5001/drafts/${registeredUser.id}`);
+        const response = await authFetch(`http://localhost:5001/drafts`);
         if (!response.ok) throw new Error('Failed to fetch drafts');
         const data = await response.json();
         setDrafts(data);
@@ -43,7 +43,7 @@ const Landing = () => {
     const fetchSharedDrafts = async () => {
       try {
         setSharedLoading(true);
-        const response = await authFetch(`http://localhost:5001/drafts/shared/${registeredUser.id}`);
+        const response = await authFetch(`http://localhost:5001/drafts/shared`);
         if (!response.ok) throw new Error('Failed to fetch shared drafts');
         const data = await response.json();
         setSharedDrafts(data);

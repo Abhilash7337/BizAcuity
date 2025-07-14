@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../App';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { setToken, setAuthUser, isAuthenticated } from '../utils/auth';
 
 const Login = () => {

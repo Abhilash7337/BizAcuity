@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ChangePasswordForm = ({ userId }) => {
+const ChangePasswordForm = () => {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -40,7 +40,7 @@ const ChangePasswordForm = ({ userId }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/user/update-password/${userId}`, {
+      const response = await fetch(`http://localhost:5001/user/update-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

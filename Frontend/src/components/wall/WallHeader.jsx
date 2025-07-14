@@ -1,5 +1,5 @@
 import React from 'react';
-import ExportButton from './ExportButton';
+import ExportButton from '../shared/ExportButton';
 
 const WallHeader = ({
   isSharedView,

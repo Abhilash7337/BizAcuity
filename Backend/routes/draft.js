@@ -15,8 +15,8 @@ const {
 // Protected route - Create new draft
 router.post('/drafts', verifyToken, createDraft);
 
-// Protected route - Get user's drafts
-router.get('/drafts/:userId', verifyToken, getUserDrafts);
+// Protected route - Get user's drafts (no userId needed in URL, use token)
+router.get('/drafts', verifyToken, getUserDrafts);
 
 // Get specific draft - Protected, but allows access to shared drafts
 router.get('/drafts/single/:draftId', verifyToken, getDraftById);
@@ -30,8 +30,8 @@ router.delete('/drafts/:draftId', verifyToken, deleteDraft);
 // Share draft endpoint - Protected
 router.post('/drafts/:draftId/share', verifyToken, shareDraft);
 
-// Get shared drafts for a user - Protected
-router.get('/drafts/shared/:userId', verifyToken, getSharedDrafts);
+// Get shared drafts for a user - Protected (no userId needed in URL, use token)
+router.get('/drafts/shared', verifyToken, getSharedDrafts);
 
 // Remove user from shared draft (unshare for the current user) - Protected
 router.delete('/drafts/shared/:draftId/remove', verifyToken, removeFromSharedDraft);

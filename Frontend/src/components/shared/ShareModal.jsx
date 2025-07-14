@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { authFetch } from '../utils/auth';
+import { authFetch } from '../../utils/auth';
+import useUser from '../../hooks/useUser';
 
 const ShareModal = ({ 
   showModal, 
@@ -10,6 +11,8 @@ const ShareModal = ({
   wallData,
   onDraftCreated
 }) => {
+  const { fetchSensitiveData } = useUser();
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [shareUrl, setShareUrl] = useState('');
   const [shareSuccess, setShareSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +22,17 @@ const ShareModal = ({
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [shareMode, setShareMode] = useState('link'); // 'link' or 'users'
+
+  // Fetch current user ID when modal opens
+  useEffect(() => {
+    if (showModal && !currentUserId) {
+      fetchSensitiveData().then(userData => {
+        if (userData) {
+          setCurrentUserId(userData.id);
+        }
+      });
+    }
+  }, [showModal, currentUserId, fetchSensitiveData]);
 
   // Debounced search
   useEffect(() => {
@@ -41,7 +55,7 @@ const ShareModal = ({
       const users = await response.json();
       // Filter out the current user and already selected users
       setSearchResults(users.filter(user => 
-        user._id !== registeredUser.id && 
+        user._id !== currentUserId && 
         !selectedUsers.some(selected => selected._id === user._id)
       ));
     } catch (error) {
@@ -374,4 +388,4 @@ const ShareModal = ({
   );
 };
 
-export default ShareModal; 
+export default ShareModal;

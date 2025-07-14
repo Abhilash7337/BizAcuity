@@ -2,21 +2,25 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import html2canvas from 'html2canvas';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../App';
-import { authFetch } from '../utils/auth';
+import { authFetch, fetchUserProfile } from '../utils/auth';
 
 // Components
-import Header from '../components/Header';
-import WallHeader from '../components/WallHeader';
-import WallSidebar from '../components/WallSidebar';
-import WallCanvas from '../components/WallCanvas';
-import WallFooter from '../components/WallFooter';
-import WallModals from '../components/WallModals';
+import { Header } from '../components/layout';
+import { 
+  WallHeader, 
+  WallSidebar, 
+  WallCanvas, 
+  WallFooter, 
+  WallModals, 
+  ImagePropertiesPanel 
+} from '../components/wall';
 
 // Sidebar Components for Tab Content
-import BackgroundPanel from '../components/Sidebar/BackgroundPanel';
-import UploadImagesPanel from '../components/Sidebar/UploadImagesPanel';
-import ImagePropertiesPanel from '../components/ImagePropertiesPanel';
-import DecorsPanel from '../components/Sidebar/DecorsPanel';
+import { 
+  BackgroundPanel, 
+  UploadImagesPanel, 
+  DecorsPanel 
+} from '../components/sidebar';
 
 const MIN_SIZE = 200;
 const MAX_SIZE = 2000;
@@ -66,18 +70,9 @@ function WallEditor() {
   // Load user wall data
   useEffect(() => {
     if (registeredUser && registeredUser.isLoggedIn) {
-      authFetch(`http://localhost:5001/wall/${registeredUser.id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.wall) {
-            setWallColor(data.wall.wallColor || '#fff');
-            setWallWidth(data.wall.wallWidth || 800);
-            setWallHeight(data.wall.wallHeight || 600);
-            setWallImage(data.wall.wallImage || null);
-            setImages(data.wall.images || []);
-            setImageStates(data.wall.imageStates || []);
-          }
-        });
+      // TODO: Implement wall API endpoint when needed
+      // For now, use default values
+      console.log('User is logged in, ready to load wall data');
     }
   }, [registeredUser]);
 

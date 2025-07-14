@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-import { authFetch } from '../utils/auth';
+import { authFetch } from '../../utils/auth';
 
 const SaveDraftModal = ({ 
   showModal, 

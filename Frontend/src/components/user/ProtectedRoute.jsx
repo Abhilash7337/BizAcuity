@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { UserContext } from '../App';
-import { isAuthenticated, getAuthUser, removeAuthUser, removeToken } from '../utils/auth';
+import { UserContext } from '../../App';
+import { isAuthenticated, getAuthUser, removeAuthUser, removeToken } from '../../utils/auth';
 
 const ProtectedRoute = ({ children }) => {
   const { registeredUser, setRegisteredUser } = useContext(UserContext);

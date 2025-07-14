@@ -42,11 +42,7 @@ const createDraft = async (req, res) => {
 // Get user's drafts
 const getUserDrafts = async (req, res) => {
   try {
-    // Ensure user can only access their own drafts
-    if (req.userId !== req.params.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
+    // Use the userId from the authenticated token
     const drafts = await Draft.find({ userId: req.userId })
       .sort({ updatedAt: -1 })
       .select('name userId previewImage createdAt updatedAt');
@@ -229,12 +225,8 @@ const shareDraft = async (req, res) => {
 // Get shared drafts for a user
 const getSharedDrafts = async (req, res) => {
   try {
-    const { userId } = req.params;
-    
-    // Ensure user can only access their own shared drafts
-    if (userId !== req.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
+    // Use the userId from the authenticated token
+    const userId = req.userId;
 
     // Find all drafts that are shared with this user
     const sharedDrafts = await Draft.find({
