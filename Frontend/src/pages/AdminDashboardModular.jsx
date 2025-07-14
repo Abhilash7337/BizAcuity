@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
+import { API_ENDPOINTS } from '../constants/api';
 import {
   DashboardStats,
   UsersManagement,
   PaymentsManagement,
   DraftsManagement,
-  SharingManagement
+  SharingManagement,
+  FlaggedContentManagement,
+  SubscriptionManagement,
+  ReportsExport
 } from '../components/admin';
 
 const AdminDashboard = () => {
@@ -21,8 +25,9 @@ const AdminDashboard = () => {
   const [payments, setPayments] = useState([]);
   const [drafts, setDrafts] = useState([]);
   const [sharedDrafts, setSharedDrafts] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [flaggedContent, setFlaggedContent] = useState([]);
   const [sharingStats, setSharingStats] = useState({});
-  const [topSharers, setTopSharers] = useState([]);
   const [pagination, setPagination] = useState({});
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({
@@ -53,7 +58,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await authFetch('http://localhost:5001/admin/dashboard');
+      const response = await authFetch('http://localhost:5001/admin/dashboard/advanced');
       if (!response.ok) throw new Error('Failed to fetch dashboard data');
       const data = await response.json();
       setDashboardData(data);
@@ -111,29 +116,49 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchSubscriptions = async (page = 1) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page,
+        limit: 10,
+        ...filters
+      });
+      
+      const response = await authFetch(`http://localhost:5001/admin/subscriptions?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch subscriptions');
+      const data = await response.json();
+      setSubscriptions(data.subscriptions);
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error('Subscriptions fetch error:', error);
+      setError('Failed to load subscriptions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchSharingAnalytics = async (page = 1) => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
         page,
         limit: 10,
-        type: filters.sharingType,
-        owner: filters.shareOwner || '',
-        recipient: filters.shareRecipient || '',
-        status: filters.shareStatus || ''
+        owner: filters.shareOwner,
+        recipient: filters.shareRecipient,
+        status: filters.shareStatus,
+        type: filters.sharingType
       });
       
-      const response = await authFetch(`http://localhost:5001/admin/sharing-analytics?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch sharing analytics');
+      const response = await authFetch(`http://localhost:5001/admin/shared-drafts?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch sharing data');
       const data = await response.json();
-      
       setSharedDrafts(data.sharedDrafts);
       setSharingStats(data.stats);
-      setTopSharers(data.topSharers);
       setPagination(data.pagination);
     } catch (error) {
-      console.error('Sharing analytics fetch error:', error);
-      setError('Failed to load sharing analytics');
+      console.error('Sharing fetch error:', error);
+      setError('Failed to load sharing data');
     } finally {
       setLoading(false);
     }
@@ -166,6 +191,28 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchFlaggedContent = async (page = 1) => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page,
+        limit: 10,
+        ...filters
+      });
+      
+      const response = await authFetch(`http://localhost:5001/admin/flagged-content?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch flagged content');
+      const data = await response.json();
+      setFlaggedContent(data.flaggedContent);
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error('Flagged content fetch error:', error);
+      setError('Failed to load flagged content');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     setError('');
@@ -183,8 +230,17 @@ const AdminDashboard = () => {
       case 'drafts':
         fetchDrafts();
         break;
+      case 'subscriptions':
+        fetchSubscriptions();
+        break;
+      case 'flagged':
+        fetchFlaggedContent();
+        break;
       case 'sharing':
         fetchSharingAnalytics();
+        break;
+      case 'reports':
+        // Reports don't need data fetching
         break;
     }
   };
@@ -363,9 +419,12 @@ const AdminDashboard = () => {
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: '📊' },
                 { id: 'users', label: 'Users', icon: '👥' },
-                { id: 'payments', label: 'Payments', icon: '💳' },
-                { id: 'drafts', label: 'Drafts', icon: '📄' },
-                { id: 'sharing', label: 'Sharing', icon: '🔗' }
+                { id: 'subscriptions', label: 'Subscriptions', icon: '💳' },
+                { id: 'payments', label: 'Payments', icon: '�' },
+                { id: 'drafts', label: 'Drafts (Altars)', icon: '📄' },
+                { id: 'flagged', label: 'Flagged Content', icon: '🚩' },
+                { id: 'sharing', label: 'Sharing', icon: '🔗' },
+                { id: 'reports', label: 'Reports & Export', icon: '📋' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -411,6 +470,21 @@ const AdminDashboard = () => {
                     pagination={pagination}
                     formatDate={formatDate}
                   />
+                )}
+
+                {/* Subscriptions Tab */}
+                {activeTab === 'subscriptions' && (
+                  <SubscriptionManagement />
+                )}
+
+                {/* Flagged Content Tab */}
+                {activeTab === 'flagged' && (
+                  <FlaggedContentManagement />
+                )}
+
+                {/* Reports Tab */}
+                {activeTab === 'reports' && (
+                  <ReportsExport />
                 )}
 
                 {/* Payments Tab */}

@@ -2,6 +2,8 @@ const User = require('../models/User');
 const Draft = require('../models/Draft');
 const Payment = require('../models/Payment');
 const SharedDraft = require('../models/SharedDraft');
+const FlaggedContent = require('../models/FlaggedContent');
+const Subscription = require('../models/Subscription');
 
 // Get all users - Admin only
 const getAllUsers = async (req, res) => {
@@ -314,6 +316,161 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// Advanced dashboard stats with new features - Admin only
+const getAdvancedDashboardStats = async (req, res) => {
+  try {
+    // Get basic counts
+    const totalUsers = await User.countDocuments();
+    const totalDrafts = await Draft.countDocuments();
+    const totalPayments = await Payment.countDocuments();
+    const totalSubscriptions = await Subscription.countDocuments();
+    
+    // Get flagged content stats
+    const flaggedContentStats = await FlaggedContent.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Get subscription health overview
+    const subscriptionHealth = await Subscription.aggregate([
+      {
+        $addFields: {
+          daysRemaining: {
+            $divide: [
+              { $subtract: ['$endDate', new Date()] },
+              1000 * 60 * 60 * 24
+            ]
+          }
+        }
+      },
+      {
+        $addFields: {
+          healthStatus: {
+            $switch: {
+              branches: [
+                { case: { $in: ['$status', ['expired', 'cancelled']] }, then: 'expired' },
+                { case: { $eq: ['$status', 'suspended'] }, then: 'suspended' },
+                { case: { $lte: ['$daysRemaining', 3] }, then: 'critical' },
+                { case: { $lte: ['$daysRemaining', 7] }, then: 'warning' },
+                { case: { $lte: ['$daysRemaining', 30] }, then: 'caution' }
+              ],
+              default: 'healthy'
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$healthStatus',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Get users by plan
+    const usersByPlan = await User.aggregate([
+      { $group: { _id: '$plan', count: { $sum: 1 } } }
+    ]);
+
+    // Get revenue
+    const totalRevenue = await Payment.aggregate([
+      { $match: { status: 'completed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    // Monthly revenue trend (last 6 months)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const monthlyRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: 'completed',
+          paymentDate: { $gte: sixMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$paymentDate' },
+            month: { $month: '$paymentDate' }
+          },
+          revenue: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
+    ]);
+
+    // Content moderation alerts
+    const pendingReports = await FlaggedContent.countDocuments({ status: 'pending' });
+    const highPriorityReports = await FlaggedContent.countDocuments({ 
+      status: 'pending', 
+      priority: { $in: ['high', 'critical'] }
+    });
+
+    // Subscription alerts
+    const expiringSubscriptions = await Subscription.findExpiring(7);
+    const suspendedSubscriptions = await Subscription.countDocuments({ status: 'suspended' });
+
+    // Recent activity data
+    const recentUsers = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('name email createdAt');
+
+    const recentPayments = await Payment.find({ status: 'completed' })
+      .populate('userId', 'name email')
+      .sort({ paymentDate: -1 })
+      .limit(5)
+      .select('amount plan paymentDate userId');
+
+    res.json({
+      stats: {
+        totalUsers,
+        totalDrafts,
+        totalPayments,
+        totalSubscriptions,
+        totalRevenue: totalRevenue[0]?.total || 0
+      },
+      usersByPlan: usersByPlan.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}),
+      flaggedContent: {
+        byStatus: flaggedContentStats.reduce((acc, item) => {
+          acc[item._id] = item.count;
+          return acc;
+        }, {}),
+        pendingReports,
+        highPriorityReports
+      },
+      subscriptionHealth: subscriptionHealth.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}),
+      alerts: {
+        pendingReports,
+        highPriorityReports,
+        expiringSubscriptions: expiringSubscriptions.length,
+        suspendedSubscriptions
+      },
+      recentActivity: {
+        recentUsers,
+        recentPayments
+      },
+      monthlyRevenue
+    });
+  } catch (error) {
+    console.error('Get advanced dashboard stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch advanced dashboard stats' });
+  }
+};
+
 // Get all drafts - Admin only
 const getAllDrafts = async (req, res) => {
   try {
@@ -374,6 +531,7 @@ module.exports = {
   getAllPayments,
   createPayment,
   getDashboardStats,
+  getAdvancedDashboardStats,
   getAllDrafts,
   deleteDraft
 };
