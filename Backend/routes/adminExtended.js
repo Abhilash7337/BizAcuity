@@ -48,26 +48,27 @@ const {
   getDraftSharingDetails
 } = require('../controllers/sharingController');
 
-// ===== USER MANAGEMENT =====
+// ===== EXISTING ROUTES =====
+
+// User Management Routes
 router.get('/admin/users', verifyToken, verifyAdmin, getAllUsers);
 router.get('/admin/users/:userId', verifyToken, verifyAdmin, getUserDetails);
 router.put('/admin/users/:userId', verifyToken, verifyAdmin, updateUser);
 router.delete('/admin/users/:userId', verifyToken, verifyAdmin, deleteUser);
 
-// ===== PAYMENT MANAGEMENT =====
+// Payment Management Routes
 router.get('/admin/payments', verifyToken, verifyAdmin, getAllPayments);
 router.post('/admin/payments', verifyToken, verifyAdmin, createPayment);
 
-// ===== DASHBOARD =====
+// Dashboard Routes
 router.get('/admin/dashboard', verifyToken, verifyAdmin, getDashboardStats);
 router.get('/admin/dashboard/advanced', verifyToken, verifyAdmin, getAdvancedDashboardStats);
 
-// ===== DRAFT MANAGEMENT =====
+// Draft Management Routes
 router.get('/admin/drafts', verifyToken, verifyAdmin, getAllDrafts);
 router.delete('/admin/drafts/:draftId', verifyToken, verifyAdmin, deleteDraft);
 
-// ===== SHARING MANAGEMENT =====
-router.get('/admin/shared-drafts', verifyToken, verifyAdmin, getSharingAnalytics);
+// Sharing Management Routes
 router.get('/admin/sharing-analytics', verifyToken, verifyAdmin, getSharingAnalytics);
 router.get('/admin/drafts/:draftId/sharing', verifyToken, verifyAdmin, getDraftSharingDetails);
 router.put('/admin/shared-drafts/:shareId/revoke', verifyToken, verifyAdmin, revokeShare);
@@ -75,14 +76,16 @@ router.put('/admin/shared-drafts/:shareId/reactivate', verifyToken, verifyAdmin,
 router.delete('/admin/shared-drafts/:shareId', verifyToken, verifyAdmin, deleteShare);
 router.delete('/admin/shared-drafts/cleanup', verifyToken, verifyAdmin, cleanupRevokedShares);
 
-// ===== FLAGGED CONTENT MANAGEMENT =====
+// ===== NEW ROUTES =====
+
+// Flagged Content Management Routes
 router.get('/admin/flagged-content', verifyToken, verifyAdmin, getAllFlaggedContent);
 router.get('/admin/flagged-content/analytics', verifyToken, verifyAdmin, getFlaggedContentAnalytics);
 router.get('/admin/flagged-content/:id', verifyToken, verifyAdmin, getFlaggedContentDetails);
 router.put('/admin/flagged-content/:id', verifyToken, verifyAdmin, updateFlaggedContentStatus);
 router.put('/admin/flagged-content/bulk-update', verifyToken, verifyAdmin, bulkUpdateFlaggedContent);
 
-// ===== SUBSCRIPTION MANAGEMENT =====
+// Subscription Management Routes
 router.get('/admin/subscriptions', verifyToken, verifyAdmin, getAllSubscriptions);
 router.get('/admin/subscriptions/analytics', verifyToken, verifyAdmin, getSubscriptionAnalytics);
 router.get('/admin/subscriptions/:id', verifyToken, verifyAdmin, getSubscriptionDetails);
@@ -90,11 +93,11 @@ router.put('/admin/subscriptions/:id', verifyToken, verifyAdmin, updateSubscript
 router.put('/admin/subscriptions/:id/cancel', verifyToken, verifyAdmin, cancelSubscription);
 router.put('/admin/subscriptions/bulk-update', verifyToken, verifyAdmin, bulkUpdateSubscriptions);
 
-// ===== REPORTS AND EXPORTS =====
+// Reports and Export Routes
 router.get('/admin/reports', verifyToken, verifyAdmin, generateAdminReport);
 router.post('/admin/export/users', verifyToken, verifyAdmin, exportUserData);
 
-// ===== PUBLIC ROUTES =====
+// Public Routes (for users to report content)
 router.post('/report-content', verifyToken, createFlaggedContentReport);
 
 module.exports = router;

@@ -25,6 +25,9 @@ router.delete('/admin/shared-drafts/:shareId', verifyToken, verifyAdmin, deleteS
 // Cleanup old revoked shares - Admin only
 router.delete('/admin/shared-drafts/cleanup', verifyToken, verifyAdmin, cleanupRevokedShares);
 
+// Get all shared drafts - Admin only
+router.get('/admin/shared-drafts', verifyToken, verifyAdmin, getSharingAnalytics);
+
 // Get sharing analytics - Admin only
 router.get('/admin/sharing-analytics', verifyToken, verifyAdmin, getSharingAnalytics);
 
