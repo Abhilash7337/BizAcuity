@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { UserContext } from '../App';
-import { isAuthenticated } from '../utils/auth';
+import { UserContext } from '../../App';
+import { isAuthenticated } from '../../utils/auth';
 
 const Header = () => {
   const location = useLocation();

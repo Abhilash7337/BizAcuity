@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
-import ChangePasswordForm from '../components/ChangePasswordForm';
-import UserProfileForm from '../components/UserProfileForm';
+import { ChangePasswordForm, UserProfileForm } from '../components/user';
 
 const User = () => {
   const { registeredUser } = useContext(UserContext);
@@ -18,7 +17,7 @@ const User = () => {
   useEffect(() => {
     if (registeredUser && registeredUser.isLoggedIn) {
       setLoading(true);
-      authFetch(`http://localhost:5001/user/${registeredUser.id}`)
+      authFetch(`http://localhost:5001/user/profile`)
         .then(res => res.json())
         .then(data => {
           setUser(data);
@@ -117,7 +116,7 @@ const User = () => {
                 </p>
               </div>
               
-              <UserProfileForm user={user} userId={registeredUser.id} onProfileUpdate={handleProfileUpdate} />
+              <UserProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
             </div>
           </div>
 
@@ -133,7 +132,7 @@ const User = () => {
                 </p>
               </div>
               
-              <ChangePasswordForm userId={registeredUser.id} />
+              <ChangePasswordForm />
             </div>
           </div>
         </div>

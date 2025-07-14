@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../App';
 import { isAuthenticated } from '../utils/auth';

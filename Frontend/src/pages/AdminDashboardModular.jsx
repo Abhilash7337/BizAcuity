@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
-import DashboardStats from '../components/admin/DashboardStats';
-import UsersManagement from '../components/admin/UsersManagement';
-import PaymentsManagement from '../components/admin/PaymentsManagement';
-import DraftsManagement from '../components/admin/DraftsManagement';
-import SharingManagement from '../components/admin/SharingManagement';
+import {
+  DashboardStats,
+  UsersManagement,
+  PaymentsManagement,
+  DraftsManagement,
+  SharingManagement
+} from '../components/admin';
 
 const AdminDashboard = () => {
   const { registeredUser } = useContext(UserContext);

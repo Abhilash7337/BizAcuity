@@ -71,11 +71,6 @@ const updateProfile = async (req, res) => {
   try {
     const { name, email, userType, profilePhoto } = req.body;
     
-    // Ensure user can only update their own profile
-    if (req.params.id !== req.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -165,10 +160,35 @@ const searchUsers = async (req, res) => {
   }
 };
 
+// Get current user profile (from authenticated token)
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId)
+      .select('-password');
+      
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.profilePhoto,
+      userType: user.userType,
+      plan: user.plan
+    });
+  } catch (error) {
+    console.error('Get user profile error:', error);
+    res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
+};
+
 module.exports = {
   getUserById,
   updatePassword,
   updateProfile,
   choosePlan,
-  searchUsers
+  searchUsers,
+  getUserProfile
 };

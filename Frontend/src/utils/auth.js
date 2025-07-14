@@ -1,3 +1,22 @@
+/*
+ * SECURITY NOTE: 
+ * This auth utility implements secure data storage practices:
+ * 
+ * STORED IN LOCALHOST (Safe, non-sensitive):
+ * - name: User's display name
+ * - isLoggedIn: Authentication status
+ * - userType: User role (regular, admin, etc.)
+ * - plan: User's subscription plan
+ * 
+ * NOT STORED IN LOCALHOST (Sensitive data):
+ * - id: User database ID
+ * - email: User email address  
+ * - profilePhoto: User avatar/photo
+ * - Any other PII (Personally Identifiable Information)
+ * 
+ * Sensitive data is fetched from server when needed using fetchUserProfile()
+ */
+
 // Store token in localStorage
 export const setToken = (token) => {
     localStorage.setItem('token', token);
@@ -19,15 +38,23 @@ export const isAuthenticated = () => {
     return !!token;
 };
 
-// Get authenticated user data
+// Get authenticated user data (only safe, non-sensitive info)
 export const getAuthUser = () => {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
 };
 
-// Set authenticated user data
+// Set authenticated user data (filter out sensitive information)
 export const setAuthUser = (user) => {
-    localStorage.setItem('user', JSON.stringify(user));
+    // Only store non-sensitive information
+    const safeUserData = {
+        name: user.name,
+        isLoggedIn: user.isLoggedIn || true,
+        userType: user.userType || 'regular',
+        plan: user.plan || 'regular'
+        // Intentionally exclude: id, email, profilePhoto and other sensitive data
+    };
+    localStorage.setItem('user', JSON.stringify(safeUserData));
 };
 
 // Remove authenticated user data
@@ -37,8 +64,7 @@ export const removeAuthUser = () => {
 
 // Logout user
 export const logout = () => {
-    removeToken();
-    removeAuthUser();
+    clearAuthData();
 };
 
 // Create authenticated fetch function
@@ -51,4 +77,40 @@ export const authFetch = async (url, options = {}) => {
         };
     }
     return fetch(url, options);
-}; 
+};
+
+// Fetch sensitive user data from server when needed (instead of storing in localStorage)
+export const fetchUserProfile = async () => {
+    try {
+        const response = await authFetch('/api/user/profile');
+        if (response.ok) {
+            return await response.json();
+        }
+        return null;
+    } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        return null;
+    }
+};
+
+// Get user ID securely (fetch from server when needed)
+export const getUserId = async () => {
+    const profile = await fetchUserProfile();
+    return profile?.id || null;
+};
+
+// Get user email securely (fetch from server when needed)  
+export const getUserEmail = async () => {
+    const profile = await fetchUserProfile();
+    return profile?.email || null;
+};
+
+// Clear all authentication data (enhanced security)
+export const clearAuthData = () => {
+    removeToken();
+    removeAuthUser();
+    // Clear any cached sensitive data
+    if (window.userProfileCache) {
+        delete window.userProfileCache;
+    }
+};

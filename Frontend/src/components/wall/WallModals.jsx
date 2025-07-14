@@ -1,6 +1,6 @@
 import React from 'react';
-import SaveDraftModal from './SaveDraftModal';
-import ShareModal from './ShareModal';
+import SaveDraftModal from '../shared/SaveDraftModal';
+import ShareModal from '../shared/ShareModal';
 
 const WallModals = ({
   showSaveModal,

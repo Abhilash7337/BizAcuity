@@ -3,20 +3,21 @@ const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
 const { 
   getUserById, 
+  getUserProfile,
   updatePassword, 
   updateProfile, 
   choosePlan, 
   searchUsers 
 } = require('../controllers/userController');
 
-// Protected route - Get user
-router.get('/user/:id', verifyToken, getUserById);
+// Protected route - Get current user profile (use token)
+router.get('/user/profile', verifyToken, getUserProfile);
 
-// Update password - Protected
-router.put('/user/update-password/:id', verifyToken, updatePassword);
+// Update password - Protected (use token)
+router.put('/user/update-password', verifyToken, updatePassword);
 
-// Update user profile - Protected
-router.put('/user/profile/:id', verifyToken, updateProfile);
+// Update user profile - Protected (use token)
+router.put('/user/profile', verifyToken, updateProfile);
 
 // Choose plan - Protected
 router.post('/api/user/choose-plan', verifyToken, choosePlan);

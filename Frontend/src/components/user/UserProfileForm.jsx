@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const UserProfileForm = ({ user, userId, onProfileUpdate }) => {
+const UserProfileForm = ({ user, onProfileUpdate }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -120,7 +120,7 @@ const UserProfileForm = ({ user, userId, onProfileUpdate }) => {
         profilePhoto: submitData.profilePhoto ? '[Base64 Image Data]' : submitData.profilePhoto
       });
 
-      const response = await fetch(`http://localhost:5001/user/profile/${userId}`, {
+      const response = await fetch(`http://localhost:5001/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

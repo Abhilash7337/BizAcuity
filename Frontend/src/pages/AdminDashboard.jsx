@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import { Header } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
 import {
