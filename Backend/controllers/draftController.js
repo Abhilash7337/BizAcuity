@@ -67,12 +67,24 @@ const getDraftById = async (req, res) => {
       return res.status(404).json({ error: 'Draft not found' });
     }
 
-    // Allow access if user owns the draft or if it's shared with them
+    // Check if this is a public access request (no token required)
+    const isPublicAccess = !req.userId;
+    
+    if (isPublicAccess) {
+      // For public access, only allow if the draft is marked as public
+      if (!draft.isPublic) {
+        return res.status(403).json({ error: 'Draft is not publicly accessible' });
+      }
+      // Return draft for public access
+      return res.json(draft);
+    }
+
+    // For authenticated access, check ownership or sharing
     const isOwner = draft.userId._id.toString() === req.userId;
     const isSharedWithUser = draft.sharedWith && Array.isArray(draft.sharedWith) && 
       draft.sharedWith.some(share => share.userId && share.userId.toString() === req.userId);
 
-    if (!isOwner && !isSharedWithUser) {
+    if (!isOwner && !isSharedWithUser && !draft.isPublic) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -89,19 +101,8 @@ const getDraftById = async (req, res) => {
 // Update draft
 const updateDraft = async (req, res) => {
   try {
-    const { name, wallData, previewImage } = req.body;
+    const { name, wallData, previewImage, isPublic } = req.body;
     
-    if (!name || !wallData || !previewImage) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        details: {
-          name: !name,
-          wallData: !wallData,
-          previewImage: !previewImage
-        }
-      });
-    }
-
     const draft = await Draft.findById(req.params.draftId);
     if (!draft) {
       return res.status(404).json({ error: 'Draft not found' });
@@ -112,9 +113,12 @@ const updateDraft = async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    draft.name = name;
-    draft.wallData = wallData;
-    draft.previewImage = previewImage;
+    // Update fields if provided
+    if (name !== undefined) draft.name = name;
+    if (wallData !== undefined) draft.wallData = wallData;
+    if (previewImage !== undefined) draft.previewImage = previewImage;
+    if (isPublic !== undefined) draft.isPublic = isPublic;
+    
     draft.lastModified = new Date();
     await draft.save();
     

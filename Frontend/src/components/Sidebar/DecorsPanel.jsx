@@ -127,56 +127,98 @@ const DecorsPanel = ({ onAddDecor }) => {
   };
 
   return (
-    <div className="bg-surface border border-border rounded-lg shadow-md p-6 mb-6 transition-all hover:shadow-lg">
-      <div className="flex items-center gap-2 mb-4">
-        <Flower2 className="w-5 h-5 text-primary-dark" />
-        <h3 className="text-primary-dark font-bold text-lg">Decorative Items</h3>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-gradient-to-r from-pink-200/50 to-yellow-200/50 rounded-xl">
+          <Flower2 className="w-5 h-5 text-primary-dark" />
+        </div>
+        <h3 className="text-primary-dark font-bold text-lg">Decorations</h3>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {Object.entries(decorCategories).map(([key, category]) => (
-          <button
-            key={key}
-            onClick={() => setActiveCategory(key)}
-            className={`px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
-              activeCategory === key
-              ? 'bg-primary text-secondary shadow-md'
-              : 'bg-secondary text-primary hover:bg-primary/10'
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
+      {/* Category Navigation */}
+      <div className="space-y-3">
+        <div className="text-xs font-semibold text-primary-dark/60 uppercase tracking-wider">Categories</div>
+        <div className="grid grid-cols-1 gap-2">
+          {Object.entries(decorCategories).map(([key, category]) => (
+            <button
+              key={key}
+              onClick={() => setActiveCategory(key)}
+              className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 text-left ${
+                activeCategory === key
+                  ? 'bg-gradient-to-r from-primary-dark to-primary text-white shadow-lg transform scale-105'
+                  : 'bg-white/60 backdrop-blur-sm text-primary-dark hover:bg-white/80 hover:scale-102'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span>{category.name}</span>
+                <span className="text-xs opacity-70">
+                  {category.items.length} item{category.items.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Active Category Items */}
-      <div className="grid grid-cols-2 gap-3">
-        {decorCategories[activeCategory].items.map((decor) => (
-          <div
-            key={decor.id}
-            onClick={() => !loadError[decor.id] && handleDecorClick(decor)}
-            className={`cursor-pointer group relative rounded-lg overflow-hidden border border-primary shadow-sm 
-              ${loadError[decor.id] ? 'opacity-50' : 'hover:border-primary-dark transition-colors'}`}
-          >
-            <div className="aspect-square">
-              <img
-                src={decor.src}
-                alt={decor.name}
-                onError={() => handleImageError(decor.id)}
-                className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-              />
-            </div>
-            <div className="p-2 bg-surface/80 backdrop-blur-sm">
-              <p className="text-sm font-medium text-primary-dark text-center">
-                {decor.name}
-                {loadError[decor.id] && (
-                  <span className="text-red-500 block text-xs">Image not found</span>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-primary rounded-full"></div>
+          <span className="text-sm font-semibold text-primary-dark/80">
+            {decorCategories[activeCategory].name} Collection
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          {decorCategories[activeCategory].items.map((decor, index) => (
+            <div
+              key={decor.id}
+              onClick={() => !loadError[decor.id] && handleDecorClick(decor)}
+              className={`group relative rounded-xl overflow-hidden border-2 border-white/40 shadow-lg transition-all duration-300 cursor-pointer animate-fade-in-up ${
+                loadError[decor.id] 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:scale-105 hover:shadow-xl hover:border-primary/50'
+              }`}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="aspect-square relative overflow-hidden">
+                <img
+                  src={decor.src}
+                  alt={decor.name}
+                  onError={() => handleImageError(decor.id)}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                
+                {/* Overlay */}
+                {!loadError[decor.id] && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-2 left-2 right-2 text-white text-xs font-medium">
+                      Click to add to wall
+                    </div>
+                  </div>
                 )}
-              </p>
+              </div>
+              
+              <div className="p-3 bg-white/80 backdrop-blur-sm">
+                <p className="text-sm font-semibold text-primary-dark text-center">
+                  {decor.name}
+                </p>
+                {loadError[decor.id] && (
+                  <p className="text-xs text-red-500 text-center mt-1">Image not available</p>
+                )}
+              </div>
+              
+              {/* Size indicator */}
+              {!loadError[decor.id] && (
+                <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
+                  <span className="text-xs font-medium text-primary-dark">
+                    {decor.size.width}×{decor.size.height}
+                  </span>
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

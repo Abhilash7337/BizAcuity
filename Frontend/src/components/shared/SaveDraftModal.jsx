@@ -120,7 +120,7 @@ const SaveDraftModal = ({
       
       // Show success message and navigate
       alert('Design saved successfully!');
-      navigate('/landing');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Save draft error:', error);
       setSaveError(error.message || 'Failed to save draft. Please try again.');

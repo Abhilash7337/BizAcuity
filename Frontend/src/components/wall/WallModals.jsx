@@ -33,15 +33,7 @@ const WallModals = ({
         draftId={draftId}
         registeredUser={registeredUser}
         wallData={wallData}
-        onDraftCreated={(newDraftId) => {
-          // Update URL with new draft ID if one was created
-          if (newDraftId && !draftId) {
-            window.history.replaceState(null, '', `/wall?draftId=${newDraftId}&shared=true&collaborate=true`);
-          }
-          if (onDraftCreated) {
-            onDraftCreated(newDraftId);
-          }
-        }}
+        onDraftCreated={onDraftCreated} // Pass through the original function without override
       />
     </>
   );

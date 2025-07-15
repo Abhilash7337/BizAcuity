@@ -151,6 +151,19 @@ const ShareModal = ({
         if (onDraftCreated) {
           onDraftCreated(finalDraftId);
         }
+      } else {
+        // For existing drafts, make sure they are marked as public for sharing
+        const updateResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            isPublic: true
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          console.warn('Failed to update draft as public, but continuing with share');
+        }
       }
 
       // Generate shareable URL

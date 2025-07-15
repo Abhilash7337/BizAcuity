@@ -13,6 +13,8 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
   const [photoRemoved, setPhotoRemoved] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
@@ -43,37 +45,61 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setSaveStatus({ 
-          type: 'error', 
-          message: 'Please select a valid image file' 
-        });
-        return;
-      }
+      processImageFile(file);
+    }
+  };
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setSaveStatus({ 
-          type: 'error', 
-          message: 'Image size must be less than 5MB' 
-        });
-        return;
-      }
+  const processImageFile = (file) => {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setSaveStatus({ 
+        type: 'error', 
+        message: 'Please select a valid image file' 
+      });
+      return;
+    }
 
-      setProfilePhoto(file);
-      
-      // Create preview and convert to base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64String = e.target.result;
-        setPhotoPreview(base64String);
-        setProfilePhotoBase64(base64String);
-      };
-      reader.readAsDataURL(file);
-      
-      setPhotoRemoved(false); // Reset removed flag when new photo is selected
-      setSaveStatus({ type: '', message: '' });
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveStatus({ 
+        type: 'error', 
+        message: 'Image size must be less than 5MB' 
+      });
+      return;
+    }
+
+    setProfilePhoto(file);
+    
+    // Create preview and convert to base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64String = e.target.result;
+      setPhotoPreview(base64String);
+      setProfilePhotoBase64(base64String);
+    };
+    reader.readAsDataURL(file);
+    
+    setPhotoRemoved(false);
+    setSaveStatus({ type: '', message: '' });
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      processImageFile(file);
     }
   };
 
@@ -151,6 +177,9 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
       // Reset photo removed flag after successful update
       setPhotoRemoved(false);
       
+      // Exit edit mode
+      setIsEditing(false);
+      
       // Trigger parent component to refresh user data
       if (onProfileUpdate) {
         onProfileUpdate(data.user);
@@ -171,177 +200,159 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Profile Photo Section */}
-      <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Profile Photo
-        </label>
-        
-        <div className="flex items-center space-x-6">
-          {/* Photo Preview */}
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
-              {photoPreview ? (
-                <img 
-                  src={photoPreview} 
-                  alt="Profile preview" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              )}
+    <div className="space-y-6">
+      {!isEditing ? (
+        // View Mode
+        <div className="space-y-6">
+          {/* User Information Display */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-primary uppercase tracking-wide">Full Name</label>
+              <div className="bg-primary-light/20 rounded-xl p-4 border border-primary-light/30">
+                <p className="text-primary-dark font-semibold text-lg">{user?.name || 'Not set'}</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-primary uppercase tracking-wide">Email Address</label>
+              <div className="bg-primary-light/20 rounded-xl p-4 border border-primary-light/30">
+                <p className="text-primary-dark font-semibold text-lg">{user?.email || 'Not set'}</p>
+              </div>
             </div>
           </div>
 
-          {/* Upload Controls */}
-          <div className="flex-1 space-y-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
-            
-            <div className="flex space-x-2">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 text-sm font-medium text-primary-dark bg-white border border-primary-dark rounded-lg hover:bg-primary-dark hover:text-white transition-colors duration-200"
-              >
-                Upload Photo
-              </button>
-              
-              {photoPreview && (
+          {/* Current Plan Display */}
+          <div className="space-y-3">
+            <label className="text-base font-bold text-primary uppercase tracking-wide">Current Plan</label>
+            <div className="bg-gradient-to-r from-primary-light/20 to-accent/20 rounded-xl p-5 border border-primary-light/30">
+              <div className="flex items-center justify-between">
+                <p className="text-primary-dark font-bold text-xl">
+                  {user?.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) + ' Plan' : 'No plan selected'}
+                </p>
                 <button
                   type="button"
-                  onClick={handleRemovePhoto}
-                  className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors duration-200"
+                  onClick={() => navigate('/choose-plan')}
+                  className="px-6 py-3 bg-primary-dark text-white rounded-xl text-base font-bold hover:bg-primary transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
-                  Remove
+                  {user?.plan ? 'Change Plan' : 'Choose Plan'}
                 </button>
-              )}
+              </div>
             </div>
-            
-            <p className="text-xs text-gray-500">
-              JPG, PNG or GIF. Max size 5MB.
-            </p>
           </div>
+
+          {/* Edit Button */}
+          <button
+            onClick={() => setIsEditing(true)}
+            className="w-full bg-gradient-to-r from-primary to-primary-dark text-white py-5 px-8 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300"
+          >
+            <span className="flex items-center justify-center gap-4">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Profile
+            </span>
+          </button>
         </div>
-      </div>
+      ) : (
+        // Edit Mode
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-black uppercase tracking-wide">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full px-4 py-4 rounded-2xl border-2 border-primary-light/30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300 bg-white/80 backdrop-blur-sm font-medium text-primary-dark"
+                required
+              />
+            </div>
 
-      {/* Name Field */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Full Name
-        </label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                   focus:outline-none focus:ring-2 focus:ring-purple-500/20 
-                   focus:border-purple-500 transition-all duration-200
-                   bg-white/50 backdrop-blur-sm"
-          required
-        />
-      </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-black uppercase tracking-wide">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-4 rounded-2xl border-2 border-primary-light/30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300 bg-white/80 backdrop-blur-sm font-medium text-primary-dark"
+                required
+              />
+            </div>
+          </div>
 
-      {/* Email Field */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Email Address
-        </label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                   focus:outline-none focus:ring-2 focus:ring-purple-500/20 
-                   focus:border-purple-500 transition-all duration-200
-                   bg-white/50 backdrop-blur-sm"
-          required
-        />
-      </div>
-
-      {/* Current Plan Display */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Current Plan
-        </label>
-        <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600">
-          {user?.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) : 'No plan selected'}
-        </div>
-      </div>
-
-      {/* Choose Plan Button */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Subscription Plan
-        </label>
-        <button
-          type="button"
-          onClick={() => navigate('/choose-plan')}
-          className="w-full px-4 py-3 rounded-xl text-white font-semibold
-                   bg-primary-dark hover:bg-primary
-                   transition-all duration-200 shadow-md
-                   hover:shadow-lg hover:scale-[1.02]"
-        >
-          {user?.plan ? 'Change Plan' : 'Choose Plan'}
-        </button>
-      </div>
-
-      {/* Status Messages */}
-      {saveStatus.type && (
-        <div className={`p-4 rounded-xl border text-sm font-medium flex items-center gap-2 ${
-          saveStatus.type === 'success' 
-            ? 'bg-[#eee3cb] border-[#967e76] text-[#967e76]' 
-            : 'bg-red-50 border-red-100 text-red-600'
-        }`}>
-          {saveStatus.type === 'success' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+          {/* Status Messages */}
+          {saveStatus.type && (
+            <div className={`p-4 rounded-2xl border-2 text-sm font-medium flex items-center gap-3 ${
+              saveStatus.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-700' 
+                : 'bg-red-50 border-red-200 text-red-700'
+            }`}>
+              {saveStatus.type === 'success' ? (
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              )}
+              {saveStatus.message}
+            </div>
           )}
-          {saveStatus.message}
-        </div>
-      )}
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 px-6 rounded-xl text-white font-semibold
-                 bg-primary-dark hover:bg-primary
-                 transition-all duration-200 shadow-md
-                 hover:shadow-lg hover:scale-[1.02]
-                 disabled:opacity-50 disabled:cursor-not-allowed
-                 disabled:hover:scale-100"
-      >
-        {loading ? (
-          <div className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Updating Profile...
+          {/* Action Buttons */}
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditing(false);
+                setSaveStatus({ type: '', message: '' });
+                // Reset form data
+                if (user) {
+                  setFormData({
+                    name: user.name || '',
+                    email: user.email || '',
+                    userType: user.userType || 'regular'
+                  });
+                  if (user.profilePhoto) {
+                    setPhotoPreview(user.profilePhoto);
+                  }
+                }
+              }}
+              className="flex-1 bg-gray-100 text-gray-700 py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-gray-200 transition-all duration-300"
+            >
+              Cancel
+            </button>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving Changes...
+                </div>
+              ) : (
+                <span className="flex items-center justify-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Save Changes
+                </span>
+              )}
+            </button>
           </div>
-        ) : (
-          'Update Profile'
-        )}
-      </button>
-    </form>
+        </form>
+      )}
+    </div>
   );
 };
 
