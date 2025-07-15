@@ -10,6 +10,7 @@ function DraggableImage({
   wallHeight,
   isSelected,
   setSelectedIdx,
+  isViewOnly = false
 }) {
   if (!imageState) return null;
 
@@ -106,7 +107,7 @@ function DraggableImage({
       minHeight={50}
       maxWidth={wallWidth}
       maxHeight={wallHeight}
-      enableResizing={{
+      enableResizing={!isViewOnly && {
         bottomRight: true,
         bottom: false,
         right: false,
@@ -116,8 +117,9 @@ function DraggableImage({
         topRight: false,
         bottomLeft: false,
       }}
+      disableDragging={isViewOnly}
       resizeHandleComponent={
-        isSelected
+        isSelected && !isViewOnly
           ? {
               bottomRight: (
                 <div
@@ -135,14 +137,16 @@ function DraggableImage({
             }
           : undefined
       }
-      onDragStart={() => setSelectedIdx(idx)}
+      onDragStart={() => !isViewOnly && setSelectedIdx(idx)}
       onDragStop={(e, d) => {
+        if (isViewOnly) return;
         const x = Math.max(0, Math.min(d.x, wallWidth - imageState.width));
         const y = Math.max(0, Math.min(d.y, wallHeight - imageState.height));
         updateImageState({ x, y });
       }}
-      onResizeStart={() => setSelectedIdx(idx)}
+      onResizeStart={() => !isViewOnly && setSelectedIdx(idx)}
       onResizeStop={(e, direction, ref, delta, position) => {
+        if (isViewOnly) return;
         const width = Math.min(parseInt(ref.style.width, 10), wallWidth);
         const height = Math.min(parseInt(ref.style.height, 10), wallHeight);
         const x = Math.max(0, Math.min(position.x, wallWidth - width));
@@ -156,17 +160,19 @@ function DraggableImage({
         });
       }}
       style={{
-        border: isSelected ? '2px dotted #1976d2' : 'none',
+        border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
         background: 'transparent',
         zIndex: isSelected ? 100 : (imageState.zIndex || idx + 1),
         overflow: 'visible',
-        cursor: 'move',
+        cursor: isViewOnly ? 'default' : 'move',
         position: 'absolute',
         ...styleOverrides,
       }}
       onClick={(e) => {
         e.stopPropagation();
-        setSelectedIdx(idx);
+        if (!isViewOnly) {
+          setSelectedIdx(idx);
+        }
       }}
     >
       {Object.keys(wrapperStyle).length > 0 ? (

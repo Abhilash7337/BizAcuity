@@ -22,6 +22,7 @@ const ShareModal = ({
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [shareMode, setShareMode] = useState('link'); // 'link' or 'users'
+  const [linkPermission, setLinkPermission] = useState('edit'); // 'edit' or 'view'
 
   // Fetch current user ID when modal opens
   useEffect(() => {
@@ -140,6 +141,7 @@ const ShareModal = ({
             name: `Shared Wall ${new Date().toLocaleDateString()}`,
             wallData: wallData,
             isPublic: true,
+            linkPermission: linkPermission, // Add permission to draft
             previewImage: null
           }),
         });
@@ -157,7 +159,8 @@ const ShareModal = ({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            isPublic: true
+            isPublic: true,
+            linkPermission: linkPermission // Update permission
           }),
         });
 
@@ -166,8 +169,8 @@ const ShareModal = ({
         }
       }
 
-      // Generate shareable URL
-      const shareableUrl = `${window.location.origin}/wall?draftId=${finalDraftId}&shared=true`;
+      // Generate shareable URL with permission parameter
+      const shareableUrl = `${window.location.origin}/wall?draftId=${finalDraftId}&shared=true&permission=${linkPermission}`;
       setShareUrl(shareableUrl);
       setIsLoading(false);
     } catch (error) {
@@ -177,12 +180,12 @@ const ShareModal = ({
     }
   };
 
-  // Start sharing process when modal opens
+  // Start sharing process when modal opens or permission changes
   useEffect(() => {
     if (showModal && shareMode === 'link' && !shareUrl && !error) {
       handleShare();
     }
-  }, [showModal, shareMode]);
+  }, [showModal, shareMode, linkPermission]);
 
   if (!showModal) return null;
 
@@ -218,6 +221,49 @@ const ShareModal = ({
             Share with Users
           </button>
         </div>
+
+        {/* Link Permission Selector - Only show in link mode */}
+        {shareMode === 'link' && (
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Link Permissions:</h3>
+            <div className="space-y-2">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  value="edit"
+                  checked={linkPermission === 'edit'}
+                  onChange={(e) => {
+                    setLinkPermission(e.target.value);
+                    setShareUrl(''); // Reset URL to regenerate with new permission
+                    setShareSuccess(false);
+                  }}
+                  className="mr-3 text-primary focus:ring-primary"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-800">Can Edit</span>
+                  <p className="text-xs text-gray-600">Anyone with this link can view and modify the wall design</p>
+                </div>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  value="view"
+                  checked={linkPermission === 'view'}
+                  onChange={(e) => {
+                    setLinkPermission(e.target.value);
+                    setShareUrl(''); // Reset URL to regenerate with new permission
+                    setShareSuccess(false);
+                  }}
+                  className="mr-3 text-primary focus:ring-primary"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-800">View Only</span>
+                  <p className="text-xs text-gray-600">Anyone with this link can only view the wall design</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        )}
 
         {error ? (
           <div className="mb-6">
@@ -332,7 +378,9 @@ const ShareModal = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <p className="text-gray-600 mb-4">Link copied to clipboard!</p>
+            <p className="text-gray-600 mb-4">
+              {linkPermission === 'edit' ? 'Editable link' : 'View-only link'} copied to clipboard!
+            </p>
             <div className="flex items-center p-2 bg-gray-100 rounded-lg mb-4">
               <input 
                 type="text" 
@@ -344,7 +392,9 @@ const ShareModal = ({
           </div>
         ) : shareUrl ? (
           <div className="py-4">
-            <p className="text-gray-600 mb-4">Share this link to let anyone view your wall design:</p>
+            <p className="text-gray-600 mb-4">
+              Share this link to let anyone {linkPermission === 'edit' ? 'view and edit' : 'view'} your wall design:
+            </p>
             <div className="flex items-center p-2 bg-gray-100 rounded-lg mb-4">
               <input 
                 type="text" 
@@ -365,6 +415,31 @@ const ShareModal = ({
                 </svg>
               </button>
             </div>
+            {/* Permission indicator */}
+            <div className="flex items-center justify-center">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                linkPermission === 'edit' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : 'bg-green-100 text-green-800'
+              }`}>
+                {linkPermission === 'edit' ? (
+                  <>
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Can Edit
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    View Only
+                  </>
+                )}
+              </span>
+            </div>
           </div>
         ) : null}
 
@@ -378,6 +453,7 @@ const ShareModal = ({
               setSelectedUsers([]);
               setSearchQuery('');
               setSearchResults([]);
+              setLinkPermission('edit'); // Reset permission to default
             }}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 transition"
           >
