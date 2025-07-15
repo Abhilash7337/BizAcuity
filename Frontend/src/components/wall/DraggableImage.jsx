@@ -179,6 +179,8 @@ function DraggableImage({
               height: '100%',
               pointerEvents: 'none',
               objectFit: 'cover',
+              transform: `rotate(${imageState.rotation || 0}deg)`,
+              transition: 'transform 0.2s ease-in-out',
             }}
             draggable={false}
           />
@@ -192,6 +194,8 @@ function DraggableImage({
             height: '100%',
             pointerEvents: 'none',
             objectFit: 'cover',
+            transform: `rotate(${imageState.rotation || 0}deg)`,
+            transition: 'transform 0.2s ease-in-out',
             ...styleOverrides,
           }}
           draggable={false}

@@ -21,6 +21,9 @@ router.get('/drafts', verifyToken, getUserDrafts);
 // Get specific draft - Protected, but allows access to shared drafts
 router.get('/drafts/single/:draftId', verifyToken, getDraftById);
 
+// Public route for shared drafts (no authentication required)
+router.get('/drafts/shared/:draftId', getDraftById);
+
 // Update draft - Protected
 router.put('/drafts/:draftId', verifyToken, updateDraft);
 

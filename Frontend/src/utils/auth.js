@@ -114,3 +114,34 @@ export const clearAuthData = () => {
         delete window.userProfileCache;
     }
 };
+
+// Redirect functionality for shared links
+export const setIntendedDestination = (path) => {
+    if (path && path !== '/login' && path !== '/register') {
+        console.log('Setting intended destination:', path);
+        localStorage.setItem('intendedDestination', path);
+    }
+};
+
+export const getIntendedDestination = () => {
+    const destination = localStorage.getItem('intendedDestination');
+    console.log('Getting intended destination:', destination);
+    return destination;
+};
+
+export const clearIntendedDestination = () => {
+    console.log('Clearing intended destination');
+    localStorage.removeItem('intendedDestination');
+};
+
+export const getPostAuthRedirect = () => {
+    const intended = getIntendedDestination();
+    console.log('getPostAuthRedirect - intended destination:', intended);
+    if (intended) {
+        clearIntendedDestination();
+        console.log('getPostAuthRedirect - using intended destination:', intended);
+        return intended;
+    }
+    console.log('getPostAuthRedirect - no intended destination, returning /dashboard');
+    return '/dashboard';
+};

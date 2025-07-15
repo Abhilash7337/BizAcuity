@@ -47,7 +47,7 @@ const AdminDashboard = () => {
   // Check if user is admin
   useEffect(() => {
     if (registeredUser && (registeredUser.userType !== 'admin' || registeredUser.email !== 'admin@gmail.com')) {
-      navigate('/landing');
+      navigate('/dashboard');
       return;
     }
     if (registeredUser?.userType === 'admin' && registeredUser?.email === 'admin@gmail.com') {

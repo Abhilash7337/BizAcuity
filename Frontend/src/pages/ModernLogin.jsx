@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../App';
-import { Header, Footer } from '../components/layout';
 import { setToken, setAuthUser, isAuthenticated, getPostAuthRedirect, getIntendedDestination, clearIntendedDestination } from '../utils/auth';
 
 const Login = () => {
@@ -93,11 +92,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-secondary to-accent relative overflow-hidden">
-      {/* Header */}
-      <Header />
-      
       {/* Animated Background Elements */}
-      <div className="absolute inset-0 opacity-15 pointer-events-none">
+      <div className="absolute inset-0 opacity-15">
         {/* Floating picture frames */}
         <div className="absolute top-10 left-10 w-24 h-16 bg-white border-3 border-primary-dark rounded-lg shadow-md transform rotate-12 animate-float">
           <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-300 rounded"></div>
@@ -118,8 +114,27 @@ const Login = () => {
         <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-accent rounded-full animate-ping delay-150"></div>
       </div>
 
+      {/* Navigation */}
+      <nav className="relative z-50 bg-white/95 backdrop-blur-sm shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <Link to="/" className="text-2xl font-bold font-poppins text-primary-dark hover:text-primary transition-colors duration-300">
+              Picture Wall Designer
+            </Link>
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/" 
+                className="text-primary-dark hover:text-primary font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary-light"
+              >
+                ← Back to Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8 pt-24">
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           {/* Welcome Section with Animation */}
           <div className={`text-center mb-8 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -313,9 +328,6 @@ const Login = () => {
           </div>
         </div>
       </main>
-      
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

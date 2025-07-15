@@ -9,7 +9,27 @@ const WallHeader = ({
   wallRef
 }) => {
   return (
-    <div className="flex justify-between items-center px-8 py-4 bg-surface shadow-md" style={{ gridArea: 'header' }}>
+    <div className="flex justify-between items-center px-8 py-4 sticky top-0 z-30"
+         style={{
+           background: `linear-gradient(135deg, 
+             rgba(255, 255, 255, 0.95) 0%, 
+             rgba(249, 250, 251, 0.9) 100%)`,
+           backdropFilter: 'blur(20px)',
+           borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+           boxShadow: `
+             0 4px 6px -1px rgba(0, 0, 0, 0.05),
+             0 0 0 1px rgba(255, 255, 255, 0.8),
+             inset 0 1px 0 rgba(255, 255, 255, 0.9)
+           `
+         }}>
+      
+      {/* Header Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)`,
+          backgroundSize: '40px 100%'
+        }}></div>
+      </div>
       <div className="flex items-center">
         <h1 className="text-2xl font-bold text-primary-dark">Wall Designer</h1>
         {isSharedView && (

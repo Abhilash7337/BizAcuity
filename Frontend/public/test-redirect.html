@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Redirect Functionality</title>
+</head>
+<body>
+    <h1>Test Redirect Functionality</h1>
+    <div id="localStorage-content"></div>
+    
+    <script>
+        function displayLocalStorage() {
+            const container = document.getElementById('localStorage-content');
+            container.innerHTML = '<h2>LocalStorage Contents:</h2>';
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                container.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            }
+            
+            // Specifically check for intendedDestination
+            const intended = localStorage.getItem('intendedDestination');
+            container.innerHTML += `<h3>Intended Destination: ${intended || 'Not set'}</h3>`;
+        }
+        
+        displayLocalStorage();
+        
+        // Refresh every 2 seconds
+        setInterval(displayLocalStorage, 2000);
+    </script>
+</body>
+</html>
