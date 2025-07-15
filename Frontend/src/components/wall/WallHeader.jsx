@@ -14,9 +14,9 @@ const WallHeader = ({
          style={{
            background: `linear-gradient(135deg, 
              rgba(255, 255, 255, 0.95) 0%, 
-             rgba(249, 250, 251, 0.9) 100%)`,
+             rgba(254, 243, 199, 0.9) 100%)`,
            backdropFilter: 'blur(20px)',
-           borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+           borderBottom: '1px solid rgba(249, 115, 22, 0.2)',
            boxShadow: `
              0 4px 6px -1px rgba(0, 0, 0, 0.05),
              0 0 0 1px rgba(255, 255, 255, 0.8),
@@ -27,14 +27,14 @@ const WallHeader = ({
       {/* Header Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(90deg, rgba(249, 115, 22, 0.1) 1px, transparent 1px)`,
           backgroundSize: '40px 100%'
         }}></div>
       </div>
       <div className="flex items-center">
-        <h1 className="text-2xl font-bold text-primary-dark">Wall Designer</h1>
+        <h1 className="text-2xl font-bold text-orange-800">Wall Designer</h1>
         {isSharedView && (
-          <span className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+          <span className="ml-3 px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
             {isCollaborating ? 'Collaborative Mode' : isViewOnly ? 'View Only' : 'Shared View'}
           </span>
         )}
@@ -48,7 +48,7 @@ const WallHeader = ({
         {!isViewOnly && (
           <button
             onClick={() => setShowSaveModal(true)}
-            className="bg-primary-dark text-secondary px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:bg-primary transition flex items-center gap-2"
+            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
           >
             <span>Save Draft</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -60,7 +60,7 @@ const WallHeader = ({
         {!isViewOnly && (
           <button
             onClick={() => setShowShareModal(true)}
-            className="bg-primary-dark text-secondary px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:bg-primary transition flex items-center gap-2"
+            className="bg-orange-100 hover:bg-orange-200 text-orange-700 hover:text-orange-800 px-4 py-2 rounded-lg text-base font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
           >
             <span>Share</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

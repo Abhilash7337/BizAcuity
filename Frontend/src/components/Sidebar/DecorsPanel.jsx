@@ -129,15 +129,15 @@ const DecorsPanel = ({ onAddDecor }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-r from-pink-200/50 to-yellow-200/50 rounded-xl">
-          <Flower2 className="w-5 h-5 text-primary-dark" />
+        <div className="p-2 bg-gradient-to-r from-orange-300/50 to-orange-400/50 rounded-xl">
+          <Flower2 className="w-5 h-5 text-orange-700" />
         </div>
-        <h3 className="text-primary-dark font-bold text-lg">Decorations</h3>
+        <h3 className="text-orange-800 font-bold text-lg">Decorations</h3>
       </div>
 
       {/* Category Navigation */}
       <div className="space-y-3">
-        <div className="text-xs font-semibold text-primary-dark/60 uppercase tracking-wider">Categories</div>
+        <div className="text-xs font-semibold text-orange-600 uppercase tracking-wider">Categories</div>
         <div className="grid grid-cols-1 gap-2">
           {Object.entries(decorCategories).map(([key, category]) => (
             <button
@@ -145,8 +145,8 @@ const DecorsPanel = ({ onAddDecor }) => {
               onClick={() => setActiveCategory(key)}
               className={`w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 text-left ${
                 activeCategory === key
-                  ? 'bg-gradient-to-r from-primary-dark to-primary text-white shadow-lg transform scale-105'
-                  : 'bg-white/60 backdrop-blur-sm text-primary-dark hover:bg-white/80 hover:scale-102'
+                  ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-lg transform scale-105'
+                  : 'bg-white/60 backdrop-blur-sm text-orange-700 hover:bg-white/80 hover:scale-102'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -163,8 +163,8 @@ const DecorsPanel = ({ onAddDecor }) => {
       {/* Active Category Items */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-primary rounded-full"></div>
-          <span className="text-sm font-semibold text-primary-dark/80">
+          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+          <span className="text-sm font-semibold text-orange-700">
             {decorCategories[activeCategory].name} Collection
           </span>
         </div>
@@ -177,7 +177,7 @@ const DecorsPanel = ({ onAddDecor }) => {
               className={`group relative rounded-xl overflow-hidden border-2 border-white/40 shadow-lg transition-all duration-300 cursor-pointer animate-fade-in-up ${
                 loadError[decor.id] 
                   ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:scale-105 hover:shadow-xl hover:border-primary/50'
+                  : 'hover:scale-105 hover:shadow-xl hover:border-orange-400/50'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -200,7 +200,7 @@ const DecorsPanel = ({ onAddDecor }) => {
               </div>
               
               <div className="p-3 bg-white/80 backdrop-blur-sm">
-                <p className="text-sm font-semibold text-primary-dark text-center">
+                <p className="text-sm font-semibold text-orange-800 text-center">
                   {decor.name}
                 </p>
                 {loadError[decor.id] && (
@@ -211,7 +211,7 @@ const DecorsPanel = ({ onAddDecor }) => {
               {/* Size indicator */}
               {!loadError[decor.id] && (
                 <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span className="text-xs font-medium text-primary-dark">
+                  <span className="text-xs font-medium text-orange-700">
                     {decor.size.width}×{decor.size.height}
                   </span>
                 </div>

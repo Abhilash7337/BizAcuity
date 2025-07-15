@@ -108,10 +108,7 @@ const Login = () => {
           <div className="w-full h-full bg-gradient-to-br from-pink-200 to-pink-300 rounded"></div>
         </div>
         
-        {/* Floating particles */}
-        <div className="absolute top-1/4 left-1/3 w-2 h-2 bg-primary rounded-full animate-ping"></div>
-        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-primary-dark rounded-full animate-ping delay-75"></div>
-        <div className="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 bg-accent rounded-full animate-ping delay-150"></div>
+
       </div>
 
       {/* Navigation */}

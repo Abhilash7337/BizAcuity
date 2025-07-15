@@ -84,7 +84,7 @@ const ExportButton = ({ wallRef }) => {
       <button
         onClick={() => setShowDropdown(!showDropdown)}
         disabled={exporting}
-        className="bg-primary-dark text-secondary px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:bg-primary transition flex items-center gap-2"
+        className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
       >
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -104,14 +104,14 @@ const ExportButton = ({ wallRef }) => {
       {showDropdown && (
         <div 
           ref={dropdownRef}
-          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-orange-200 ring-opacity-50 z-50"
         >
           <div className="py-1" role="menu">
             {['PNG', 'JPEG', 'PDF'].map((format) => (
               <button
                 key={format}
                 onClick={() => handleExport(format.toLowerCase())}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                className="w-full text-left px-4 py-2 text-sm text-orange-700 hover:bg-orange-50 hover:text-orange-800"
                 role="menuitem"
               >
                 Export as {format}

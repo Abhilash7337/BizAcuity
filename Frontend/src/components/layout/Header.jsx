@@ -33,7 +33,7 @@ const Header = () => {
         <div className="flex items-center py-4">
           {/* Logo - Far Left */}
           <div className="flex items-center">
-            <Link to="/home" className="text-2xl font-bold font-poppins text-primary-dark hover:text-primary transition-colors duration-300">
+            <Link to="/home" className="text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
               Picture Wall Designer
             </Link>
           </div>
@@ -44,26 +44,26 @@ const Header = () => {
               <>
                 <Link 
                   to="/dashboard" 
-                  className={`text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-primary font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   to="/wall" 
-                  className={`text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-primary font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Wall Designer
                 </Link>
                 <Link 
                   to="/user" 
-                  className={`text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-primary font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Profile
                 </Link>
                 {registeredUser?.userType === 'admin' && registeredUser?.email === 'admin@gmail.com' && (
                   <Link 
                     to="/admin" 
-                    className={`text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-primary font-semibold' : ''}`}
+                    className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-orange-600 font-semibold' : ''}`}
                   >
                     Admin
                   </Link>
@@ -73,25 +73,25 @@ const Header = () => {
               <>
                 <Link 
                   to="/" 
-                  className={`text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-primary font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Home
                 </Link>
                 <Link 
                   to="#about" 
-                  className="text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                 >
                   About Us
                 </Link>
                 <Link 
                   to="#faq" 
-                  className="text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                 >
                   FAQ
                 </Link>
                 <Link 
                   to="#blog" 
-                  className="text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                 >
                   Blog
                 </Link>
@@ -106,12 +106,12 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (
               <>
-                <span className="text-primary-dark font-medium font-inter">
+                <span className="text-orange-700 font-medium font-inter">
                   Hi, {registeredUser?.name}
                 </span>
                 <button
                   onClick={onLogout}
-                  className="text-primary-dark hover:text-primary font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary-light"
+                  className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-50"
                 >
                   Logout
                 </button>
@@ -120,13 +120,13 @@ const Header = () => {
               <>
                 <button
                   onClick={handleLogin}
-                  className="text-primary-dark hover:text-primary font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary-light"
+                  className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-50"
                 >
                   Log in
                 </button>
                 <button
                   onClick={handleCreateWall}
-                  className="bg-primary-dark hover:bg-primary text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
                   Create Wall
                 </button>
@@ -138,7 +138,7 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-primary-dark hover:text-primary focus:outline-none focus:text-primary transition-colors duration-300"
+              className="text-orange-700 hover:text-orange-600 focus:outline-none focus:text-orange-600 transition-colors duration-300"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
@@ -159,21 +159,21 @@ const Header = () => {
                 <>
                   <Link
                     to="/dashboard"
-                    className={`block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-primary font-semibold' : ''}`}
+                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/wall"
-                    className={`block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-primary font-semibold' : ''}`}
+                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Wall Designer
                   </Link>
                   <Link
                     to="/user"
-                    className={`block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-primary font-semibold' : ''}`}
+                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Profile
@@ -181,14 +181,14 @@ const Header = () => {
                   {registeredUser?.userType === 'admin' && registeredUser?.email === 'admin@gmail.com' && (
                     <Link
                       to="/admin"
-                      className={`block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-primary font-semibold' : ''}`}
+                      className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-orange-600 font-semibold' : ''}`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Admin
                     </Link>
                   )}
                   <div className="border-t border-gray-200 pt-3 mt-3">
-                    <div className="px-3 py-2 text-primary-dark font-medium font-inter">
+                    <div className="px-3 py-2 text-orange-700 font-medium font-inter">
                       Hi, {registeredUser?.name}
                     </div>
                     <button
@@ -196,7 +196,7 @@ const Header = () => {
                         onLogout();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="block w-full text-left px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                      className="block w-full text-left px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                     >
                       Logout
                     </button>
@@ -206,28 +206,28 @@ const Header = () => {
                 <>
                   <Link
                     to="/"
-                    className={`block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-primary font-semibold' : ''}`}
+                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Home
                   </Link>
                   <Link
                     to="#about"
-                    className="block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     About Us
                   </Link>
                   <Link
                     to="#faq"
-                    className="block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     FAQ
                   </Link>
                   <Link
                     to="#blog"
-                    className="block px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Blog
@@ -238,7 +238,7 @@ const Header = () => {
                         handleLogin();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="block w-full text-left px-3 py-2 text-primary-dark hover:text-primary font-medium font-inter transition-colors duration-300"
+                      className="block w-full text-left px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
                     >
                       Log in
                     </button>
@@ -247,7 +247,7 @@ const Header = () => {
                         handleCreateWall();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="block w-full mt-2 bg-primary-dark hover:bg-primary text-white font-semibold px-3 py-2 rounded-lg transition-all duration-300"
+                      className="block w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-3 py-2 rounded-lg transition-all duration-300"
                     >
                       Create Wall
                     </button>
