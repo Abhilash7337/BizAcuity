@@ -18,6 +18,7 @@ const draftRoutes = require('./routes/draft');
 const uploadRoutes = require('./routes/upload');
 const adminRoutes = require('./routes/admin-simple');
 const sharingRoutes = require('./routes/sharing');
+const decorRoutes = require('./routes/decor');
 
 const app = express();
 const PORT = 5001;
@@ -43,6 +44,7 @@ app.use('/', draftRoutes);                  // Draft management routes
 app.use('/', uploadRoutes);                 // File upload routes
 app.use('/admin', adminRoutes);             // Admin management routes
 app.use('/', sharingRoutes);                // Sharing management routes
+app.use('/', decorRoutes);                  // Decor management routes
 
 // Health check endpoint
 app.get('/health', (req, res) => {

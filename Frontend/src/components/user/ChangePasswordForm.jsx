@@ -85,9 +85,8 @@ const ChangePasswordForm = () => {
         <button
           onClick={() => setIsUpdatingPassword(!isUpdatingPassword)}
           className="w-full py-3 px-6 rounded-xl text-white font-semibold
-                   bg-primary-dark hover:bg-primary
-                   transition-all duration-200 shadow-md
-                   hover:shadow-lg hover:scale-[1.02]"
+                   bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
+                   transition-all duration-200 shadow-xl hover:scale-105"
         >
           {isUpdatingPassword ? 'Cancel Password Update' : 'Change Password'}
         </button>
@@ -105,10 +104,10 @@ const ChangePasswordForm = () => {
               name="currentPassword"
               value={passwordForm.currentPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                       focus:outline-none focus:ring-2 focus:ring-purple-500/20 
-                       focus:border-purple-500 transition-all duration-200
-                       bg-white/50 backdrop-blur-sm"
+              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
+                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+                       focus:border-orange-400 transition-all duration-300
+                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
               required
             />
           </div>
@@ -122,10 +121,10 @@ const ChangePasswordForm = () => {
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                       focus:outline-none focus:ring-2 focus:ring-purple-500/20 
-                       focus:border-purple-500 transition-all duration-200
-                       bg-white/50 backdrop-blur-sm"
+              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
+                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+                       focus:border-orange-400 transition-all duration-300
+                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
               required
             />
           </div>
@@ -139,22 +138,22 @@ const ChangePasswordForm = () => {
               name="confirmPassword"
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                       focus:outline-none focus:ring-2 focus:ring-purple-500/20 
-                       focus:border-purple-500 transition-all duration-200
-                       bg-white/50 backdrop-blur-sm"
+              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
+                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+                       focus:border-orange-400 transition-all duration-300
+                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
               required
             />
           </div>
 
           {updateError && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm">
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm">
               {updateError}
             </div>
           )}
 
           {updateSuccess && (
-            <div className="p-4 rounded-xl bg-[#eee3cb] border border-[#967e76] text-[#967e76] text-sm font-medium flex items-center gap-2">
+            <div className="p-4 rounded-2xl bg-orange-50 border border-orange-200 text-orange-900 text-sm font-medium flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -164,10 +163,9 @@ const ChangePasswordForm = () => {
 
           <button
             type="submit"
-            className="w-full py-3 px-6 rounded-xl text-white font-semibold
-                     bg-primary-dark hover:bg-primary
-                     transition-all duration-200 shadow-md
-                     hover:shadow-lg hover:scale-[1.02]"
+            className="w-full py-3 px-6 rounded-2xl text-white font-semibold
+                     bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
+                     transition-all duration-200 shadow-xl hover:scale-105"
           >
             Update Password
           </button>

@@ -70,13 +70,17 @@ export const logout = () => {
 // Create authenticated fetch function
 export const authFetch = async (url, options = {}) => {
     const token = getToken();
+    // Add base URL for backend API
+    const baseURL = 'http://localhost:5001';
+    const fullURL = url.startsWith('http') ? url : `${baseURL}${url}`;
+    
     if (token) {
         options.headers = {
             ...options.headers,
             'Authorization': `Bearer ${token}`
         };
     }
-    return fetch(url, options);
+    return fetch(fullURL, options);
 };
 
 // Fetch sensitive user data from server when needed (instead of storing in localStorage)

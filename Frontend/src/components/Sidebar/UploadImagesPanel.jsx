@@ -1,52 +1,93 @@
 import React from 'react';
 import { Upload, X, Image, Plus } from 'lucide-react';
 
-const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
+const UploadImagesPanel = ({ 
+  imagesInputRef, 
+  images, 
+  handleRemoveImage, 
+  imageUploadLimit = null, 
+  imageUploadPlan = '' 
+}) => (
   <div className="space-y-6">
     <div className="flex items-center gap-3 mb-6">
       <div className="p-2 bg-gradient-to-r from-orange-300/50 to-orange-400/50 rounded-xl">
         <Image className="w-5 h-5 text-orange-700" />
       </div>
-      <h3 className="text-orange-800 font-bold text-lg">Your Images</h3>
+      <div className="flex-1">
+        <h3 className="text-orange-800 font-bold text-lg">Your Images</h3>
+        {imageUploadLimit !== null && (
+          <div className="text-xs text-orange-600 mt-1">
+            {imageUploadLimit === -1 ? (
+              <span className="text-green-600 font-medium">✓ Unlimited uploads ({imageUploadPlan})</span>
+            ) : (
+              <span>
+                {images.length}/{imageUploadLimit} images used ({imageUploadPlan})
+                {images.length >= imageUploadLimit && (
+                  <span className="text-red-600 font-medium ml-2">• Limit reached!</span>
+                )}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </div>
 
     {/* Upload Button */}
     <div className="relative">
-      {/* Direct file input overlay */}
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={(e) => {
-          console.log('📁 Direct images file input triggered');
-          if (e.target.files?.length > 0 && imagesInputRef?.current) {
-            // Copy files to the hidden input to maintain existing workflow
-            const dt = new DataTransfer();
-            Array.from(e.target.files).forEach(file => dt.items.add(file));
-            imagesInputRef.current.files = dt.files;
-            
-            // Trigger the existing change handler
-            const changeEvent = new Event('change', { bubbles: true });
-            imagesInputRef.current.dispatchEvent(changeEvent);
-            console.log('� Files forwarded to main handler');
-          }
-        }}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-        title="Upload Images"
-      />
-      
-      {/* Visual button underneath */}
-      <div className="w-full bg-gradient-to-r from-orange-400/10 to-orange-500/10 border-2 border-dashed border-orange-300/50 rounded-xl px-6 py-8 transition-all duration-300 hover:border-orange-400 hover:bg-gradient-to-r hover:from-orange-400/20 hover:to-orange-500/20 group">
-        <div className="flex flex-col items-center gap-3">
-          <div className="p-3 bg-white/60 rounded-full group-hover:scale-110 transition-transform duration-300">
-            <Plus className="w-6 h-6 text-orange-700" />
-          </div>
-          <div className="text-center">
-            <div className="text-sm font-semibold text-orange-800">Add Images</div>
-            <div className="text-xs text-orange-600 mt-1">Upload multiple images at once</div>
+      {/* Check if upload should be disabled */}
+      {imageUploadLimit !== null && imageUploadLimit !== -1 && images.length >= imageUploadLimit ? (
+        /* Disabled state when limit reached */
+        <div className="w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl px-6 py-8 opacity-50">
+          <div className="flex flex-col items-center gap-3">
+            <div className="p-3 bg-gray-200 rounded-full">
+              <Plus className="w-6 h-6 text-gray-400" />
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-500">Upload Limit Reached</div>
+              <div className="text-xs text-gray-400 mt-1">Remove some images to add more</div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Active upload area */
+        <>
+          {/* Direct file input overlay */}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              console.log('📁 Direct images file input triggered');
+              if (e.target.files?.length > 0 && imagesInputRef?.current) {
+                // Copy files to the hidden input to maintain existing workflow
+                const dt = new DataTransfer();
+                Array.from(e.target.files).forEach(file => dt.items.add(file));
+                imagesInputRef.current.files = dt.files;
+                
+                // Trigger the existing change handler
+                const changeEvent = new Event('change', { bubbles: true });
+                imagesInputRef.current.dispatchEvent(changeEvent);
+                console.log('� Files forwarded to main handler');
+              }
+            }}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            title="Upload Images"
+          />
+          
+          {/* Visual button underneath */}
+          <div className="w-full bg-gradient-to-r from-orange-400/10 to-orange-500/10 border-2 border-dashed border-orange-300/50 rounded-xl px-6 py-8 transition-all duration-300 hover:border-orange-400 hover:bg-gradient-to-r hover:from-orange-400/20 hover:to-orange-500/20 group">
+            <div className="flex flex-col items-center gap-3">
+              <div className="p-3 bg-white/60 rounded-full group-hover:scale-110 transition-transform duration-300">
+                <Plus className="w-6 h-6 text-orange-700" />
+              </div>
+              <div className="text-center">
+                <div className="text-sm font-semibold text-orange-800">Add Images</div>
+                <div className="text-xs text-orange-600 mt-1">Upload multiple images at once</div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
 
     {/* Image Gallery */}
@@ -94,25 +135,34 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
         
         {/* Quick Actions */}
         <div className="flex gap-2">
-          <button
-            type="button"
-            className="flex-1 bg-white/60 backdrop-blur-sm border border-orange-200/40 rounded-lg px-3 py-2 text-xs font-semibold text-orange-700 transition-all duration-300 hover:bg-white/80"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Add More button clicked');
-              console.log('imagesInputRef.current:', imagesInputRef.current);
-              if (imagesInputRef && imagesInputRef.current) {
-                console.log('Triggering file input click');
-                imagesInputRef.current.click();
-              } else {
-                console.error('imagesInputRef is null or undefined');
-              }
-            }}
-          >
-            <Upload className="w-3 h-3 inline mr-1" />
-            Add More
-          </button>
+          {imageUploadLimit !== null && imageUploadLimit !== -1 && images.length >= imageUploadLimit ? (
+            /* Disabled Add More button */
+            <div className="flex-1 bg-gray-200 border border-gray-300 rounded-lg px-3 py-2 text-xs font-semibold text-gray-400 opacity-50">
+              <Upload className="w-3 h-3 inline mr-1" />
+              Limit Reached
+            </div>
+          ) : (
+            /* Active Add More button */
+            <button
+              type="button"
+              className="flex-1 bg-white/60 backdrop-blur-sm border border-orange-200/40 rounded-lg px-3 py-2 text-xs font-semibold text-orange-700 transition-all duration-300 hover:bg-white/80"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Add More button clicked');
+                console.log('imagesInputRef.current:', imagesInputRef.current);
+                if (imagesInputRef && imagesInputRef.current) {
+                  console.log('Triggering file input click');
+                  imagesInputRef.current.click();
+                } else {
+                  console.error('imagesInputRef is null or undefined');
+                }
+              }}
+            >
+              <Upload className="w-3 h-3 inline mr-1" />
+              Add More
+            </button>
+          )}
         </div>
       </div>
     )}

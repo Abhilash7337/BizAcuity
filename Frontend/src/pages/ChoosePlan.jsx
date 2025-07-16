@@ -174,7 +174,7 @@ const ChoosePlan = () => {
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Plan Limits:</h4>
                           <ul className="text-xs text-gray-600 space-y-1">
                             <li>
-                              Designs: {plan.limits.designsPerMonth === -1 ? 'Unlimited' : `${plan.limits.designsPerMonth}/month`}
+                              Saved Drafts: {plan.limits.designsPerMonth === -1 ? 'Unlimited' : `${plan.limits.designsPerMonth} draft${plan.limits.designsPerMonth !== 1 ? 's' : ''}`}
                             </li>
                             <li>Export Quality: {plan.limits.exportResolution || 'HD'}</li>
                             <li>Storage: {plan.limits.storageGB || 1}GB</li>

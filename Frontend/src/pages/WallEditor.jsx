@@ -22,6 +22,8 @@ import {
   DecorsPanel 
 } from '../components/sidebar';
 
+import ExportButton from '../components/shared/ExportButton';
+
 const MIN_SIZE = 200;
 const MAX_SIZE = 2000;
 
@@ -45,6 +47,8 @@ function WallEditor() {
   const [images, setImages] = useState([]);
   const [imageStates, setImageStates] = useState([]);
   const [selectedIdx, setSelectedIdx] = useState(null);
+  const [imageUploadLimit, setImageUploadLimit] = useState(null);
+  const [imageUploadPlan, setImageUploadPlan] = useState('');
 
   // UI State
   const [activeTab, setActiveTab] = useState('editor');
@@ -70,6 +74,41 @@ function WallEditor() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const draftId = searchParams.get('draftId');
+
+  // Fetch image upload limits
+  useEffect(() => {
+    const fetchImageUploadLimits = async () => {
+      try {
+        if (!registeredUser?.isLoggedIn) {
+          setImageUploadLimit(1); // Guest users get 1 image for testing
+          setImageUploadPlan('Guest');
+          return;
+        }
+
+        const response = await authFetch('http://localhost:5001/drafts/image-upload-status');
+        
+        if (!response.ok) {
+          console.warn('Could not fetch image upload limits. Status:', response.status);
+          const errorText = await response.text();
+          console.warn('Error response:', errorText);
+          setImageUploadLimit(1); // Default fallback
+          setImageUploadPlan('Unknown');
+          return;
+        }
+
+        const data = await response.json();
+        setImageUploadLimit(data.allowedLimit);
+        setImageUploadPlan(data.planName || 'Current Plan');
+        console.log('Image upload limits loaded:', data);
+      } catch (error) {
+        console.error('Error fetching image upload limits:', error);
+        setImageUploadLimit(1); // Default fallback
+        setImageUploadPlan('Unknown');
+      }
+    };
+
+    fetchImageUploadLimits();
+  }, [registeredUser]);
 
   // Load user wall data
   useEffect(() => {
@@ -315,11 +354,67 @@ function WallEditor() {
     }
   };
 
+  // Check image upload limits
+  const checkImageUploadLimits = async (newImagesCount) => {
+    try {
+      if (!registeredUser?.isLoggedIn) {
+        // For non-logged in users, allow up to 1 image (guest limit)
+        const currentCount = images.length;
+        const totalAfterUpload = currentCount + newImagesCount;
+        if (totalAfterUpload > 1) {
+          throw new Error(`Guest users can only upload up to 1 image per design. You currently have ${currentCount} images and are trying to add ${newImagesCount} more.`);
+        }
+        return true;
+      }
+
+      console.log('Checking image upload limits...');
+      const response = await authFetch('http://localhost:5001/drafts/image-upload-status');
+      
+      if (!response.ok) {
+        console.warn('Could not check image upload limits, allowing upload');
+        return true; // Allow upload if we can't check limits
+      }
+
+      const data = await response.json();
+      console.log('Image upload status:', data);
+
+      const { allowedLimit, currentUsage } = data;
+      const currentCount = images.length;
+      const totalAfterUpload = currentCount + newImagesCount;
+
+      // Check if unlimited (-1)
+      if (allowedLimit === -1) {
+        console.log('Unlimited image uploads allowed');
+        return true;
+      }
+
+      // Check if within limit
+      if (totalAfterUpload > allowedLimit) {
+        const planName = data.planName || 'Current plan';
+        throw new Error(
+          `${planName} allows only ${allowedLimit} image${allowedLimit !== 1 ? 's' : ''} per design. ` +
+          `You currently have ${currentCount} image${currentCount !== 1 ? 's' : ''} and are trying to add ${newImagesCount} more. ` +
+          `Please upgrade your plan or remove some existing images.`
+        );
+      }
+
+      console.log(`Image upload allowed: ${totalAfterUpload}/${allowedLimit} images`);
+      return true;
+
+    } catch (error) {
+      console.error('Image upload limit check failed:', error);
+      throw error;
+    }
+  };
+
   const handleImageChange = async (e) => {
     console.log('handleImageChange called', e.target.files);
     const files = Array.from(e.target.files);
     console.log('Images selected:', files);
     try {
+      // Check image upload limits before proceeding
+      await checkImageUploadLimits(files.length);
+      
       const uploadPromises = files.map(async (file) => {
         const formData = new FormData();
         formData.append('image', file);
@@ -367,7 +462,13 @@ function WallEditor() {
       setImageStates(prevStates => [...prevStates, ...newStates]);
     } catch (error) {
       console.error('Error uploading images:', error);
-      alert('Failed to upload one or more images. Please try again.');
+      
+      // Show specific error message for limit errors
+      if (error.message && (error.message.includes('allows only') || error.message.includes('Guest users'))) {
+        alert(error.message);
+      } else {
+        alert('Failed to upload one or more images. Please try again.');
+      }
     }
   };
 
@@ -547,6 +648,8 @@ function WallEditor() {
         imagesInputRef={imagesInputRef}
         images={images}
         handleRemoveImage={handleRemoveImage}
+        imageUploadLimit={imageUploadLimit}
+        imageUploadPlan={imageUploadPlan}
       />
     );
   } else if (activeTab === 'editor') {
@@ -955,7 +1058,7 @@ function WallEditor() {
               <div className="flex items-center gap-3">
                 <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-4 4a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <span className="font-semibold text-sm">
@@ -1004,7 +1107,6 @@ function WallEditor() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </button>
-          
           <button 
             onClick={() => setShowShareModal(true)}
             className="w-14 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle delay-100 transform hover:scale-110"
@@ -1014,7 +1116,10 @@ function WallEditor() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
             </svg>
           </button>
-          
+          {/* Export Button - new floating action button */}
+          <div className="w-14 h-14">
+            <ExportButton wallRef={wallRef} />
+          </div>
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="w-12 h-12 bg-white/90 hover:bg-white text-orange-600 rounded-full shadow-lg transition-all duration-300 animate-pulse transform hover:scale-110"

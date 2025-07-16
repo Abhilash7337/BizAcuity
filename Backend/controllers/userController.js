@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Subscription = require('../models/Subscription');
+const Plan = require('../models/Plan');
 
 // Get user by ID
 const getUserById = async (req, res) => {
@@ -105,8 +107,14 @@ const choosePlan = async (req, res) => {
   try {
     const { plan } = req.body;
     
-    if (!plan || !['regular', 'pro'].includes(plan)) {
-      return res.status(400).json({ error: 'Invalid plan selection' });
+    // Validate plan selection against allowed values
+    const validPlans = ['free', 'regular', 'pro', 'enterprise'];
+    if (!plan || !validPlans.includes(plan)) {
+      return res.status(400).json({ 
+        error: 'Invalid plan selection',
+        validPlans: validPlans,
+        receivedPlan: plan
+      });
     }
 
     const user = await User.findById(req.userId);
@@ -114,13 +122,48 @@ const choosePlan = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Get the plan details from the Plan collection
+    const planDetails = await Plan.findOne({ name: plan });
+    const planPrice = planDetails ? planDetails.monthlyPrice : 0;
+
     // Update user's plan
     user.plan = plan;
     await user.save();
 
+    // Create or update user's subscription
+    let subscription = await Subscription.findOne({ userId: req.userId });
+    
+    if (!subscription) {
+      // Create new subscription
+      subscription = new Subscription({
+        userId: req.userId,
+        plan: plan,
+        status: 'active',
+        billingCycle: 'monthly',
+        amount: planPrice,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        autoRenew: false
+      });
+    } else {
+      // Update existing subscription
+      subscription.plan = plan;
+      subscription.amount = planPrice;
+      subscription.status = 'active';
+      subscription.startDate = new Date();
+      subscription.endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    }
+    
+    await subscription.save();
+
     res.json({
       message: 'Plan selected successfully',
       plan: user.plan,
+      subscription: {
+        plan: subscription.plan,
+        amount: subscription.amount,
+        status: subscription.status
+      },
       user: {
         id: user._id,
         name: user.name,
