@@ -435,11 +435,27 @@ function WallEditor() {
 
         const data = await response.json();
         console.log('Image upload successful:', data);
+        console.log('Generated URL:', data.url);
+        console.log('URL type:', typeof data.url);
+        console.log('URL length:', data.url?.length);
         return data.url;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
       console.log('All images uploaded:', uploadedUrls);
+      console.log('Sample URL test:', uploadedUrls[0]);
+      
+      // Test if URLs are accessible
+      for (let i = 0; i < uploadedUrls.length; i++) {
+        const url = uploadedUrls[i];
+        try {
+          console.log(`Testing URL ${i}: ${url}`);
+          const testResponse = await fetch(url, { method: 'HEAD' });
+          console.log(`URL ${i} status: ${testResponse.status}`);
+        } catch (error) {
+          console.error(`URL ${i} test failed:`, error);
+        }
+      }
       
       const newStates = uploadedUrls.map((_, index) => {
         const baseX = 100;
@@ -460,6 +476,9 @@ function WallEditor() {
 
       setImages(prevImages => [...prevImages, ...uploadedUrls]);
       setImageStates(prevStates => [...prevStates, ...newStates]);
+      
+      console.log('🎯 Final images array:', [...images, ...uploadedUrls]);
+      console.log('🎯 Final imageStates array:', [...imageStates, ...newStates]);
     } catch (error) {
       console.error('Error uploading images:', error);
       

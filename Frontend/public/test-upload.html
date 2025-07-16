@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            background: #fee;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+            background: #efe;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Upload Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Backend Connection</h2>
+        <button onclick="testBackend()">Test Backend Health</button>
+        <div id="backend-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Static File Access</h2>
+        <button onclick="testStaticFile()">Test Static File</button>
+        <div id="static-result"></div>
+        <img id="static-image" class="image-preview" style="display: none;" />
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Image Upload</h2>
+        <input type="file" id="imageInput" accept="image/*" />
+        <button onclick="testUpload()">Upload Image</button>
+        <div id="upload-result"></div>
+        <img id="uploaded-image" class="image-preview" style="display: none;" />
+    </div>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('backend-result');
+            try {
+                const response = await fetch('http://localhost:5001/health');
+                const data = await response.json();
+                resultDiv.innerHTML = `<div class="success">✅ Backend is running: ${JSON.stringify(data)}</div>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Backend connection failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testStaticFile() {
+            const resultDiv = document.getElementById('static-result');
+            const imageEl = document.getElementById('static-image');
+            const testImageUrl = 'http://localhost:5001/uploads/0fc669cac3ae64c21a1513c0b1f01d888ad1f50a8464fbb5f60058f03d929ff0.png';
+            
+            try {
+                const response = await fetch(testImageUrl);
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ Static file accessible</div>`;
+                    imageEl.src = testImageUrl;
+                    imageEl.style.display = 'block';
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Static file not accessible: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Static file test failed: ${error.message}</div>`;
+            }
+        }
+
+        async function testUpload() {
+            const resultDiv = document.getElementById('upload-result');
+            const imageEl = document.getElementById('uploaded-image');
+            const fileInput = document.getElementById('imageInput');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = `<div class="error">Please select an image first</div>`;
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+
+                // First try without auth
+                resultDiv.innerHTML = `<div>Uploading without auth...</div>`;
+                const response = await fetch('http://localhost:5001/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `<div class="success">✅ Upload successful: ${JSON.stringify(data)}</div>`;
+                    imageEl.src = data.url;
+                    imageEl.style.display = 'block';
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="error">❌ Upload failed: ${response.status} - ${errorText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Upload error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
