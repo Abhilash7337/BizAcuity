@@ -4,10 +4,10 @@ import { Upload, X, Image, Plus } from 'lucide-react';
 const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
   <div className="space-y-6">
     <div className="flex items-center gap-3 mb-6">
-      <div className="p-2 bg-gradient-to-r from-green-200/50 to-blue-200/50 rounded-xl">
-        <Image className="w-5 h-5 text-primary-dark" />
+      <div className="p-2 bg-gradient-to-r from-orange-300/50 to-orange-400/50 rounded-xl">
+        <Image className="w-5 h-5 text-orange-700" />
       </div>
-      <h3 className="text-primary-dark font-bold text-lg">Your Images</h3>
+      <h3 className="text-orange-800 font-bold text-lg">Your Images</h3>
     </div>
 
     {/* Upload Button */}
@@ -36,14 +36,14 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
       />
       
       {/* Visual button underneath */}
-      <div className="w-full bg-gradient-to-r from-green-500/10 to-blue-500/10 border-2 border-dashed border-green-300/50 rounded-xl px-6 py-8 transition-all duration-300 hover:border-green-400 hover:bg-gradient-to-r hover:from-green-500/20 hover:to-blue-500/20 group">
+      <div className="w-full bg-gradient-to-r from-orange-400/10 to-orange-500/10 border-2 border-dashed border-orange-300/50 rounded-xl px-6 py-8 transition-all duration-300 hover:border-orange-400 hover:bg-gradient-to-r hover:from-orange-400/20 hover:to-orange-500/20 group">
         <div className="flex flex-col items-center gap-3">
           <div className="p-3 bg-white/60 rounded-full group-hover:scale-110 transition-transform duration-300">
-            <Plus className="w-6 h-6 text-primary-dark" />
+            <Plus className="w-6 h-6 text-orange-700" />
           </div>
           <div className="text-center">
-            <div className="text-sm font-semibold text-primary-dark">Add Images</div>
-            <div className="text-xs text-primary-dark/60 mt-1">Upload multiple images at once</div>
+            <div className="text-sm font-semibold text-orange-800">Add Images</div>
+            <div className="text-xs text-orange-600 mt-1">Upload multiple images at once</div>
           </div>
         </div>
       </div>
@@ -53,8 +53,8 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
     {images.length > 0 && (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-primary rounded-full"></div>
-          <span className="text-sm font-semibold text-primary-dark/80">
+          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+          <span className="text-sm font-semibold text-orange-700">
             {images.length} image{images.length !== 1 ? 's' : ''} added
           </span>
         </div>
@@ -86,7 +86,7 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
               
               {/* Image index */}
               <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
-                <span className="text-xs font-bold text-primary-dark">{idx + 1}</span>
+                <span className="text-xs font-bold text-orange-700">{idx + 1}</span>
               </div>
             </div>
           ))}
@@ -96,7 +96,7 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
         <div className="flex gap-2">
           <button
             type="button"
-            className="flex-1 bg-white/60 backdrop-blur-sm border border-white/40 rounded-lg px-3 py-2 text-xs font-semibold text-primary-dark transition-all duration-300 hover:bg-white/80"
+            className="flex-1 bg-white/60 backdrop-blur-sm border border-orange-200/40 rounded-lg px-3 py-2 text-xs font-semibold text-orange-700 transition-all duration-300 hover:bg-white/80"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -120,10 +120,10 @@ const UploadImagesPanel = ({ imagesInputRef, images, handleRemoveImage }) => (
     {/* Empty state message */}
     {images.length === 0 && (
       <div className="text-center py-8">
-        <div className="text-primary-dark/60 text-sm">
+        <div className="text-orange-600 text-sm">
           No images added yet
         </div>
-        <div className="text-primary-dark/40 text-xs mt-1">
+        <div className="text-orange-500 text-xs mt-1">
           Upload images to start designing your wall
         </div>
       </div>

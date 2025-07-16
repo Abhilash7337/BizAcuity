@@ -6,7 +6,7 @@ import { authFetch, fetchUserProfile, getToken } from '../utils/auth';
 import { Image } from 'lucide-react';
 
 // Components
-import { Header } from '../components/layout';
+import { Header, Footer } from '../components/layout';
 import { 
   WallHeader, 
   WallSidebar, 
@@ -54,6 +54,8 @@ function WallEditor() {
   const [loading, setLoading] = useState(false);
   const [isSharedView, setIsSharedView] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
+  const [isViewOnly, setIsViewOnly] = useState(false);
+  const [linkPermission, setLinkPermission] = useState('edit');
   const [isVisible, setIsVisible] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -164,8 +166,12 @@ function WallEditor() {
   useEffect(() => {
     const sharedParam = searchParams.get('shared');
     const collaborateParam = searchParams.get('collaborate');
+    const permissionParam = searchParams.get('permission');
+    
     setIsSharedView(sharedParam === 'true');
     setIsCollaborating(collaborateParam === 'true');
+    setLinkPermission(permissionParam || 'edit');
+    setIsViewOnly(permissionParam === 'view');
   }, [searchParams]);
 
   // Load draft and set up real-time updates
@@ -598,8 +604,114 @@ function WallEditor() {
   }
 
   return (
+    <>
+      {/* Animation Keyframes for Wall Editor */}
+      <style>{`
+        @keyframes cloudDrift {
+          0% { 
+            transform: translateX(-100px) translateY(0px) scale(1);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.3;
+          }
+          50% { 
+            transform: translateX(50vw) translateY(-20px) scale(1.1);
+            opacity: 0.6;
+          }
+          90% {
+            opacity: 0.3;
+          }
+          100% { 
+            transform: translateX(calc(100vw + 100px)) translateY(0px) scale(1);
+            opacity: 0;
+          }
+        }
+
+        @keyframes abstractMorph {
+          0%, 100% { 
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            transform: rotate(0deg) scale(1);
+          }
+          25% { 
+            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+            transform: rotate(90deg) scale(1.1);
+          }
+          50% { 
+            border-radius: 50% 30% 60% 40% / 30% 70% 40% 70%;
+            transform: rotate(180deg) scale(0.9);
+          }
+          75% { 
+            border-radius: 40% 70% 30% 60% / 70% 40% 60% 30%;
+            transform: rotate(270deg) scale(1.05);
+          }
+        }
+
+        @keyframes backgroundFlow {
+          0%, 100% { 
+            transform: translateX(0px) translateY(0px) scale(1); 
+            opacity: 0.6;
+          }
+          25% { 
+            transform: translateX(20px) translateY(-10px) scale(1.05); 
+            opacity: 0.8;
+          }
+          50% { 
+            transform: translateX(-15px) translateY(15px) scale(0.95); 
+            opacity: 0.7;
+          }
+          75% { 
+            transform: translateX(10px) translateY(-5px) scale(1.02); 
+            opacity: 0.9;
+          }
+        }
+
+        @keyframes gentleFloat {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          33% { transform: translateY(-8px) translateX(5px); }
+          66% { transform: translateY(5px) translateX(-3px); }
+        }
+
+        @keyframes drift {
+          0% { transform: translateX(0px) translateY(0px); }
+          25% { transform: translateX(10px) translateY(-5px); }
+          50% { transform: translateX(0px) translateY(-10px); }
+          75% { transform: translateX(-10px) translateY(-5px); }
+          100% { transform: translateX(0px) translateY(0px); }
+        }
+
+        @keyframes slowRotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        @keyframes gradientShift {
+          0%, 100% { 
+            background: linear-gradient(45deg, rgba(251, 146, 60, 0.1), rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
+          }
+          33% { 
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1), rgba(194, 65, 12, 0.1));
+          }
+          66% { 
+            background: linear-gradient(225deg, rgba(234, 88, 12, 0.1), rgba(194, 65, 12, 0.1), rgba(251, 146, 60, 0.1));
+          }
+        }
+
+        @keyframes mesh-move {
+          0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+          25% { transform: translate(20px, -15px) rotate(1deg); }
+          50% { transform: translate(-15px, 25px) rotate(-1deg); }
+          75% { transform: translate(10px, -20px) rotate(0.5deg); }
+        }
+      `}</style>
+
     <div 
-      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-primary-light via-secondary to-accent"
+      className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400"
       onClick={(e) => {
         // Unselect when clicking on background (but not on sidebar, buttons, or inputs)
         const clickedElement = e.target;
@@ -659,19 +771,108 @@ function WallEditor() {
         onChange={handleImageChange}
       />
       
-      {/* Enhanced Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
+      {/* Enhanced Background Animation Layer */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Main background container */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {/* Abstract morphing shapes for editor */}
+          <div 
+            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-300 to-orange-500 opacity-15 blur-xl"
+            style={{animation: 'abstractMorph 45s ease-in-out infinite'}}
+          ></div>
+          <div 
+            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 opacity-12 blur-xl"
+            style={{animation: 'abstractMorph 60s ease-in-out infinite reverse', animationDelay: '-20s'}}
+          ></div>
+          <div 
+            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-white to-orange-300 opacity-10 blur-lg"
+            style={{animation: 'abstractMorph 35s ease-in-out infinite', animationDelay: '-15s'}}
+          ></div>
+          
+          {/* Enhanced Flowing lines effect with SVG */}
+          <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path 
+              d="M0,50 Q25,25 50,50 T100,50" 
+              stroke="url(#editorFlowGradient)" 
+              strokeWidth="0.5" 
+              fill="none"
+              style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
+            />
+            <path 
+              d="M0,30 Q25,5 50,30 T100,30" 
+              stroke="url(#editorFlowGradient)" 
+              strokeWidth="0.3" 
+              fill="none"
+              style={{animation: 'backgroundFlow 50s ease-in-out infinite reverse', animationDelay: '-10s'}}
+            />
+            <path 
+              d="M0,70 Q25,95 50,70 T100,70" 
+              stroke="url(#editorFlowGradient)" 
+              strokeWidth="0.4" 
+              fill="none"
+              style={{animation: 'backgroundFlow 35s ease-in-out infinite', animationDelay: '-25s'}}
+            />
+            <defs>
+              <linearGradient id="editorFlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.6)" />
+                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.8)" />
+                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.6)" />
+              </linearGradient>
+            </defs>
+          </svg>
+          
+          {/* Additional gradient overlay animation */}
+          <div 
+            className="absolute inset-0 w-full h-full"
+            style={{animation: 'gradientShift 80s ease-in-out infinite'}}
+          ></div>
+        </div>
+      </div>
+
+      {/* Enhanced Background Pattern with Floating Elements */}
+      <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(152, 161, 188, 0.1) 0%, transparent 40%),
-                           radial-gradient(circle at 80% 20%, rgba(152, 161, 188, 0.08) 0%, transparent 50%),
-                           radial-gradient(circle at 40% 70%, rgba(222, 211, 196, 0.06) 0%, transparent 60%),
-                           radial-gradient(circle at 90% 80%, rgba(152, 161, 188, 0.1) 0%, transparent 45%)`
+          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.1) 0%, transparent 40%),
+                           radial-gradient(circle at 80% 20%, rgba(251, 146, 60, 0.08) 0%, transparent 50%),
+                           radial-gradient(circle at 40% 70%, rgba(234, 88, 12, 0.06) 0%, transparent 60%),
+                           radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 45%)`
         }}></div>
         
+        {/* Floating Picture Frame Elements */}
+        <div className="absolute top-20 left-10 w-32 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-12 hover:scale-110 transition-all duration-500" style={{animation: 'gentleFloat 20s ease-in-out infinite'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        <div className="absolute top-32 left-32 w-20 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-6 hover:rotate-0 transition-all duration-700" style={{animation: 'drift 25s ease-in-out infinite, slowRotate 40s linear infinite'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        
+        {/* Right side floating frames */}
+        <div className="absolute top-40 right-20 w-28 h-20 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-6 hover:-rotate-3 transition-all duration-500" style={{animation: 'float 18s ease-in-out infinite reverse'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        <div className="absolute top-16 right-40 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-12 hover:rotate-6 transition-all duration-700" style={{animation: 'gentleFloat 22s ease-in-out infinite, slowRotate 35s linear infinite reverse'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        
+        {/* Bottom floating frames */}
+        <div className="absolute bottom-40 left-20 w-36 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-3 hover:scale-105 transition-all duration-500" style={{animation: 'drift 30s ease-in-out infinite reverse'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        <div className="absolute bottom-20 right-16 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-8 hover:rotate-4 transition-all duration-700" style={{animation: 'float 16s ease-in-out infinite, slowRotate 45s linear infinite'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        
+        {/* Center floating frame */}
+        <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-lg rotate-3 hover:scale-110 hover:rotate-0 transition-all duration-700" style={{animation: 'gentleFloat 24s ease-in-out infinite reverse, slowRotate 50s linear infinite'}}>
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        </div>
+        
+
+        
         {/* Modern Floating Elements */}
-        <div className="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary-light/30 rounded-full blur-xl animate-pulse backdrop-blur-sm"></div>
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-secondary/20 to-accent/25 rounded-full blur-2xl animate-pulse delay-1000 backdrop-blur-sm"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-gradient-to-br from-primary-dark/15 to-text-primary/20 rounded-full blur-xl animate-pulse delay-2000 backdrop-blur-sm"></div>
+        <div className="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-orange-300/30 rounded-full blur-xl animate-pulse backdrop-blur-sm"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-orange-400/20 to-orange-600/25 rounded-full blur-2xl animate-pulse delay-1000 backdrop-blur-sm"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-gradient-to-br from-orange-700/15 to-orange-500/20 rounded-full blur-xl animate-pulse delay-2000 backdrop-blur-sm"></div>
         <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-gradient-to-br from-secondary/30 to-accent/20 rounded-full blur-lg animate-pulse delay-3000 backdrop-blur-sm"></div>
         
         {/* Animated Mesh Grid */}
@@ -708,6 +909,7 @@ function WallEditor() {
           setShowSaveModal={setShowSaveModal}
           setShowShareModal={setShowShareModal}
           wallRef={wallRef}
+          isViewOnly={isViewOnly}
           className="relative z-20 animate-fade-in-up"
         />
 
@@ -725,6 +927,7 @@ function WallEditor() {
           MIN_SIZE={MIN_SIZE}
           MAX_SIZE={MAX_SIZE}
           selectedIdx={selectedIdx}
+          isViewOnly={isViewOnly}
           className="animate-slide-in-left delay-200"
         />
 
@@ -741,8 +944,27 @@ function WallEditor() {
           setSelectedIdx={setSelectedIdx}
           setActiveTab={setActiveTab}
           setImageStates={setImageStates}
+          isViewOnly={isViewOnly}
           className="animate-slide-in-right delay-400"
         />
+
+        {/* View-Only Notification Banner */}
+        {isViewOnly && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-slide-in-down">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg backdrop-blur-sm border border-amber-300/30">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-sm">
+                  You're viewing this design in read-only mode
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Enhanced WallModals with Animation */}
         <WallModals
@@ -775,7 +997,7 @@ function WallEditor() {
         <div className="fixed bottom-8 right-8 z-30 flex flex-col gap-4">
           <button 
             onClick={() => setShowSaveModal(true)}
-            className="w-14 h-14 bg-primary-dark text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle"
+            className="w-14 h-14 bg-orange-600 hover:bg-orange-700 text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle transform hover:scale-110"
             title="Save Design"
           >
             <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -785,7 +1007,7 @@ function WallEditor() {
           
           <button 
             onClick={() => setShowShareModal(true)}
-            className="w-14 h-14 bg-accent text-primary-dark rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle delay-100"
+            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle delay-100 transform hover:scale-110"
             title="Share Design"
           >
             <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -795,7 +1017,7 @@ function WallEditor() {
           
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="w-12 h-12 bg-white/80 text-primary-dark rounded-full shadow-lg transition-all duration-300 animate-pulse"
+            className="w-12 h-12 bg-white/90 hover:bg-white text-orange-600 rounded-full shadow-lg transition-all duration-300 animate-pulse transform hover:scale-110"
             title="Back to Top"
           >
             <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -804,7 +1026,11 @@ function WallEditor() {
           </button>
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
+    </>
   );
 }
 

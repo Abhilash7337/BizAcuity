@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth');
+const { getPublicPlans } = require('../controllers/planController');
 const { 
   getUserById, 
   getUserProfile,
@@ -9,6 +10,9 @@ const {
   choosePlan, 
   searchUsers 
 } = require('../controllers/userController');
+
+// Public route - Get active plans
+router.get('/api/plans', getPublicPlans);
 
 // Protected route - Get current user profile (use token)
 router.get('/user/profile', verifyToken, getUserProfile);

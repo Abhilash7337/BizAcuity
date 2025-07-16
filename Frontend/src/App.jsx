@@ -7,7 +7,7 @@ import Landing from './pages/Landing'
 import PublicLanding from './pages/PublicLanding'
 import User from './pages/User'
 import ChoosePlan from './pages/ChoosePlan'
-import AdminDashboard from './pages/AdminDashboardModular'
+import Admin from './pages/Admin'
 import { ProtectedRoute } from './components/user'
 import './index.css'
 import { Upload, Settings, Palette, Image as LucideImage, Ruler, Trash2, Download, X } from 'lucide-react'
@@ -113,7 +113,7 @@ function App() {
           } />
           <Route path="/admin" element={
             <ProtectedRoute>
-              <AdminDashboard />
+              <Admin />
             </ProtectedRoute>
           } />
         </Routes>
