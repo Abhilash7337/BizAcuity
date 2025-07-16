@@ -16,7 +16,7 @@ const fallbackAuthRoutes = require('./routes/fallbackAuth');
 const userRoutes = require('./routes/user');
 const draftRoutes = require('./routes/draft');
 const uploadRoutes = require('./routes/upload');
-const adminRoutes = require('./routes/admin');
+const adminRoutes = require('./routes/admin-simple');
 const sharingRoutes = require('./routes/sharing');
 
 const app = express();
@@ -41,8 +41,8 @@ app.use('/', fallbackAuthRoutes);           // Fallback auth routes (direct logi
 app.use('/', userRoutes);                   // User management routes
 app.use('/', draftRoutes);                  // Draft management routes
 app.use('/', uploadRoutes);                 // File upload routes
-app.use('/', adminRoutes);                  // Admin management routes
-app.use('/', sharingRoutes);                // Admin sharing management routes
+app.use('/admin', adminRoutes);             // Admin management routes
+app.use('/', sharingRoutes);                // Sharing management routes
 
 // Health check endpoint
 app.get('/health', (req, res) => {

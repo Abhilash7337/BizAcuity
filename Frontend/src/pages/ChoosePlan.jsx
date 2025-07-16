@@ -8,6 +8,8 @@ const ChoosePlan = () => {
   const [selectedPlan, setSelectedPlan] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [plans, setPlans] = useState([]);
+  const [plansLoading, setPlansLoading] = useState(true);
   const { setRegisteredUser } = useContext(UserContext);
 
   const navigate = useNavigate();
@@ -18,35 +20,38 @@ const ChoosePlan = () => {
     if (currentUser?.plan) {
       setSelectedPlan(currentUser.plan);
     }
+    
+    // Fetch available plans
+    fetchPlans();
   }, []);
 
-  const plans = [
-    {
-      id: 'regular',
-      name: 'Regular',
-      price: 'Free',
-      features: [
-        'Basic wall design tools',
-        'Up to 10 saved designs',
-        'Standard decorators'
-        ],
-      description: 'Perfect for getting started with wall design'
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: '₹299/month',
-      features: [
-        'Advanced design tools',
-        'Unlimited saved designs',
-        'Premium templates',
-        'Priority support',
-        'Export high-resolution images',
-        'Collaboration features'
-      ],
-      description: 'For professional designers and power users'
+  const fetchPlans = async () => {
+    try {
+      setPlansLoading(true);
+      const response = await fetch('http://localhost:5001/api/plans');
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Convert backend plan structure to frontend format
+        const formattedPlans = data.plans.map(plan => ({
+          id: plan.name.toLowerCase().replace(/\s+/g, ''),
+          name: plan.name,
+          price: plan.monthlyPrice === 0 ? 'Free' : `₹${plan.monthlyPrice}/month`,
+          features: plan.features || [],
+          description: plan.description,
+          limits: plan.limits
+        }));
+        setPlans(formattedPlans);
+      } else {
+        throw new Error(data.error || 'Failed to fetch plans');
+      }
+    } catch (err) {
+      console.error('Fetch plans error:', err);
+      setError('Failed to load subscription plans');
+    } finally {
+      setPlansLoading(false);
     }
-  ];
+  };
 
   const handlePlanSelect = (planId) => {
     setSelectedPlan(planId);
@@ -119,92 +124,117 @@ const ChoosePlan = () => {
             </p>
           </div>
 
-          {/* Plan Selection Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Plan Cards */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`relative p-6 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
-                    selectedPlan === plan.id
-                      ? 'border-primary-dark bg-white/90 shadow-lg scale-[1.02]'
-                      : 'border-gray-200 bg-white/80 hover:border-primary/50 hover:scale-[1.01]'
-                  }`}
-                  onClick={() => handlePlanSelect(plan.id)}
-                >
-                  {/* Selection Indicator */}
-                  {selectedPlan === plan.id && (
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary-dark rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
+          {/* Loading State */}
+          {plansLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-dark mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading subscription plans...</p>
+            </div>
+          ) : (
+            <>
+              {/* Plan Selection Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Plan Cards */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className={`relative p-6 rounded-2xl border-2 transition-all duration-200 cursor-pointer ${
+                        selectedPlan === plan.id
+                          ? 'border-primary-dark bg-white/90 shadow-lg scale-[1.02]'
+                          : 'border-gray-200 bg-white/80 hover:border-primary/50 hover:scale-[1.01]'
+                      }`}
+                      onClick={() => handlePlanSelect(plan.id)}
+                    >
+                      {/* Selection Indicator */}
+                      {selectedPlan === plan.id && (
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary-dark rounded-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
 
-                  {/* Plan Header */}
-                  <div className="text-center mb-4">
-                    <h3 className="text-2xl font-bold mb-2" style={{ color: '#625d8c' }}>
-                      {plan.name}
-                    </h3>
-                    <div className="text-3xl font-bold text-primary-dark mb-2">
-                      {plan.price}
-                    </div>
-                    <p className="text-gray-600 text-sm">
-                      {plan.description}
-                    </p>
-                  </div>
+                      {/* Plan Header */}
+                      <div className="text-center mb-4">
+                        <h3 className="text-2xl font-bold mb-2" style={{ color: '#625d8c' }}>
+                          {plan.name}
+                        </h3>
+                        <div className="text-3xl font-bold text-primary-dark mb-2">
+                          {plan.price}
+                        </div>
+                        <p className="text-gray-600 text-sm">
+                          {plan.description}
+                        </p>
+                      </div>
 
-                  {/* Features List */}
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-gray-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                      {/* Plan Limits */}
+                      {plan.limits && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Plan Limits:</h4>
+                          <ul className="text-xs text-gray-600 space-y-1">
+                            <li>
+                              Designs: {plan.limits.designsPerMonth === -1 ? 'Unlimited' : `${plan.limits.designsPerMonth}/month`}
+                            </li>
+                            <li>Export Quality: {plan.limits.exportResolution || 'HD'}</li>
+                            <li>Storage: {plan.limits.storageGB || 1}GB</li>
+                            <li>Support: {plan.limits.supportLevel || 'Basic'}</li>
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Features List */}
+                      <ul className="space-y-3">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-start">
+                            <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-gray-700">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-center">
-                {error}
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="text-center">
-              <button
-                type="submit"
-                disabled={loading || !selectedPlan}
-                className="px-8 py-4 rounded-xl text-white font-semibold text-lg
-                         bg-primary-dark hover:bg-primary
-                         transition-all duration-200 shadow-md
-                         hover:shadow-lg hover:scale-[1.02]
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         disabled:hover:scale-100"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Processing...
+                {/* Error Message */}
+                {error && (
+                  <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-center">
+                    {error}
                   </div>
-                ) : (
-                  getAuthUser()?.plan 
-                    ? `Update to ${selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'Plan'}`
-                    : `Continue with ${selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'Plan'}`
                 )}
-              </button>
-            </div>
-          </form>
+
+                {/* Submit Button */}
+                <div className="text-center">
+                  <button
+                    type="submit"
+                    disabled={loading || !selectedPlan}
+                    className="px-8 py-4 rounded-xl text-white font-semibold text-lg
+                             bg-primary-dark hover:bg-primary
+                             transition-all duration-200 shadow-md
+                             hover:shadow-lg hover:scale-[1.02]
+                             disabled:opacity-50 disabled:cursor-not-allowed
+                             disabled:hover:scale-100"
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </div>
+                    ) : (
+                      getAuthUser()?.plan 
+                        ? `Update to ${selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'Plan'}`
+                        : `Continue with ${selectedPlan ? plans.find(p => p.id === selectedPlan)?.name : 'Plan'}`
+                    )}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </main>
     </div>
