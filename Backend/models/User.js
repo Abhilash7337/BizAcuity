@@ -29,10 +29,15 @@ const userSchema = new mongoose.Schema({
         enum: ['regular', 'admin'],
         default: 'regular'
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     plan: {
         type: String,
-        enum: ['regular', 'pro'],
-        default: 'regular'
+        enum: ['free', 'regular', 'pro', 'enterprise'],
+        default: 'free'
     },
     isVerified: {
         type: Boolean,

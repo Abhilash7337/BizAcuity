@@ -1,5 +1,8 @@
 const Draft = require('../models/Draft');
 const SharedDraft = require('../models/SharedDraft');
+const User = require('../models/User');
+const Subscription = require('../models/Subscription');
+const Plan = require('../models/Plan');
 
 // Create new draft
 const createDraft = async (req, res) => {
@@ -15,6 +18,39 @@ const createDraft = async (req, res) => {
           previewImage: !previewImage
         }
       });
+    }
+
+    // Check user's current subscription and plan limits
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let draftLimit = 1; // Default limit for free users
+    
+    if (subscription && subscription.plan) {
+      // Find the plan details to get the draft limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.designsPerMonth !== undefined) {
+        draftLimit = plan.limits.designsPerMonth;
+      }
+    }
+
+    // If unlimited drafts allowed (-1), skip limit check
+    if (draftLimit !== -1) {
+      // Count user's existing drafts
+      const existingDraftsCount = await Draft.countDocuments({ userId: req.userId });
+      
+      if (existingDraftsCount >= draftLimit) {
+        return res.status(403).json({ 
+          error: 'Draft limit exceeded',
+          message: `You have reached your plan limit of ${draftLimit} saved draft${draftLimit > 1 ? 's' : ''}. Please upgrade your plan or delete existing drafts to continue.`,
+          currentCount: existingDraftsCount,
+          limit: draftLimit
+        });
+      }
     }
 
     const draft = new Draft({
@@ -295,6 +331,78 @@ const removeFromSharedDraft = async (req, res) => {
   }
 };
 
+// Get user's draft status and limits
+const getDraftStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let draftLimit = 1; // Default limit for free users
+    let planName = 'Free';
+    
+    if (subscription && subscription.plan) {
+      planName = subscription.plan;
+      // Find the plan details to get the draft limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.designsPerMonth !== undefined) {
+        draftLimit = plan.limits.designsPerMonth;
+      }
+    }
+
+    // Count user's existing drafts
+    const currentDrafts = await Draft.countDocuments({ userId: req.userId });
+    
+    res.json({
+      currentDrafts,
+      limit: draftLimit,
+      planName,
+      canSaveMore: draftLimit === -1 || currentDrafts < draftLimit,
+      unlimited: draftLimit === -1
+    });
+  } catch (error) {
+    console.error('Get draft status error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get draft status',
+      details: error.message
+    });
+  }
+};
+
+// Get image upload status and limits for user
+const getImageUploadStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let imageUploadLimit = 1; // Default limit if no subscription found
+    
+    if (subscription && subscription.plan) {
+      // Find the plan details to get the image upload limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.imageUploadsPerDesign !== undefined) {
+        imageUploadLimit = plan.limits.imageUploadsPerDesign;
+      }
+    }
+
+    res.json({
+      allowedLimit: imageUploadLimit,
+      isUnlimited: imageUploadLimit === -1,
+      planName: subscription?.plan || 'free'
+    });
+  } catch (error) {
+    console.error('Get image upload status error:', error);
+    res.status(500).json({ error: 'Failed to get image upload status' });
+  }
+};
+
 module.exports = {
   createDraft,
   getUserDrafts,
@@ -303,5 +411,7 @@ module.exports = {
   deleteDraft,
   shareDraft,
   getSharedDrafts,
-  removeFromSharedDraft
+  removeFromSharedDraft,
+  getDraftStatus,
+  getImageUploadStatus
 };

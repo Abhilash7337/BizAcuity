@@ -44,7 +44,7 @@ const UserProfile = () => {
           <button 
             onClick={handleShowSensitiveData}
             disabled={loading}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
+            className="bg-gradient-to-r from-orange-600 to-orange-400 text-white px-4 py-2 rounded-2xl shadow-xl hover:from-orange-500 hover:to-orange-300 transition-all duration-300"
           >
             {loading ? 'Loading...' : 'Load Sensitive Data'}
           </button>

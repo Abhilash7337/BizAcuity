@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
+import { PlanManagement, DecorManagement } from '../components/admin';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -11,23 +12,6 @@ const Admin = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dashboardStats, setDashboardStats] = useState(null);
-  const [plans, setPlans] = useState([]);
-  const [showPlanForm, setShowPlanForm] = useState(false);
-  const [editingPlan, setEditingPlan] = useState(null);
-  const [planFormData, setPlanFormData] = useState({
-    name: '',
-    monthlyPrice: '',
-    yearlyPrice: '',
-    description: '',
-    features: [],
-    limits: {
-      designsPerMonth: -1,
-      exportResolution: 'HD',
-      storageGB: 10,
-      supportLevel: 'basic'
-    },
-    isActive: true
-  });
 
   // Check if user is admin
   useEffect(() => {
@@ -42,7 +26,6 @@ const Admin = () => {
     }
 
     fetchDashboardStats();
-    fetchPlans();
   }, [registeredUser, navigate]);
 
   const fetchDashboardStats = async () => {
@@ -59,116 +42,6 @@ const Admin = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchPlans = async () => {
-    try {
-      const response = await authFetch('http://localhost:5001/admin/plans');
-      if (!response.ok) throw new Error('Failed to fetch plans');
-      
-      const data = await response.json();
-      setPlans(data.plans || []);
-    } catch (error) {
-      console.error('Plans fetch error:', error);
-      setError('Failed to load plans');
-    }
-  };
-
-  const handlePlanSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const url = editingPlan 
-        ? `http://localhost:5001/admin/plans/${editingPlan._id}`
-        : 'http://localhost:5001/admin/plans';
-      
-      const method = editingPlan ? 'PUT' : 'POST';
-      
-      const response = await authFetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(planFormData)
-      });
-
-      if (!response.ok) throw new Error('Failed to save plan');
-
-      await fetchPlans();
-      resetPlanForm();
-      setShowPlanForm(false);
-    } catch (error) {
-      console.error('Plan save error:', error);
-      setError('Failed to save plan');
-    }
-  };
-
-  const handleEditPlan = (plan) => {
-    setEditingPlan(plan);
-    setPlanFormData({
-      name: plan.name,
-      monthlyPrice: plan.monthlyPrice,
-      yearlyPrice: plan.yearlyPrice || '',
-      description: plan.description || '',
-      features: plan.features || [],
-      limits: plan.limits || {
-        designsPerMonth: -1,
-        exportResolution: 'HD',
-        storageGB: 10,
-        supportLevel: 'basic'
-      },
-      isActive: plan.isActive
-    });
-    setShowPlanForm(true);
-  };
-
-  const handleDeletePlan = async (planId) => {
-    if (!window.confirm('Are you sure you want to delete this plan?')) return;
-
-    try {
-      const response = await authFetch(`http://localhost:5001/admin/plans/${planId}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) throw new Error('Failed to delete plan');
-
-      await fetchPlans();
-    } catch (error) {
-      console.error('Plan delete error:', error);
-      setError('Failed to delete plan');
-    }
-  };
-
-  const resetPlanForm = () => {
-    setPlanFormData({
-      name: '',
-      monthlyPrice: '',
-      yearlyPrice: '',
-      description: '',
-      features: [],
-      limits: {
-        designsPerMonth: -1,
-        exportResolution: 'HD',
-        storageGB: 10,
-        supportLevel: 'basic'
-      },
-      isActive: true
-    });
-    setEditingPlan(null);
-  };
-
-  const addFeature = () => {
-    const feature = prompt('Enter feature name:');
-    if (feature && feature.trim()) {
-      setPlanFormData(prev => ({
-        ...prev,
-        features: [...prev.features, feature.trim()]
-      }));
-    }
-  };
-
-  const removeFeature = (index) => {
-    setPlanFormData(prev => ({
-      ...prev,
-      features: prev.features.filter((_, i) => i !== index)
-    }));
   };
 
   if (!registeredUser || (registeredUser.userType !== 'admin' && registeredUser.email !== 'admin@gmail.com')) {
@@ -282,6 +155,20 @@ const Admin = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 <span className="font-medium">Plan Management</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('decors')}
+                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                  activeTab === 'decors'
+                    ? 'bg-orange-100 text-orange-700 shadow-md'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <span className="font-medium">Decor Management</span>
               </button>
             </div>
           </div>
@@ -401,241 +288,12 @@ const Admin = () => {
 
           {/* Plans Tab */}
           {activeTab === 'plans' && (
-            <div className="space-y-8">
-              <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-white">Plan Management</h1>
-                <button
-                  onClick={() => {
-                    resetPlanForm();
-                    setShowPlanForm(true);
-                  }}
-                  className="bg-white text-orange-600 px-6 py-3 rounded-xl font-medium hover:bg-orange-50 transition-colors duration-200 shadow-lg"
-                >
-                  Create New Plan
-                </button>
-              </div>
+            <PlanManagement />
+          )}
 
-              {/* Plan Form */}
-              {showPlanForm && (
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                    {editingPlan ? 'Edit Plan' : 'Create New Plan'}
-                  </h2>
-                  
-                  <form onSubmit={handlePlanSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
-                        <input
-                          type="text"
-                          value={planFormData.name}
-                          onChange={(e) => setPlanFormData({ ...planFormData, name: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Monthly Price ($)</label>
-                        <input
-                          type="number"
-                          value={planFormData.monthlyPrice}
-                          onChange={(e) => setPlanFormData({ ...planFormData, monthlyPrice: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          min="0"
-                          step="0.01"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Yearly Price ($)</label>
-                        <input
-                          type="number"
-                          value={planFormData.yearlyPrice}
-                          onChange={(e) => setPlanFormData({ ...planFormData, yearlyPrice: e.target.value })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          min="0"
-                          step="0.01"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Designs Per Month</label>
-                        <input
-                          type="number"
-                          value={planFormData.limits.designsPerMonth}
-                          onChange={(e) => setPlanFormData({ 
-                            ...planFormData, 
-                            limits: { ...planFormData.limits, designsPerMonth: parseInt(e.target.value) }
-                          })}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          min="-1"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">-1 for unlimited</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                      <textarea
-                        value={planFormData.description}
-                        onChange={(e) => setPlanFormData({ ...planFormData, description: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        rows="3"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
-                      <div className="space-y-2">
-                        {planFormData.features.map((feature, index) => (
-                          <div key={index} className="flex items-center space-x-2">
-                            <input
-                              type="text"
-                              value={feature}
-                              onChange={(e) => {
-                                const newFeatures = [...planFormData.features];
-                                newFeatures[index] = e.target.value;
-                                setPlanFormData({ ...planFormData, features: newFeatures });
-                              }}
-                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeFeature(index)}
-                              className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={addFeature}
-                          className="px-4 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200"
-                        >
-                          Add Feature
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="isActive"
-                        checked={planFormData.isActive}
-                        onChange={(e) => setPlanFormData({ ...planFormData, isActive: e.target.checked })}
-                        className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                      />
-                      <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-                        Active Plan
-                      </label>
-                    </div>
-
-                    <div className="flex space-x-4">
-                      <button
-                        type="submit"
-                        className="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition-colors duration-200"
-                      >
-                        {editingPlan ? 'Update Plan' : 'Create Plan'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowPlanForm(false);
-                          resetPlanForm();
-                        }}
-                        className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-400 transition-colors duration-200"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Plans List */}
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Existing Plans</h2>
-                
-                {plans.length === 0 ? (
-                  <div className="text-center py-12">
-                    <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    <p className="text-gray-500 text-lg">No plans created yet</p>
-                    <p className="text-gray-400 text-sm">Create your first subscription plan to get started</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {plans.map((plan) => (
-                      <div key={plan._id} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow duration-200">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-xl font-bold text-gray-800">{plan.name}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            plan.isActive 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-red-100 text-red-700'
-                          }`}>
-                            {plan.isActive ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-                        
-                        <div className="mb-4">
-                          <div className="text-3xl font-bold text-orange-600 mb-1">
-                            ${plan.monthlyPrice}
-                            <span className="text-sm text-gray-500 font-normal">/month</span>
-                          </div>
-                          {plan.yearlyPrice > 0 && (
-                            <div className="text-sm text-gray-600">
-                              ${plan.yearlyPrice}/year
-                            </div>
-                          )}
-                        </div>
-
-                        {plan.description && (
-                          <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
-                        )}
-
-                        <div className="mb-4">
-                          <p className="text-xs text-gray-500 mb-2">Features:</p>
-                          {plan.features && plan.features.length > 0 ? (
-                            <ul className="text-xs text-gray-600 space-y-1">
-                              {plan.features.map((feature, index) => (
-                                <li key={index} className="flex items-center">
-                                  <svg className="w-3 h-3 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                  {feature}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-xs text-gray-400">No features listed</p>
-                          )}
-                        </div>
-
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEditPlan(plan)}
-                            className="flex-1 px-3 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors duration-200"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeletePlan(plan._id)}
-                            className="flex-1 px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors duration-200"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Decors Tab */}
+          {activeTab === 'decors' && (
+            <DecorManagement />
           )}
         </div>
       </div>

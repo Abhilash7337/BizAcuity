@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import { authFetch } from '../../utils/auth';
@@ -15,7 +15,39 @@ const SaveDraftModal = ({
   const [draftName, setDraftName] = useState(initialDraftName);
   const [saveError, setSaveError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [draftStatus, setDraftStatus] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Fetch draft status when modal opens
+  useEffect(() => {
+    if (showModal && registeredUser?.isLoggedIn && !draftId) {
+      fetchDraftStatus();
+    }
+  }, [showModal, registeredUser?.isLoggedIn, draftId]);
+
+  const fetchDraftStatus = async () => {
+    try {
+      setStatusLoading(true);
+      const response = await authFetch('http://localhost:5001/drafts/status');
+      
+      if (response.ok) {
+        const status = await response.json();
+        setDraftStatus(status);
+        
+        // Check if user can save more drafts
+        if (!status.canSaveMore) {
+          setSaveError(`You have reached your plan limit of ${status.limit} saved draft${status.limit > 1 ? 's' : ''}. Please upgrade your plan or delete existing drafts to continue.`);
+        } else {
+          setSaveError(''); // Clear any previous errors
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch draft status:', error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
 
   const captureWallPreview = async () => {
     if (!wallRef.current) return null;
@@ -76,6 +108,12 @@ const SaveDraftModal = ({
       return;
     }
 
+    // Check draft limits for new drafts
+    if (!draftId && draftStatus && !draftStatus.canSaveMore) {
+      setSaveError(`You have reached your plan limit of ${draftStatus.limit} saved draft${draftStatus.limit > 1 ? 's' : ''}. Please upgrade your plan or delete existing drafts to continue.`);
+      return;
+    }
+
     try {
       setLoading(true);
       setSaveError('');
@@ -106,7 +144,18 @@ const SaveDraftModal = ({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save draft');
+        
+        // Handle specific draft limit error
+        if (errorData.error === 'Draft limit exceeded') {
+          setSaveError(errorData.message || 'You have reached your plan limit for saved drafts.');
+          // Refresh draft status to update the UI
+          if (!draftId) {
+            fetchDraftStatus();
+          }
+        } else {
+          throw new Error(errorData.error || 'Failed to save draft');
+        }
+        return;
       }
 
       const result = await response.json();
@@ -137,12 +186,40 @@ const SaveDraftModal = ({
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           {draftId ? 'Update Design' : 'Save Design'}
         </h2>
+        
+        {/* Draft Status Display */}
+        {!draftId && draftStatus && !statusLoading && (
+          <div className={`mb-4 p-3 rounded-lg ${draftStatus.canSaveMore ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            <div className="text-sm">
+              <span className="font-medium text-gray-700">Draft Usage: </span>
+              <span className={draftStatus.canSaveMore ? 'text-green-600' : 'text-red-600'}>
+                {draftStatus.currentDrafts}/{draftStatus.unlimited ? '∞' : draftStatus.limit}
+              </span>
+              <span className="text-gray-600 ml-1">
+                ({draftStatus.planName} plan)
+              </span>
+            </div>
+            {!draftStatus.canSaveMore && (
+              <div className="text-xs text-red-600 mt-1">
+                Upgrade your plan to save more drafts
+              </div>
+            )}
+          </div>
+        )}
+        
+        {statusLoading && !draftId && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="text-sm text-gray-600">Checking draft limits...</div>
+          </div>
+        )}
+        
         <input
           type="text"
           value={draftName}
           onChange={(e) => setDraftName(e.target.value)}
           placeholder="Enter a name for your design"
           className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+          disabled={!draftId && draftStatus && !draftStatus.canSaveMore}
         />
         {saveError && (
           <p className="text-red-600 mb-4">{saveError}</p>
@@ -156,7 +233,7 @@ const SaveDraftModal = ({
           </button>
           <button
             onClick={handleSaveDraft}
-            disabled={loading}
+            disabled={loading || (!draftId && draftStatus && !draftStatus.canSaveMore)}
             className="bg-primary-dark text-secondary px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:bg-primary transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Saving...' : draftId ? 'Update' : 'Save'}

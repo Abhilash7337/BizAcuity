@@ -103,37 +103,91 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-secondary to-accent relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 opacity-15">
-        {/* Floating picture frames */}
-        <div className="absolute top-10 left-10 w-24 h-16 bg-white border-3 border-primary-dark rounded-lg shadow-md transform rotate-12 animate-float">
-          <div className="w-full h-full bg-gradient-to-br from-orange-200 to-orange-300 rounded"></div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 relative overflow-hidden">
+      {/* Animated Background Elements - morphing shapes and flowing lines */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-0 left-0 w-full h-full">
+          {/* Abstract morphing shapes */}
+          <div 
+            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-300 to-orange-500 opacity-15 blur-xl"
+            style={{animation: 'abstractMorph 45s ease-in-out infinite'}}
+          ></div>
+          <div 
+            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 opacity-12 blur-xl"
+            style={{animation: 'abstractMorph 60s ease-in-out infinite reverse', animationDelay: '-20s'}}
+          ></div>
+          <div 
+            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-white to-orange-300 opacity-10 blur-lg"
+            style={{animation: 'abstractMorph 35s ease-in-out infinite', animationDelay: '-15s'}}
+          ></div>
+          {/* Flowing SVG lines */}
+          <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path 
+              d="M0,50 Q25,25 50,50 T100,50" 
+              stroke="url(#flowGradient)" 
+              strokeWidth="0.5" 
+              fill="none"
+              style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
+            />
+            <path 
+              d="M0,30 Q25,5 50,30 T100,30" 
+              stroke="url(#flowGradient)" 
+              strokeWidth="0.3" 
+              fill="none"
+              style={{animation: 'backgroundFlow 50s ease-in-out infinite reverse', animationDelay: '-10s'}}
+            />
+            <path 
+              d="M0,70 Q25,95 50,70 T100,70" 
+              stroke="url(#flowGradient)" 
+              strokeWidth="0.4" 
+              fill="none"
+              style={{animation: 'backgroundFlow 35s ease-in-out infinite', animationDelay: '-25s'}}
+            />
+            <defs>
+              <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.6)" />
+                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.8)" />
+                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.6)" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-        <div className="absolute top-20 right-20 w-20 h-24 bg-white border-3 border-primary-dark rounded-lg shadow-md transform -rotate-6 animate-float delay-100">
-          <div className="w-full h-full bg-gradient-to-br from-teal-200 to-teal-300 rounded"></div>
+        {/* Floating picture frames in orange/cream/white palette */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-32 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-12 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute top-32 left-32 w-20 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-6 animate-drift">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute top-40 right-20 w-28 h-20 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-6 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute top-16 right-40 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-12 animate-gentleFloat">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute bottom-40 left-20 w-36 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-3 animate-drift">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute bottom-20 right-16 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-8 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
+          <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-lg rotate-3 animate-gentleFloat">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          </div>
         </div>
-        <div className="absolute bottom-20 left-20 w-28 h-20 bg-white border-3 border-primary-dark rounded-lg shadow-md transform rotate-6 animate-float delay-200">
-          <div className="w-full h-full bg-gradient-to-br from-rose-200 to-rose-300 rounded"></div>
-        </div>
-        <div className="absolute bottom-10 right-10 w-16 h-24 bg-white border-3 border-primary-dark rounded-lg shadow-md transform -rotate-12 animate-float delay-300">
-          <div className="w-full h-full bg-gradient-to-br from-amber-200 to-amber-300 rounded"></div>
-        </div>
-        
-
       </div>
-
       {/* Navigation */}
       <nav className="relative z-50 bg-white/95 backdrop-blur-sm shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl font-bold font-poppins text-primary-dark hover:text-primary transition-colors duration-300">
+            <Link to="/" className="text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
               Picture Wall Designer
             </Link>
             <div className="flex items-center space-x-4">
               <Link 
                 to="/" 
-                className="text-primary-dark hover:text-primary font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary-light"
+                className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-100"
               >
                 ← Back to Home
               </Link>
@@ -141,7 +195,6 @@ const Register = () => {
           </div>
         </div>
       </nav>
-
       {/* Main Content */}
       <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
@@ -149,30 +202,29 @@ const Register = () => {
             <>
               {/* Welcome Section with Animation */}
               <div className={`text-center mb-8 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-dark to-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold font-poppins text-primary-dark mb-2">
+                <h1 className="text-3xl font-bold font-poppins text-orange-700 mb-2">
                   Join Our Community!
                 </h1>
-                <p className="text-gray-600 font-inter">
+                <p className="text-orange-900 font-inter">
                   Create your account and start designing beautiful walls
                 </p>
               </div>
-
               {/* Register Form */}
               <div className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50 transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <form onSubmit={handleRegister} className="space-y-6">
                   {/* Name Field */}
                   <div className="space-y-2">
-                    <label htmlFor="name" className="block text-sm font-semibold text-primary-dark font-inter">
+                    <label htmlFor="name" className="block text-sm font-semibold text-orange-700 font-inter">
                       Full Name
                     </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
@@ -182,25 +234,24 @@ const Register = () => {
                         value={name}
                         onChange={e => setName(e.target.value)}
                         placeholder="Enter your full name"
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 
-                                 focus:outline-none focus:ring-4 focus:ring-primary/20 
-                                 focus:border-primary transition-all duration-300
-                                 bg-gray-50/50 backdrop-blur-sm hover:bg-white/80
-                                 text-primary-dark font-medium"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-orange-200 
+                                 focus:outline-none focus:ring-4 focus:ring-orange-300/20 
+                                 focus:border-orange-400 transition-all duration-300
+                                 bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
+                                 text-orange-900 font-medium"
                         required
                         disabled={isLoading}
                       />
                     </div>
                   </div>
-
                   {/* Email Field */}
                   <div className="space-y-2">
-                    <label htmlFor="email" className="block text-sm font-semibold text-primary-dark font-inter">
+                    <label htmlFor="email" className="block text-sm font-semibold text-orange-700 font-inter">
                       Email Address
                     </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                         </svg>
                       </div>
@@ -210,25 +261,24 @@ const Register = () => {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="Enter your email"
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 
-                                 focus:outline-none focus:ring-4 focus:ring-primary/20 
-                                 focus:border-primary transition-all duration-300
-                                 bg-gray-50/50 backdrop-blur-sm hover:bg-white/80
-                                 text-primary-dark font-medium"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-orange-200 
+                                 focus:outline-none focus:ring-4 focus:ring-orange-300/20 
+                                 focus:border-orange-400 transition-all duration-300
+                                 bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
+                                 text-orange-900 font-medium"
                         required
                         disabled={isLoading}
                       />
                     </div>
                   </div>
-
                   {/* Password Field */}
                   <div className="space-y-2">
-                    <label htmlFor="password" className="block text-sm font-semibold text-primary-dark font-inter">
+                    <label htmlFor="password" className="block text-sm font-semibold text-orange-700 font-inter">
                       Password
                     </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                       </div>
@@ -238,18 +288,18 @@ const Register = () => {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="Create a strong password"
-                        className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-gray-200 
-                                 focus:outline-none focus:ring-4 focus:ring-primary/20 
-                                 focus:border-primary transition-all duration-300
-                                 bg-gray-50/50 backdrop-blur-sm hover:bg-white/80
-                                 text-primary-dark font-medium"
+                        className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-orange-200 
+                                 focus:outline-none focus:ring-4 focus:ring-orange-300/20 
+                                 focus:border-orange-400 transition-all duration-300
+                                 bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
+                                 text-orange-900 font-medium"
                         required
                         disabled={isLoading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-primary transition-colors duration-300"
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-orange-300 hover:text-orange-500 transition-colors duration-300"
                       >
                         {showPassword ? (
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,7 +314,6 @@ const Register = () => {
                       </button>
                     </div>
                   </div>
-
                   {/* Error Message */}
                   {error && (
                     <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 text-sm animate-slide-in-up">
@@ -276,13 +325,12 @@ const Register = () => {
                       </div>
                     </div>
                   )}
-
                   {/* Submit Button */}
                   <button 
                     type="submit" 
                     className="group w-full py-4 px-6 rounded-2xl text-white font-bold text-lg
-                             bg-gradient-to-r from-primary-dark to-primary 
-                             hover:from-primary hover:to-primary-light
+                             bg-gradient-to-r from-orange-600 to-orange-400 
+                             hover:from-orange-500 hover:to-orange-300
                              transition-all duration-300 shadow-xl hover:shadow-2xl
                              disabled:opacity-50 disabled:cursor-not-allowed
                              transform hover:scale-105 hover:-translate-y-1 active:scale-95
@@ -306,23 +354,21 @@ const Register = () => {
                       </span>
                     )}
                   </button>
-
                   {/* Divider */}
                   <div className="relative flex items-center justify-center py-4">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300"></div>
+                      <div className="w-full border-t border-orange-200"></div>
                     </div>
-                    <div className="relative bg-white px-4 text-sm text-gray-500 font-medium">
+                    <div className="relative bg-white px-4 text-sm text-orange-400 font-medium">
                       Already have an account?
                     </div>
                   </div>
-
                   {/* Login Link */}
                   <Link 
                     to="/login" 
                     className="group w-full flex items-center justify-center py-4 px-6 rounded-2xl 
-                             border-2 border-primary-dark text-primary-dark font-bold text-lg
-                             hover:bg-primary-dark hover:text-white
+                             border-2 border-orange-600 text-orange-700 font-bold text-lg
+                             hover:bg-orange-600 hover:text-white
                              transition-all duration-300 shadow-lg hover:shadow-xl
                              transform hover:scale-105 hover:-translate-y-1"
                   >
@@ -340,29 +386,28 @@ const Register = () => {
             <>
               {/* OTP Verification Section */}
               <div className={`text-center mb-8 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h1 className="text-3xl font-bold font-poppins text-primary-dark mb-2">
+                <h1 className="text-3xl font-bold font-poppins text-orange-700 mb-2">
                   Check Your Email!
                 </h1>
-                <p className="text-gray-600 font-inter">
+                <p className="text-orange-900 font-inter">
                   We've sent a verification code to your email address
                 </p>
               </div>
-
               {/* OTP Form */}
               <div className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50 transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                 <form onSubmit={handleOTPVerification} className="space-y-6">
                   <div className="space-y-2">
-                    <label htmlFor="otp" className="block text-sm font-semibold text-primary-dark font-inter">
+                    <label htmlFor="otp" className="block text-sm font-semibold text-orange-700 font-inter">
                       Verification Code
                     </label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400 group-focus-within:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                       </div>
@@ -372,18 +417,17 @@ const Register = () => {
                         value={otp}
                         onChange={e => setOTP(e.target.value)}
                         placeholder="Enter the 6-digit code"
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-200 
-                                 focus:outline-none focus:ring-4 focus:ring-primary/20 
-                                 focus:border-primary transition-all duration-300
-                                 bg-gray-50/50 backdrop-blur-sm hover:bg-white/80
-                                 text-primary-dark font-medium text-center text-2xl tracking-widest"
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-orange-200 
+                                 focus:outline-none focus:ring-4 focus:ring-orange-300/20 
+                                 focus:border-orange-400 transition-all duration-300
+                                 bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
+                                 text-orange-900 font-medium text-center text-2xl tracking-widest"
                         required
                         disabled={isLoading}
                         maxLength="6"
                       />
                     </div>
                   </div>
-
                   {/* Error Message */}
                   {error && (
                     <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 text-sm animate-slide-in-up">
@@ -395,13 +439,12 @@ const Register = () => {
                       </div>
                     </div>
                   )}
-
                   {/* Submit Button */}
                   <button 
                     type="submit" 
                     className="group w-full py-4 px-6 rounded-2xl text-white font-bold text-lg
-                             bg-gradient-to-r from-green-600 to-green-500 
-                             hover:from-green-500 hover:to-green-400
+                             bg-gradient-to-r from-orange-600 to-orange-400 
+                             hover:from-orange-500 hover:to-orange-300
                              transition-all duration-300 shadow-xl hover:shadow-2xl
                              disabled:opacity-50 disabled:cursor-not-allowed
                              transform hover:scale-105 hover:-translate-y-1 active:scale-95
@@ -429,10 +472,9 @@ const Register = () => {
               </div>
             </>
           )}
-
           {/* Additional Features */}
           <div className={`text-center space-y-4 mt-8 transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="flex justify-center items-center space-x-8 text-primary-dark/60">
+            <div className="flex justify-center items-center space-x-8 text-orange-400/80">
               <div className="text-center group cursor-pointer">
                 <div className="text-lg font-bold group-hover:scale-110 transition-transform duration-300">🚀</div>
                 <div className="text-xs">Quick Setup</div>

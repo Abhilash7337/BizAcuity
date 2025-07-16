@@ -9,7 +9,9 @@ const {
   deleteDraft, 
   shareDraft, 
   getSharedDrafts, 
-  removeFromSharedDraft 
+  removeFromSharedDraft,
+  getDraftStatus,
+  getImageUploadStatus
 } = require('../controllers/draftController');
 
 // Protected route - Create new draft
@@ -17,6 +19,12 @@ router.post('/drafts', verifyToken, createDraft);
 
 // Protected route - Get user's drafts (no userId needed in URL, use token)
 router.get('/drafts', verifyToken, getUserDrafts);
+
+// Protected route - Get user's draft status and limits
+router.get('/drafts/status', verifyToken, getDraftStatus);
+
+// Protected route - Get user's image upload status and limits
+router.get('/drafts/image-upload-status', verifyToken, getImageUploadStatus);
 
 // Get specific draft - Protected, but allows access to shared drafts
 router.get('/drafts/single/:draftId', verifyToken, getDraftById);

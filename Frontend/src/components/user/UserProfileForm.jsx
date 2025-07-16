@@ -322,7 +322,7 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
                   }
                 }
               }}
-              className="flex-1 bg-gray-100 text-gray-700 py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-gray-200 transition-all duration-300"
+              className="flex-1 bg-orange-100 text-orange-700 py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-orange-200 transition-all duration-300"
             >
               Cancel
             </button>
@@ -330,7 +330,7 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-gradient-to-r from-primary to-primary-dark text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-1 bg-gradient-to-r from-orange-600 to-orange-400 text-white py-4 px-6 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? (
                 <div className="flex items-center justify-center">

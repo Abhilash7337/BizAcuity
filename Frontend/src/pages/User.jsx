@@ -175,46 +175,15 @@ const User = () => {
             opacity: 0.6;
           }
         }
-
-        @keyframes streamFlow {
-          0% { 
-            transform: translateX(-20px) scale(1);
-            opacity: 0.3;
-          }
-          25% { 
-            transform: translateX(10px) scale(1.05);
-            opacity: 0.6;
-          }
-          50% { 
-            transform: translateX(-5px) scale(0.98);
-            opacity: 0.8;
-          }
-          75% { 
-            transform: translateX(15px) scale(1.02);
-            opacity: 0.5;
-          }
-          100% { 
-            transform: translateX(-20px) scale(1);
-            opacity: 0.3;
-          }
+        @keyframes streamFloatIcon {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-10px) scale(1.08); }
         }
-
-        @keyframes verticalFlow {
-          0%, 100% { 
-            transform: translateY(0px) scaleY(1);
-            opacity: 0.4;
-          }
-          33% { 
-            transform: translateY(-10px) scaleY(1.1);
-            opacity: 0.7;
-          }
-          66% { 
-            transform: translateY(15px) scaleY(0.9);
-            opacity: 0.8;
-          }
+        @keyframes cardFadeIn {
+          from { opacity: 0; transform: translateY(30px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
-
     <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 overflow-hidden">
       {/* Subtle Background Animation Layer */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -233,7 +202,6 @@ const User = () => {
             className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-white to-orange-300 opacity-10 blur-lg"
             style={{animation: 'abstractMorph 35s ease-in-out infinite', animationDelay: '-15s'}}
           ></div>
-          
           {/* Enhanced Flowing lines effect with SVG - Multiple layers for fluid motion */}
           <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
             {/* Primary flowing lines */}
@@ -341,9 +309,7 @@ const User = () => {
           ></div>
         </div>
       </div>
-
       <Header />
-      
       {/* Main Container - Full Width */}
       <div className="pt-20 px-6 relative z-10">
         {/* Additional subtle background elements for content sections */}
@@ -351,70 +317,43 @@ const User = () => {
           {/* Floating Picture Frame Mockups with Animations */}
           <div className="absolute inset-0 opacity-10">
             {/* Top left frames */}
-            <div className="absolute top-20 left-10 w-24 h-18 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-12 hover:scale-110 transition-all duration-500" style={{animation: 'gentleFloat 20s ease-in-out infinite'}}>
+            <div className="absolute top-20 left-10 w-24 h-18 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-12 hover:scale-110 transition-all duration-500 animate-float" style={{animationDelay: '0s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-            <div className="absolute top-32 left-32 w-16 h-22 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-6 hover:rotate-0 transition-all duration-700" style={{animation: 'drift 25s ease-in-out infinite, slowRotate 40s linear infinite'}}>
+            <div className="absolute top-32 left-32 w-16 h-22 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-6 hover:rotate-0 transition-all duration-700 animate-drift" style={{animationDelay: '2s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-            
             {/* Top right frames */}
-            <div className="absolute top-40 right-20 w-22 h-16 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-6 hover:-rotate-3 transition-all duration-500" style={{animation: 'float 18s ease-in-out infinite reverse'}}>
+            <div className="absolute top-40 right-20 w-22 h-16 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-6 hover:-rotate-3 transition-all duration-500 animate-float" style={{animationDelay: '1s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-            <div className="absolute top-16 right-40 w-20 h-26 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-12 hover:rotate-6 transition-all duration-700" style={{animation: 'gentleFloat 22s ease-in-out infinite, slowRotate 35s linear infinite reverse'}}>
+            <div className="absolute top-16 right-40 w-20 h-26 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-12 hover:rotate-6 transition-all duration-700 animate-gentleFloat" style={{animationDelay: '3s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-            
             {/* Bottom frames */}
-            <div className="absolute bottom-40 left-20 w-28 h-20 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-3 hover:scale-105 transition-all duration-500" style={{animation: 'drift 30s ease-in-out infinite reverse'}}>
+            <div className="absolute bottom-40 left-20 w-28 h-20 bg-white border-3 border-orange-600 rounded-lg shadow-md transform rotate-3 hover:scale-105 transition-all duration-500 animate-drift" style={{animationDelay: '2s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-            <div className="absolute bottom-20 right-16 w-20 h-26 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-8 hover:rotate-4 transition-all duration-700" style={{animation: 'float 16s ease-in-out infinite, slowRotate 45s linear infinite'}}>
+            <div className="absolute bottom-20 right-16 w-20 h-26 bg-white border-3 border-orange-600 rounded-lg shadow-md transform -rotate-8 hover:rotate-4 transition-all duration-700 animate-float" style={{animationDelay: '1.5s'}}>
               <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
             </div>
-          </div>
-
-          {/* Gentle floating elements for content sections */}
-          <div 
-            className="absolute top-32 right-20 w-24 h-24 bg-orange-300 opacity-8 blur-2xl rounded-full"
-            style={{animation: 'gentleFloat 35s ease-in-out infinite'}}
-          ></div>
-          <div 
-            className="absolute bottom-32 left-20 w-32 h-32 bg-white opacity-6 blur-3xl rounded-full"
-            style={{animation: 'drift 45s ease-in-out infinite reverse'}}
-          ></div>
-          <div 
-            className="absolute top-1/2 left-1/4 w-16 h-16 bg-orange-400 opacity-10 blur-xl rounded-full"
-            style={{animation: 'abstractMorph 25s ease-in-out infinite'}}
-          ></div>
-          <div 
-            className="absolute bottom-1/4 right-1/3 w-20 h-20 bg-orange-200 opacity-12 blur-2xl rounded-full"
-            style={{animation: 'float 30s ease-in-out infinite'}}
-          ></div>
-
-          {/* Additional decorative elements */}
-          <div className="absolute inset-0 opacity-6">
-            <div className="absolute top-10 right-10 w-28 h-28 border-2 border-orange-400 rounded-full" style={{animation: 'slowRotate 25s linear infinite'}}></div>
-            <div className="absolute bottom-10 left-10 w-16 h-16 border border-orange-400 rounded-lg animate-pulse" style={{animationDuration: '5s'}}></div>
-            <div className="absolute bottom-1/3 right-1/5 w-20 h-5 bg-orange-400/20 rounded-full" style={{animation: 'drift 20s ease-in-out infinite reverse'}}></div>
-            <div className="absolute top-3/4 left-1/3 w-14 h-14 border border-orange-300/30 transform rotate-45" style={{animation: 'float 16s ease-in-out infinite'}}></div>
           </div>
         </div>
         <div className={`transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          
           {/* Page Header */}
           <div className="mb-8">
-            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden">
-              <div className="relative h-32 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700">
+            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease] relative">
+              <div className="relative h-40 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 flex items-end">
+                {/* Layered gradients and floating icons */}
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-transparent to-black/20"></div>
-                
-                {/* Top Section with Profile Info and Action Buttons */}
-                <div className="absolute top-6 left-8 right-8 flex items-center justify-between">
+                <div className="absolute -top-8 left-8 w-24 h-24 bg-orange-200/60 rounded-full blur-2xl animate-float" style={{zIndex:1}}></div>
+                <div className="absolute -top-6 right-12 w-16 h-16 bg-orange-400/40 rounded-full blur-xl animate-gentleFloat" style={{zIndex:1}}></div>
+                {/* Profile Info and Actions */}
+                <div className="absolute top-8 left-8 right-8 flex flex-col md:flex-row items-center md:items-end justify-between z-10">
                   {/* Profile Info - Left Side */}
-                  <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-6 mb-4 md:mb-0">
                     {/* Profile Photo */}
-                    <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
+                    <div className="w-28 h-28 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white relative">
                       {user.profilePhoto ? (
                         <img 
                           src={user.profilePhoto} 
@@ -423,38 +362,39 @@ const User = () => {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center">
-                          <span className="text-white text-2xl font-bold">
+                          <span className="text-white text-3xl font-bold">
                             {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                           </span>
                         </div>
                       )}
+                      {/* Floating icon */}
+                      <div className="absolute -top-4 -right-4 w-10 h-10 bg-orange-400/80 rounded-full flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '1s'}}>
+                        <svg className="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                      </div>
                     </div>
-                    
                     {/* User Info */}
                     <div>
-                      <h1 className="text-2xl font-bold text-white mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.6)'}}>{user.name}</h1>
-                      <p className="text-white text-sm font-medium" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.6)'}}>{user.email}</p>
+                      <h1 className="text-3xl font-bold text-white mb-1" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.6)'}}>{user.name}</h1>
+                      <p className="text-white text-lg font-medium" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.6)'}}>{user.email}</p>
                     </div>
                   </div>
-                  
                   {/* Action Buttons - Right Side */}
                   <div className="flex space-x-3">
                     <button 
                       onClick={() => navigate('/dashboard')}
-                      className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-white/30 transition-all duration-300 shadow-lg"
+                      className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-xl text-base font-semibold hover:bg-white/30 hover:scale-105 active:scale-98 transition-all duration-300 shadow-lg"
                     >
                       Dashboard
                     </button>
                     <button 
                       onClick={() => navigate('/wall')}
-                      className="bg-white text-orange-700 px-4 py-2 rounded-xl text-sm font-medium hover:bg-orange-100 transition-all duration-300 shadow-lg"
+                      className="bg-white text-orange-700 px-6 py-3 rounded-xl text-base font-semibold hover:bg-orange-100 hover:scale-105 active:scale-98 transition-all duration-300 shadow-lg"
                     >
                       Create Design
                     </button>
                   </div>
                 </div>
               </div>
-              
               {/* Stats Section */}
               <div className="pt-8 pb-8 px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -504,59 +444,49 @@ const User = () => {
               </div>
             </div>
           </div>
-          
           {/* Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            
             {/* Profile Settings Card */}
-            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden">
-              <div className="p-8 border-b border-orange-200/20">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-orange-800">Profile Details</h2>
-                    <p className="text-orange-600 text-sm">Update your personal information and preferences</p>
-                  </div>
+            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]">
+              <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '0.5s'}}>
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-orange-800">Profile Details</h2>
+                  <p className="text-orange-600 text-sm">Update your personal information and preferences</p>
                 </div>
               </div>
               <div className="p-8">
                 <UserProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
               </div>
             </div>
-
             {/* Security Settings Card */}
-            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden">
-              <div className="p-8 border-b border-orange-200/20">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-orange-800">Security Settings</h2>
-                    <p className="text-orange-600 text-sm">Manage your password and account security</p>
-                  </div>
+            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.2s'}}>
+              <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '1s'}}>
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-orange-800">Security Settings</h2>
+                  <p className="text-orange-600 text-sm">Manage your password and account security</p>
                 </div>
               </div>
               <div className="p-8">
                 <ChangePasswordForm />
               </div>
             </div>
-
           </div>
-
           {/* Additional Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            
             {/* Activity Overview */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6">
+            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.3s'}}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '0.7s'}}>
                   <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
@@ -580,11 +510,10 @@ const User = () => {
                 </div>
               </div>
             </div>
-
             {/* Storage Info */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6">
+            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.4s'}}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-400/20 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-orange-400/20 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.2s'}}>
                   <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10M5 6h14l-1 10a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6z" />
                   </svg>
@@ -608,11 +537,10 @@ const User = () => {
                 </div>
               </div>
             </div>
-
             {/* Quick Actions */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6">
+            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.5s'}}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-300/30 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-orange-300/30 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.5s'}}>
                   <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -637,13 +565,9 @@ const User = () => {
                 </button>
               </div>
             </div>
-
           </div>
-
         </div>
       </div>
-      
-      {/* Footer */}
       <Footer />
     </div>
     </>
