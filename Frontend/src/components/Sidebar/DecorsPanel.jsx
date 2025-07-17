@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Flower2 } from 'lucide-react';
 import { authFetch } from '../../utils/auth';
 
-const DecorsPanel = ({ onAddDecor }) => {
+const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectUserDecor }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [decors, setDecors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +157,49 @@ const DecorsPanel = ({ onAddDecor }) => {
         <h3 className="font-semibold text-orange-800">Decors</h3>
       </div>
 
+      {/* User Uploaded Decors Section */}
+      {userDecors.length > 0 && (
+        <div className="mb-6">
+          <h4 className="text-sm font-semibold text-orange-700 mb-3 px-1">Your Uploaded Decors</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {userDecors.map(({ src, state, idx }, i) => (
+              <div
+                key={idx}
+                className="relative group bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden cursor-pointer"
+                onClick={() => onSelectUserDecor && onSelectUserDecor(idx)}
+              >
+                <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
+                  <img
+                    src={src}
+                    alt={`User Decor ${i + 1}`}
+                    className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
+                  />
+                </div>
+                <div className="p-3 bg-white/80 backdrop-blur-sm flex flex-col items-center">
+                  <p className="text-xs font-semibold text-orange-800 text-center mb-2">User Decor</p>
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-red-600 transition"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveUserDecor && onRemoveUserDecor(idx);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+                {/* Size indicator */}
+                <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
+                  <span className="text-xs font-medium text-orange-700">
+                    {state.width}×{state.height}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Category Filter */}
       <div className="mb-4">
         <select
@@ -185,7 +228,6 @@ const DecorsPanel = ({ onAddDecor }) => {
               <h4 className="text-sm font-semibold text-orange-700 mb-3 px-1">
                 {category.name}
               </h4>
-              
               <div className="grid grid-cols-2 gap-3">
                 {category.items.map((decor) => (
                   <div
@@ -202,7 +244,6 @@ const DecorsPanel = ({ onAddDecor }) => {
                         onLoad={() => handleImageLoad(decor.id)}
                         style={{ display: loadError[decor.id] ? 'none' : 'block' }}
                       />
-                      
                       {loadError[decor.id] && (
                         <div className="flex flex-col items-center justify-center text-orange-400">
                           <Flower2 className="w-8 h-8 mb-2" />
@@ -210,7 +251,6 @@ const DecorsPanel = ({ onAddDecor }) => {
                         </div>
                       )}
                     </div>
-                    
                     <div className="p-3 bg-white/80 backdrop-blur-sm">
                       <p className="text-sm font-semibold text-orange-800 text-center">
                         {decor.name}
@@ -219,7 +259,6 @@ const DecorsPanel = ({ onAddDecor }) => {
                         <p className="text-xs text-red-500 text-center mt-1">Image not available</p>
                       )}
                     </div>
-                    
                     {/* Size indicator */}
                     {!loadError[decor.id] && (
                       <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">

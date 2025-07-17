@@ -4,40 +4,58 @@ const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 const { sendOTPEmail } = require('../utils/emailService');
 
-// Register new user and send OTP
+// Temporary registration model for pending users
+const mongoose = require('mongoose');
+const tempRegistrationSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  otp: {
+    code: String,
+    expiresAt: Date
+  },
+  createdAt: { type: Date, default: Date.now }
+});
+const TempRegistration = mongoose.models.TempRegistration || mongoose.model('TempRegistration', tempRegistrationSchema);
+
+// Register new user and send OTP (do not save to User collection yet)
 router.post('/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Check if user already exists
+        // Check if user already exists (in permanent or temp collection)
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ error: 'User already exists' });
         }
-
-        // Create new user
-        user = new User({
-            name,
-            email,
-            password
-        });
+        let tempUser = await TempRegistration.findOne({ email });
+        if (tempUser) {
+            return res.status(400).json({ error: 'Registration already initiated. Please verify your email.' });
+        }
 
         // Generate OTP
-        const otp = user.generateOTP();
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
 
-        // Save user
-        await user.save();
+        // Save to temp collection
+        tempUser = new TempRegistration({
+            name,
+            email,
+            password,
+            otp: { code: otpCode, expiresAt: otpExpires }
+        });
+        await tempUser.save();
 
         // Send OTP email
-        const emailSent = await sendOTPEmail(email, otp);
+        const emailSent = await sendOTPEmail(email, otpCode);
         if (!emailSent) {
-            await User.deleteOne({ _id: user._id });
+            await TempRegistration.deleteOne({ _id: tempUser._id });
             return res.status(500).json({ error: 'Failed to send verification email' });
         }
 
         res.status(201).json({ 
             message: 'Registration initiated. Please verify your email.',
-            userId: user._id
+            tempId: tempUser._id
         });
     } catch (error) {
         console.error('Registration error:', error);
@@ -48,40 +66,44 @@ router.post('/register', async (req, res) => {
 // Verify OTP
 router.post('/verify-otp', async (req, res) => {
     try {
-        const { userId, otp } = req.body;
+        const { tempId, otp } = req.body;
 
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+        // Find temp registration
+        const tempUser = await TempRegistration.findById(tempId);
+        if (!tempUser) {
+            return res.status(404).json({ error: 'Registration not found or already verified' });
         }
 
-        if (user.isVerified) {
-            return res.status(400).json({ error: 'Email already verified' });
-        }
-
-        if (!user.verifyOTP(otp)) {
+        // Check OTP
+        if (!tempUser.otp || tempUser.otp.code !== otp || tempUser.otp.expiresAt < new Date()) {
             return res.status(400).json({ error: 'Invalid or expired OTP' });
         }
 
-        // Mark user as verified
-        user.isVerified = true;
-        user.otp.code = null;
-        user.otp.expiresAt = null;
-        await user.save();
+        // Create user in permanent collection
+        const newUser = new User({
+            name: tempUser.name,
+            email: tempUser.email,
+            password: tempUser.password,
+            isVerified: true
+        });
+        await newUser.save();
+
+        // Remove temp registration
+        await TempRegistration.deleteOne({ _id: tempUser._id });
 
         // Generate token for the verified user
-        const token = generateToken(user._id);
+        const token = generateToken(newUser._id);
 
         res.json({ 
             message: 'Email verified successfully',
             token,
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                profilePhoto: user.profilePhoto,
-                userType: user.userType,
-                plan: user.plan
+                id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+                profilePhoto: newUser.profilePhoto,
+                userType: newUser.userType,
+                plan: newUser.plan
             }
         });
     } catch (error) {

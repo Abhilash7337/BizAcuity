@@ -2,13 +2,13 @@ import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-const ExportButton = ({ wallRef }) => {
+const ExportButton = ({ wallRef, canExport = true }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [exporting, setExporting] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleExport = async (format) => {
-    if (!wallRef.current || exporting) return;
+    if (!wallRef.current || exporting || !canExport) return;
 
     setExporting(true);
     try {
@@ -82,10 +82,10 @@ const ExportButton = ({ wallRef }) => {
   return (
     <div className="relative group">
       <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        disabled={exporting}
-        className="w-14 h-14 bg-orange-600 hover:bg-orange-700 text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle transform hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-300/40"
-        title="Export Design"
+        onClick={() => canExport && setShowDropdown(!showDropdown)}
+        disabled={exporting || !canExport}
+        className={`w-14 h-14 ${canExport ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-300 cursor-not-allowed'} text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle transform hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-300/40`}
+        title={canExport ? 'Export Design' : 'Export not allowed for your plan'}
         aria-label="Export Design"
       >
         <svg 
@@ -102,10 +102,10 @@ const ExportButton = ({ wallRef }) => {
         </svg>
         {/* Tooltip on hover */}
         <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-orange-700 text-white text-xs rounded shadow opacity-0 group-hover:opacity-100 transition pointer-events-none z-50 whitespace-nowrap">
-          Export Design
+          {canExport ? 'Export Design' : 'Upgrade plan to enable export'}
         </span>
       </button>
-      {showDropdown && (
+      {showDropdown && canExport && (
         <div 
           ref={dropdownRef}
           className="absolute right-0 mt-3 w-40 rounded-xl shadow-xl bg-white ring-1 ring-orange-200 ring-opacity-50 z-50 animate-fade-in-up"

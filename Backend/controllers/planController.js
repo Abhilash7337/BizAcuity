@@ -3,7 +3,7 @@ const Plan = require('../models/Plan');
 // Create a new subscription plan
 const createPlan = async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
 
     // Validate required fields
     if (!name || monthlyPrice === undefined) {
@@ -28,11 +28,10 @@ const createPlan = async (req, res) => {
       features: features || [],
       limits: {
         designsPerMonth: limits?.designsPerMonth ?? -1,
-        exportResolution: limits?.exportResolution || 'HD',
-        storageGB: limits?.storageGB || 10,
-        supportLevel: limits?.supportLevel || 'basic'
+        imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
-      isActive: isActive !== undefined ? isActive : true
+      isActive: isActive !== undefined ? isActive : true,
+      exportDrafts: exportDrafts === true // default false if not provided
     });
 
     const savedPlan = await newPlan.save();
@@ -140,7 +139,7 @@ const getPlanById = async (req, res) => {
 const updatePlan = async (req, res) => {
   try {
     const { planId } = req.params;
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
 
     const plan = await Plan.findById(planId);
     if (!plan) {
@@ -167,13 +166,12 @@ const updatePlan = async (req, res) => {
     if (description !== undefined) plan.description = description.trim();
     if (features !== undefined) plan.features = features;
     if (isActive !== undefined) plan.isActive = isActive;
+    if (exportDrafts !== undefined) plan.exportDrafts = exportDrafts;
     
     if (limits) {
       plan.limits = {
         designsPerMonth: limits.designsPerMonth ?? plan.limits.designsPerMonth,
-        exportResolution: limits.exportResolution || plan.limits.exportResolution,
-        storageGB: limits.storageGB ?? plan.limits.storageGB,
-        supportLevel: limits.supportLevel || plan.limits.supportLevel
+        imageUploadsPerDesign: limits.imageUploadsPerDesign ?? plan.limits.imageUploadsPerDesign
       };
     }
 
@@ -327,7 +325,7 @@ const getPublicPlans = async (req, res) => {
   try {
     const plans = await Plan.find({ isActive: true })
       .sort({ monthlyPrice: 1 })
-      .select('name monthlyPrice yearlyPrice description features limits');
+      .select('name monthlyPrice yearlyPrice description features limits exportDrafts');
 
     res.json({
       success: true,

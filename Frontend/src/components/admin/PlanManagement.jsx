@@ -15,12 +15,10 @@ const PlanManagement = () => {
     yearlyPrice: 0,
     description: '',
     features: [],
+    customFeatures: [], // <-- new
     limits: {
       designsPerMonth: 1,
-      imageUploadsPerDesign: 3,
-      exportResolution: 'HD',
-      storageGB: 1,
-      supportLevel: 'basic'
+      imageUploadsPerDesign: 3
     },
     booleanFeatures: {
       prioritySupport: false,
@@ -30,7 +28,8 @@ const PlanManagement = () => {
       teamCollaboration: false,
       watermarkRemoval: false
     },
-    isActive: true
+    isActive: true,
+    exportDrafts: false
   });
 
   // Fetch plans on component mount
@@ -91,13 +90,18 @@ const PlanManagement = () => {
       if (formData.booleanFeatures.customFonts) featuresList.push('Custom Font Upload');
       if (formData.booleanFeatures.teamCollaboration) featuresList.push('Team Collaboration Tools');
       if (formData.booleanFeatures.watermarkRemoval) featuresList.push('Remove Watermark');
-
+      // Add custom features
+      if (formData.customFeatures && Array.isArray(formData.customFeatures)) {
+        featuresList.push(...formData.customFeatures.filter(f => f && f.trim() !== ''));
+      }
       const submitData = {
         ...formData,
         features: featuresList,
-        limits: formData.limits
+        limits: formData.limits,
+        exportDrafts: formData.exportDrafts
       };
       delete submitData.booleanFeatures;
+      delete submitData.customFeatures;
 
       const url = editingPlan 
         ? `http://localhost:5001/admin/plans/${editingPlan._id}`
@@ -160,12 +164,10 @@ const PlanManagement = () => {
       yearlyPrice: 0,
       description: '',
       features: [],
+      customFeatures: [],
       limits: {
         designsPerMonth: 1,
-        imageUploadsPerDesign: 3,
-        exportResolution: 'HD',
-        storageGB: 1,
-        supportLevel: 'basic'
+        imageUploadsPerDesign: 3
       },
       booleanFeatures: {
         prioritySupport: false,
@@ -175,14 +177,14 @@ const PlanManagement = () => {
         teamCollaboration: false,
         watermarkRemoval: false
       },
-      isActive: true
+      isActive: true,
+      exportDrafts: false
     });
     setEditingPlan(null);
   };
 
   const handleEdit = (plan) => {
     setEditingPlan(plan);
-    
     // Convert features array back to boolean flags
     const booleanFeatures = {
       prioritySupport: plan.features?.includes('24/7 Priority Support') || plan.features?.includes('Priority Support') || false,
@@ -192,17 +194,30 @@ const PlanManagement = () => {
       teamCollaboration: plan.features?.includes('Team Collaboration Tools') || plan.features?.includes('Team Collaboration') || false,
       watermarkRemoval: plan.features?.includes('Remove Watermark') || false
     };
-
+    // Extract custom features (not in predefined list)
+    const predefined = [
+      '24/7 Priority Support',
+      'Priority Support',
+      'Commercial Usage License',
+      'Commercial License',
+      'Premium Design Templates',
+      'Advanced Templates',
+      'Custom Font Upload',
+      'Custom Fonts',
+      'Team Collaboration Tools',
+      'Team Collaboration',
+      'Remove Watermark'
+    ];
+    const customFeatures = (plan.features || []).filter(f => !predefined.includes(f));
     setFormData({
       ...plan,
       limits: {
         designsPerMonth: plan.limits?.designsPerMonth || 1,
-        imageUploadsPerDesign: plan.limits?.imageUploadsPerDesign || 3,
-        exportResolution: plan.limits?.exportResolution || 'HD',
-        storageGB: plan.limits?.storageGB || 1,
-        supportLevel: plan.limits?.supportLevel || 'basic'
+        imageUploadsPerDesign: plan.limits?.imageUploadsPerDesign || 3
       },
-      booleanFeatures
+      booleanFeatures,
+      customFeatures,
+      exportDrafts: plan.exportDrafts === true
     });
     setShowForm(true);
   };
@@ -469,6 +484,48 @@ const PlanManagement = () => {
               </div>
             </div>
 
+            {/* Custom Features */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Custom Features</label>
+              {formData.customFeatures && formData.customFeatures.length > 0 && (
+                <ul className="mb-2">
+                  {formData.customFeatures.map((feature, idx) => (
+                    <li key={idx} className="flex items-center mb-1">
+                      <input
+                        type="text"
+                        value={feature}
+                        onChange={e => {
+                          const updated = [...formData.customFeatures];
+                          updated[idx] = e.target.value;
+                          setFormData(f => ({ ...f, customFeatures: updated }));
+                        }}
+                        className="border border-gray-300 rounded px-2 py-1 mr-2 flex-1"
+                        placeholder="Custom feature"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = formData.customFeatures.filter((_, i) => i !== idx);
+                          setFormData(f => ({ ...f, customFeatures: updated }));
+                        }}
+                        className="text-red-500 hover:text-red-700 px-2"
+                        title="Remove feature"
+                      >
+                        &times;
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                type="button"
+                onClick={() => setFormData(f => ({ ...f, customFeatures: [...(f.customFeatures || []), ''] }))}
+                className="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded-lg text-sm font-medium"
+              >
+                + Add Custom Feature
+              </button>
+            </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -478,6 +535,17 @@ const PlanManagement = () => {
                 className="mr-2"
               />
               <label htmlFor="isActive" className="text-sm text-gray-700">Active Plan</label>
+            </div>
+            {/* Export Drafts Option */}
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id="exportDrafts"
+                checked={formData.exportDrafts}
+                onChange={(e) => setFormData({ ...formData, exportDrafts: e.target.checked })}
+                className="mr-2"
+              />
+              <label htmlFor="exportDrafts" className="text-sm text-gray-700">Allow Export Drafts</label>
             </div>
 
             <div className="flex space-x-3">
@@ -538,9 +606,6 @@ const PlanManagement = () => {
                       </div>
                       <div className="text-xs text-gray-500">
                         {plan.limits?.imageUploadsPerDesign === -1 ? 'Unlimited' : plan.limits?.imageUploadsPerDesign || 'N/A'} images per design
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {plan.limits?.exportResolution || 'HD'} • {plan.limits?.storageGB || 1}GB storage
                       </div>
                     </td>
                     <td className="px-6 py-4">

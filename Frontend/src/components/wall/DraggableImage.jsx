@@ -1,5 +1,5 @@
 import { Rnd } from 'react-rnd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 function DraggableImage({
   src,
@@ -12,7 +12,15 @@ function DraggableImage({
   setSelectedIdx,
   isViewOnly = false
 }) {
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
   if (!imageState) return null;
+
+  // Debug logging for image source
+  useEffect(() => {
+    console.log(`🖼️ DraggableImage ${idx}: src="${src}", loading=${imageLoading}, error=${imageLoadError}`);
+  }, [src, imageLoading, imageLoadError, idx]);
 
   const updateImageState = (updates) => {
     setImageStates(prevStates => {
@@ -192,20 +200,40 @@ function DraggableImage({
           />
         </div>
       ) : (
-        <img
-          src={src}
-          alt=""
-          style={{
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            objectFit: 'cover',
-            transform: `rotate(${imageState.rotation || 0}deg)`,
-            transition: 'transform 0.2s ease-in-out',
-            ...styleOverrides,
-          }}
-          draggable={false}
-        />
+        <div className="relative">
+          <img
+            src={src}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+              objectFit: 'cover',
+              transform: `rotate(${imageState.rotation || 0}deg)`,
+              transition: 'transform 0.2s ease-in-out',
+              ...styleOverrides,
+            }}
+            draggable={false}
+            onLoad={() => {
+              console.log(`✅ Image ${idx} loaded successfully: ${src}`);
+              setImageLoading(false);
+              setImageLoadError(false);
+            }}
+            onError={(e) => {
+              console.error(`❌ Image ${idx} failed to load: ${src}`, e);
+              setImageLoading(false);
+              setImageLoadError(true);
+            }}
+          />
+          {imageLoadError && (
+            <div className="absolute inset-0 bg-red-100 border-2 border-red-300 rounded flex items-center justify-center text-red-600 text-xs p-2">
+              <div className="text-center">
+                <div>❌ Failed to load</div>
+                <div className="mt-1 break-all">{src}</div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </Rnd>
   );

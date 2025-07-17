@@ -124,7 +124,7 @@ const seedPlans = async () => {
     console.log(`Successfully inserted ${insertedPlans.length} subscription plans:`);
     
     insertedPlans.forEach(plan => {
-      console.log(`- ${plan.name}: $${plan.monthlyPrice}/month (${plan.features.length} features)`);
+      console.log(`- ${plan.name}: ₹${plan.monthlyPrice}/month (${plan.features.length} features)`);
     });
 
     console.log('\nSubscription plans seeded successfully!');

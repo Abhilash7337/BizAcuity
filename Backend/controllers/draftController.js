@@ -3,6 +3,7 @@ const SharedDraft = require('../models/SharedDraft');
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
 const Plan = require('../models/Plan');
+const crypto = require('crypto');
 
 // Create new draft
 const createDraft = async (req, res) => {
@@ -93,6 +94,13 @@ const getUserDrafts = async (req, res) => {
   }
 };
 
+// Helper to generate a secure random token
+function generateShareToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+const SHARE_TOKEN_EXPIRATION_DAYS = 7;
+
 // Get specific draft
 const getDraftById = async (req, res) => {
   try {
@@ -103,24 +111,15 @@ const getDraftById = async (req, res) => {
       return res.status(404).json({ error: 'Draft not found' });
     }
 
-    // Check if this is a public access request (no token required)
-    const isPublicAccess = !req.userId;
-    
-    if (isPublicAccess) {
-      // For public access, only allow if the draft is marked as public
-      if (!draft.isPublic) {
-        return res.status(403).json({ error: 'Draft is not publicly accessible' });
-      }
-      // Return draft for public access
-      return res.json(draft);
+    // Only allow access for owner or users the draft is shared with
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
-
-    // For authenticated access, check ownership or sharing
     const isOwner = draft.userId._id.toString() === req.userId;
     const isSharedWithUser = draft.sharedWith && Array.isArray(draft.sharedWith) && 
       draft.sharedWith.some(share => share.userId && share.userId.toString() === req.userId);
 
-    if (!isOwner && !isSharedWithUser && !draft.isPublic) {
+    if (!isOwner && !isSharedWithUser) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -259,6 +258,87 @@ const shareDraft = async (req, res) => {
   } catch (error) {
     console.error('Share draft error:', error);
     res.status(500).json({ error: 'Failed to share draft' });
+  }
+};
+
+// Share draft via link (generate token if needed)
+const setDraftPublicWithToken = async (req, res) => {
+  try {
+    const { draftId } = req.params;
+    const { isPublic, linkPermission } = req.body;
+    const userId = req.userId;
+    const draft = await Draft.findById(draftId);
+    if (!draft) {
+      return res.status(404).json({ error: 'Draft not found' });
+    }
+    if (draft.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    // Only generate a new token if making public and no token exists
+    if (isPublic) {
+      if (!draft.shareToken) {
+        draft.shareToken = generateShareToken();
+        draft.shareTokenExpires = new Date(Date.now() + SHARE_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000);
+      }
+      draft.isPublic = true;
+    } else {
+      draft.isPublic = false;
+      draft.shareToken = null;
+      draft.shareTokenExpires = null;
+    }
+    // Optionally store linkPermission if needed
+    if (linkPermission !== undefined) {
+      draft.linkPermission = linkPermission;
+    }
+    await draft.save();
+    res.json({
+      message: 'Draft sharing updated',
+      shareToken: draft.shareToken,
+      shareTokenExpires: draft.shareTokenExpires,
+      isPublic: draft.isPublic
+    });
+  } catch (error) {
+    console.error('Set draft public with token error:', error);
+    res.status(500).json({ error: 'Failed to update sharing' });
+  }
+};
+
+// Revoke share token (owner only)
+const revokeShareToken = async (req, res) => {
+  try {
+    const { draftId } = req.params;
+    const userId = req.userId;
+    const draft = await Draft.findById(draftId);
+    if (!draft) {
+      return res.status(404).json({ error: 'Draft not found' });
+    }
+    if (draft.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    draft.shareToken = null;
+    draft.shareTokenExpires = null;
+    draft.isPublic = false;
+    await draft.save();
+    res.json({ message: 'Share link revoked' });
+  } catch (error) {
+    console.error('Revoke share token error:', error);
+    res.status(500).json({ error: 'Failed to revoke share link' });
+  }
+};
+
+// Get drafts shared by the current user via link
+const getDraftsSharedByMe = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const drafts = await Draft.find({
+      userId,
+      isPublic: true,
+      shareToken: { $ne: null }
+    }).sort({ updatedAt: -1 });
+    res.json(drafts);
+  } catch (error) {
+    console.error('Get drafts shared by me error:', error);
+    res.status(500).json({ error: 'Failed to fetch shared drafts' });
   }
 };
 
@@ -413,5 +493,8 @@ module.exports = {
   getSharedDrafts,
   removeFromSharedDraft,
   getDraftStatus,
-  getImageUploadStatus
+  getImageUploadStatus,
+  setDraftPublicWithToken,
+  revokeShareToken,
+  getDraftsSharedByMe
 };

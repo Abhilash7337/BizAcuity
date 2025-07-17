@@ -100,7 +100,7 @@ const createTestPlans = async () => {
     for (const planData of testPlans) {
       const plan = new Plan(planData);
       await plan.save();
-      console.log(`Created plan: ${plan.name} with ${plan.limits.designsPerMonth === -1 ? 'unlimited' : plan.limits.designsPerMonth} draft limit`);
+      console.log(`Created plan: ${plan.name} with ${plan.limits.designsPerMonth === -1 ? 'unlimited' : plan.limits.designsPerMonth} draft limit, ₹${plan.monthlyPrice}/month`);
     }
 
     console.log('Test plans created successfully!');

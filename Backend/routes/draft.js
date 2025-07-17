@@ -11,7 +11,10 @@ const {
   getSharedDrafts, 
   removeFromSharedDraft,
   getDraftStatus,
-  getImageUploadStatus
+  getImageUploadStatus,
+  setDraftPublicWithToken,
+  revokeShareToken,
+  getDraftsSharedByMe
 } = require('../controllers/draftController');
 
 // Protected route - Create new draft
@@ -34,6 +37,14 @@ router.get('/drafts/shared/:draftId', getDraftById);
 
 // Update draft - Protected
 router.put('/drafts/:draftId', verifyToken, updateDraft);
+
+// Add a protected route for updating public sharing and generating a share token
+router.put('/drafts/:draftId/public', verifyToken, setDraftPublicWithToken);
+
+// Add a protected route for revoking a share token
+router.put('/drafts/:draftId/revoke-share', verifyToken, revokeShareToken);
+// Add a protected route for getting drafts shared by the current user via link
+router.get('/drafts/shared-by-me', verifyToken, getDraftsSharedByMe);
 
 // Delete draft - Protected
 router.delete('/drafts/:draftId', verifyToken, deleteDraft);

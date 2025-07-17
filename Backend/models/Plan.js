@@ -37,22 +37,11 @@ const planSchema = new mongoose.Schema({
       type: Number,
       default: 3, // Default limit for image uploads per design
       min: -1 // -1 means unlimited
-    },
-    exportResolution: {
-      type: String,
-      enum: ['SD', 'HD', 'FHD', '4K'],
-      default: 'HD'
-    },
-    storageGB: {
-      type: Number,
-      default: 10,
-      min: 0
-    },
-    supportLevel: {
-      type: String,
-      enum: ['basic', 'priority', 'premium'],
-      default: 'basic'
     }
+  },
+  exportDrafts: {
+    type: Boolean,
+    default: false
   },
   isActive: {
     type: Boolean,

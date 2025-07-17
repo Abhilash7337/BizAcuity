@@ -6,15 +6,24 @@ const fs = require('fs');
 // Configure multer for decor uploads
 const decorStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const decorDir = path.join(__dirname, '../../uploads/decors');
+    const decorDir = path.join(__dirname, '../uploads/decors');
+    console.log('🔍 Multer destination path:', decorDir);
+    console.log('🔍 __dirname:', __dirname);
+    console.log('🔍 Checking if directory exists...');
+    
     if (!fs.existsSync(decorDir)) {
+      console.log('🔍 Directory does not exist, creating:', decorDir);
       fs.mkdirSync(decorDir, { recursive: true });
+    } else {
+      console.log('🔍 Directory already exists:', decorDir);
     }
     cb(null, decorDir);
   },
   filename: (req, file, cb) => {
     const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueName + path.extname(file.originalname));
+    const filename = uniqueName + path.extname(file.originalname);
+    console.log('🔍 Generated filename:', filename);
+    cb(null, filename);
   }
 });
 
@@ -47,17 +56,46 @@ const getAllDecors = async (req, res) => {
 
 // Create new decor (admin only)
 const createDecor = (req, res) => {
+  console.log('🎯 Backend: createDecor called');
+  console.log('🎯 Request body:', req.body);
+  console.log('🎯 Request file:', req.file);
+  
   upload.single('image')(req, res, async (err) => {
     if (err) {
+      console.error('🎯 Multer error:', err);
       return res.status(400).json({ error: err.message });
+    }
+
+    console.log('🎯 After multer - req.file:', req.file);
+    console.log('🎯 After multer - req.body:', req.body);
+    
+    if (req.file) {
+      console.log('🔍 File details:');
+      console.log('  - Original name:', req.file.originalname);
+      console.log('  - Filename:', req.file.filename);
+      console.log('  - Destination:', req.file.destination);
+      console.log('  - Path:', req.file.path);
+      console.log('  - Size:', req.file.size);
+      
+      // Verify file was actually saved
+      const fileExists = fs.existsSync(req.file.path);
+      console.log('🔍 File exists on disk:', fileExists);
+      
+      if (!fileExists) {
+        console.error('🚨 File was not saved to disk!');
+        return res.status(500).json({ error: 'File upload failed - file not saved' });
+      }
     }
 
     try {
       const { name, category, description } = req.body;
       
       if (!req.file) {
+        console.error('🎯 No file received!');
         return res.status(400).json({ error: 'Image file is required' });
       }
+
+      console.log('🎯 Creating decor with file:', req.file.filename);
 
       const decor = new Decor({
         name,
@@ -69,9 +107,10 @@ const createDecor = (req, res) => {
       });
 
       await decor.save();
+      console.log('🎯 Decor saved successfully:', decor);
       res.status(201).json(decor);
     } catch (error) {
-      console.error('Error creating decor:', error);
+      console.error('🎯 Error creating decor:', error);
       res.status(500).json({ error: 'Failed to create decor' });
     }
   });
