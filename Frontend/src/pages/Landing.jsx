@@ -8,7 +8,8 @@ import {
   DraftsGrid, 
   SharedDraftsGrid, 
   DeleteModal, 
-  SharedDeleteModal
+  SharedDeleteModal,
+  SharedByYouGrid
 } from '../components/landing';
 
 const Landing = () => {
@@ -25,6 +26,11 @@ const Landing = () => {
   const [showSharedDeleteModal, setShowSharedDeleteModal] = useState(false);
   const [sharedDraftToRemove, setSharedDraftToRemove] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [sharedByYouDrafts, setSharedByYouDrafts] = useState([]);
+  const [sharedByYouLoading, setSharedByYouLoading] = useState(true);
+  const [sharedByYouError, setSharedByYouError] = useState(null);
+  const [revokeLoading, setRevokeLoading] = useState(false);
+  const [revokeError, setRevokeError] = useState(null);
 
   // Extra protection - redirect to login if not authenticated
   useEffect(() => {
@@ -66,8 +72,23 @@ const Landing = () => {
       }
     };
 
+    const fetchSharedByYouDrafts = async () => {
+      try {
+        setSharedByYouLoading(true);
+        const response = await authFetch('http://localhost:5001/drafts/shared-by-me');
+        if (!response.ok) throw new Error('Failed to fetch drafts shared by you');
+        const data = await response.json();
+        setSharedByYouDrafts(data);
+      } catch (err) {
+        setSharedByYouError(err.message);
+      } finally {
+        setSharedByYouLoading(false);
+      }
+    };
+
     fetchDrafts();
     fetchSharedDrafts();
+    fetchSharedByYouDrafts();
   }, [registeredUser, navigate]);
 
   const formatDate = (dateString) => {
@@ -137,6 +158,26 @@ const Landing = () => {
       console.error('Remove shared draft error:', error);
       alert('Failed to remove from shared drafts. Please try again.');
     }
+  };
+
+  const handleRevokeShare = async (draft) => {
+    if (!draft) return;
+    setRevokeLoading(true);
+    setRevokeError(null);
+    try {
+      const response = await authFetch(`http://localhost:5001/drafts/${draft._id}/revoke-share`, {
+        method: 'PUT',
+      });
+      if (!response.ok) throw new Error('Failed to revoke share link');
+      setSharedByYouDrafts(sharedByYouDrafts.filter(d => d._id !== draft._id));
+    } catch (err) {
+      setRevokeError(err.message);
+    } finally {
+      setRevokeLoading(false);
+    }
+  };
+  const handleOpenSharedByYouDraft = (draftId, token) => {
+    navigate(`/wall?draftId=${draftId}&shared=true&token=${token}`);
   };
 
   // Don't render anything until we verify authentication
@@ -423,6 +464,17 @@ const Landing = () => {
           isVisible={isVisible}
           onOpenDraft={handleOpenDraft}
           onRemoveClick={handleSharedDraftRemoveClick}
+          formatDate={formatDate}
+        />
+
+        {/* Shared By You Section */}
+        <SharedByYouGrid
+          sharedByYouDrafts={sharedByYouDrafts}
+          loading={sharedByYouLoading || revokeLoading}
+          error={sharedByYouError || revokeError}
+          isVisible={isVisible}
+          onOpenDraft={handleOpenSharedByYouDraft}
+          onRevokeClick={handleRevokeShare}
           formatDate={formatDate}
         />
       </div>

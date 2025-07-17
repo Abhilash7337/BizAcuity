@@ -51,6 +51,14 @@ const draftSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
     },
+  shareToken: {
+    type: String,
+    default: null
+  },
+  shareTokenExpires: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

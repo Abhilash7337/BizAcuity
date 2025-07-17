@@ -131,6 +131,7 @@ const ShareModal = ({
       setError('');
 
       let finalDraftId = draftId;
+      let shareToken = null;
 
       if (!draftId) {
         // Create a new draft for sharing
@@ -153,24 +154,26 @@ const ShareModal = ({
         if (onDraftCreated) {
           onDraftCreated(finalDraftId);
         }
-      } else {
-        // For existing drafts, make sure they are marked as public for sharing
-        const updateResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            isPublic: true,
-            linkPermission: linkPermission // Update permission
-          }),
-        });
-
-        if (!updateResponse.ok) {
-          console.warn('Failed to update draft as public, but continuing with share');
-        }
       }
 
-      // Generate shareable URL with permission parameter
-      const shareableUrl = `${window.location.origin}/wall?draftId=${finalDraftId}&shared=true&permission=${linkPermission}`;
+      // Request backend to set public and get share token
+      const updateResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}/public`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isPublic: true,
+          linkPermission: linkPermission // Update permission
+        }),
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update draft as public');
+      }
+      const updateData = await updateResponse.json();
+      shareToken = updateData.shareToken;
+
+      // Generate shareable URL with token and permission parameter
+      const shareableUrl = `${window.location.origin}/wall?draftId=${finalDraftId}&shared=true&token=${shareToken}&permission=${linkPermission}`;
       setShareUrl(shareableUrl);
       setIsLoading(false);
     } catch (error) {
