@@ -44,11 +44,15 @@ function WallEditor() {
   const [wallHeight, setWallHeight] = useState(600);
 
   // Image State
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // All images (user uploads + decors)
   const [imageStates, setImageStates] = useState([]);
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [imageUploadLimit, setImageUploadLimit] = useState(null);
   const [imageUploadPlan, setImageUploadPlan] = useState('');
+
+  // Derived: Only user-uploaded images (not decors)
+  const userUploadedImages = images.filter((_, idx) => !imageStates[idx]?.isDecor);
+  const userUploadedImageStates = imageStates.filter((img) => !img.isDecor);
 
   // UI State
   const [activeTab, setActiveTab] = useState('editor');
@@ -63,6 +67,7 @@ function WallEditor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [canExport, setCanExport] = useState(true); // default true for backward compatibility
 
   // Refs
   const wallRef = useRef(null);
@@ -322,6 +327,35 @@ function WallEditor() {
     }
   }, [draftId, shareToken, sharedParam, location.search]);
 
+  // Fetch exportDrafts permission from backend
+  useEffect(() => {
+    const fetchExportPermission = async () => {
+      if (!registeredUser?.isLoggedIn) {
+        setCanExport(false);
+        return;
+      }
+      try {
+        // Fetch user profile (should include plan name)
+        const profileRes = await authFetch('http://localhost:5001/user/profile');
+        if (!profileRes.ok) throw new Error('Failed to fetch user profile');
+        const profile = await profileRes.json();
+        if (!profile.plan) {
+          setCanExport(false);
+          return;
+        }
+        // Fetch plan details
+        const plansRes = await fetch('http://localhost:5001/api/plans');
+        const plansData = await plansRes.json();
+        let plans = plansData.plans || plansData;
+        const userPlan = plans.find(p => p.name.toLowerCase() === profile.plan.toLowerCase());
+        setCanExport(userPlan?.exportDrafts === true);
+      } catch (err) {
+        setCanExport(false);
+      }
+    };
+    fetchExportPermission();
+  }, [registeredUser]);
+
   // Helper function to sync image states
   const syncImageStates = (imgs, states) => {
     return imgs.map((img, idx) => {
@@ -383,7 +417,7 @@ function WallEditor() {
     try {
       if (!registeredUser?.isLoggedIn) {
         // For non-logged in users, allow up to 1 image (guest limit)
-        const currentCount = images.length;
+        const currentCount = userUploadedImages.length;
         const totalAfterUpload = currentCount + newImagesCount;
         if (totalAfterUpload > 1) {
           throw new Error(`Guest users can only upload up to 1 image per design. You currently have ${currentCount} images and are trying to add ${newImagesCount} more.`);
@@ -403,7 +437,7 @@ function WallEditor() {
       console.log('Image upload status:', data);
 
       const { allowedLimit, currentUsage } = data;
-      const currentCount = images.length;
+      const currentCount = userUploadedImages.length;
       const totalAfterUpload = currentCount + newImagesCount;
 
       // Check if unlimited (-1)
@@ -517,9 +551,18 @@ function WallEditor() {
 
   const handleRemoveWallImage = () => setWallImage(null);
   
-  const handleRemoveImage = (idx) => {
+  // Remove only user-uploaded images (not decors)
+  const handleRemoveImage = (userIdx) => {
+    // Find the index in the full images/imageStates arrays
+    let count = -1;
+    const removeIdx = imageStates.findIndex((img) => {
+      if (!img.isDecor) count++;
+      return !img.isDecor && count === userIdx;
+    });
+    if (removeIdx === -1) return;
+
     const preservedStates = imageStates
-      .filter((_, i) => i !== idx)
+      .filter((_, i) => i !== removeIdx)
       .map(state => ({
         ...state,
         x: state.x,
@@ -532,14 +575,14 @@ function WallEditor() {
         zIndex: state.zIndex
       }));
 
-    const preservedImages = images.filter((_, i) => i !== idx);
+    const preservedImages = images.filter((_, i) => i !== removeIdx);
 
     setImages(preservedImages);
     setImageStates(preservedStates);
 
-    if (selectedIdx === idx) {
+    if (selectedIdx === removeIdx) {
       setSelectedIdx(null);
-    } else if (selectedIdx > idx) {
+    } else if (selectedIdx > removeIdx) {
       setSelectedIdx(selectedIdx - 1);
     }
   };
@@ -689,7 +732,7 @@ function WallEditor() {
     tabContent = (
       <UploadImagesPanel
         imagesInputRef={imagesInputRef}
-        images={images}
+        images={userUploadedImages}
         handleRemoveImage={handleRemoveImage}
         imageUploadLimit={imageUploadLimit}
         imageUploadPlan={imageUploadPlan}
@@ -746,7 +789,33 @@ function WallEditor() {
       </div>
     );
   } else if (activeTab === 'decors') {
-    tabContent = <DecorsPanel onAddDecor={handleAddDecor} />;
+    // Find user-uploaded decors (isDecor: true)
+    const userDecors = images
+      .map((src, idx) => ({ src, state: imageStates[idx], idx }))
+      .filter(item => item.state && item.state.isDecor);
+
+    // Handler to remove a decor by its index in images/imageStates
+    const handleRemoveDecor = (decorIdx) => {
+      setImages(prev => prev.filter((_, i) => i !== decorIdx));
+      setImageStates(prev => prev.filter((_, i) => i !== decorIdx));
+      if (selectedIdx === decorIdx) setSelectedIdx(null);
+      else if (selectedIdx > decorIdx) setSelectedIdx(selectedIdx - 1);
+    };
+
+    // Handler to select a user decor by its index
+    const handleSelectUserDecor = (decorIdx) => {
+      setSelectedIdx(decorIdx);
+      setActiveTab('editor'); // Switch to editor tab for property changes
+    };
+
+    tabContent = (
+      <DecorsPanel
+        onAddDecor={handleAddDecor}
+        userDecors={userDecors}
+        onRemoveUserDecor={handleRemoveDecor}
+        onSelectUserDecor={handleSelectUserDecor}
+      />
+    );
   }
 
   return (
@@ -1174,7 +1243,7 @@ function WallEditor() {
             </button>
             {/* Export Button - new floating action button */}
             <div className="w-14 h-14">
-              <ExportButton wallRef={wallRef} />
+              <ExportButton wallRef={wallRef} canExport={canExport} />
             </div>
             <button 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

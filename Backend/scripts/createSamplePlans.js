@@ -113,7 +113,7 @@ async function createSamplePlans() {
     console.log(`Created ${createdPlans.length} sample plans:`);
     
     createdPlans.forEach(plan => {
-      console.log(`- ${plan.name}: $${plan.monthlyPrice}/month (${plan.features.length} features)`);
+      console.log(`- ${plan.name}: ₹${plan.monthlyPrice}/month (${plan.features.length} features)`);
     });
 
     console.log('\nSample plans created successfully!');

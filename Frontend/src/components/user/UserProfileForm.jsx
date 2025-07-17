@@ -203,36 +203,38 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
     <div className="space-y-6">
       {!isEditing ? (
         // View Mode
-        <div className="space-y-6">
+        <div className="space-y-6 font-poppins">
           {/* User Information Display */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-primary uppercase tracking-wide">Full Name</label>
-              <div className="bg-primary-light/20 rounded-xl p-4 border border-primary-light/30">
-                <p className="text-primary-dark font-semibold text-lg">{user?.name || 'Not set'}</p>
+              <label className="text-sm font-medium text-[#ff9800] uppercase tracking-wide">Full Name</label>
+              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                <p className="text-[#625d8c] font-semibold text-lg">{user?.name || 'Not set'}</p>
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium text-primary uppercase tracking-wide">Email Address</label>
-              <div className="bg-primary-light/20 rounded-xl p-4 border border-primary-light/30">
-                <p className="text-primary-dark font-semibold text-lg">{user?.email || 'Not set'}</p>
+              <label className="text-sm font-medium text-[#ff9800] uppercase tracking-wide">Email Address</label>
+              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                <p className="text-[#625d8c] font-semibold text-lg">{user?.email || 'Not set'}</p>
               </div>
             </div>
           </div>
 
           {/* Current Plan Display */}
           <div className="space-y-3">
-            <label className="text-base font-bold text-primary uppercase tracking-wide">Current Plan</label>
-            <div className="bg-gradient-to-r from-primary-light/20 to-accent/20 rounded-xl p-5 border border-primary-light/30">
+            <label className="text-base font-bold text-[#625d8c] uppercase tracking-wide">Current Plan</label>
+            <div className="bg-gradient-to-r from-orange-100 to-orange-200 rounded-xl p-5 border border-orange-100">
               <div className="flex items-center justify-between">
-                <p className="text-primary-dark font-bold text-xl">
+                <p className="text-[#ff9800] font-bold text-xl">
                   {user?.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) + ' Plan' : 'No plan selected'}
                 </p>
                 <button
                   type="button"
                   onClick={() => navigate('/choose-plan')}
-                  className="px-6 py-3 bg-primary-dark text-white rounded-xl text-base font-bold hover:bg-primary transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+                  className="w-half py-3 px-6 rounded-2xl text-white font-semibold
+                     bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
+                     transition-all duration-200 shadow-xl hover:scale-105"
                 >
                   {user?.plan ? 'Change Plan' : 'Choose Plan'}
                 </button>
@@ -243,7 +245,9 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
           {/* Edit Button */}
           <button
             onClick={() => setIsEditing(true)}
-            className="w-full bg-gradient-to-r from-primary to-primary-dark text-white py-5 px-8 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300"
+            className="w-half py-3 px-6 rounded-2xl text-white font-semibold
+                     bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
+                     transition-all duration-200 shadow-xl hover:scale-105"
           >
             <span className="flex items-center justify-center gap-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

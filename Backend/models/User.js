@@ -36,7 +36,6 @@ const userSchema = new mongoose.Schema({
     },
     plan: {
         type: String,
-        enum: ['free', 'regular', 'pro', 'enterprise'],
         default: 'free'
     },
     isVerified: {

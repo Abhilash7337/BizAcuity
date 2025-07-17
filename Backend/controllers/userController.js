@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
 const Plan = require('../models/Plan');
+const { sendOTPEmail, sendPlanSubscriptionEmail } = require('../utils/emailService');
 
 // Get user by ID
 const getUserById = async (req, res) => {
@@ -107,12 +108,21 @@ const choosePlan = async (req, res) => {
   try {
     const { plan } = req.body;
     
-    // Validate plan selection against allowed values
-    const validPlans = ['free', 'regular', 'pro', 'enterprise'];
-    if (!plan || !validPlans.includes(plan)) {
+    // Validate plan selection against database
+    if (!plan) {
+      return res.status(400).json({ 
+        error: 'No plan specified',
+        receivedPlan: plan
+      });
+    }
+
+    // Find the plan in the database (case-insensitive)
+    const planDetails = await Plan.findOne({ name: { $regex: new RegExp('^' + plan + '$', 'i') } });
+    if (!planDetails) {
+      const allPlans = await Plan.find({}).select('name -_id');
       return res.status(400).json({ 
         error: 'Invalid plan selection',
-        validPlans: validPlans,
+        validPlans: allPlans.map(p => p.name),
         receivedPlan: plan
       });
     }
@@ -122,22 +132,19 @@ const choosePlan = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Get the plan details from the Plan collection
-    const planDetails = await Plan.findOne({ name: plan });
-    const planPrice = planDetails ? planDetails.monthlyPrice : 0;
-
-    // Update user's plan
-    user.plan = plan;
+    // Update user's plan to the canonical plan name
+    user.plan = planDetails.name;
     await user.save();
 
     // Create or update user's subscription
     let subscription = await Subscription.findOne({ userId: req.userId });
+    const planPrice = planDetails.monthlyPrice;
     
     if (!subscription) {
       // Create new subscription
       subscription = new Subscription({
         userId: req.userId,
-        plan: plan,
+        plan: planDetails.name,
         status: 'active',
         billingCycle: 'monthly',
         amount: planPrice,
@@ -147,7 +154,7 @@ const choosePlan = async (req, res) => {
       });
     } else {
       // Update existing subscription
-      subscription.plan = plan;
+      subscription.plan = planDetails.name;
       subscription.amount = planPrice;
       subscription.status = 'active';
       subscription.startDate = new Date();
@@ -155,6 +162,22 @@ const choosePlan = async (req, res) => {
     }
     
     await subscription.save();
+
+    // Send plan subscription confirmation email
+    if (user.email && planDetails) {
+      sendPlanSubscriptionEmail(
+        user.email,
+        user.name,
+        {
+          name: planDetails.name,
+          monthlyPrice: planDetails.monthlyPrice,
+          yearlyPrice: planDetails.yearlyPrice,
+          description: planDetails.description,
+          features: planDetails.features,
+          limits: planDetails.limits
+        }
+      );
+    }
 
     res.json({
       message: 'Plan selected successfully',

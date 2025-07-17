@@ -21,7 +21,6 @@ const paymentSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ['regular', 'pro'],
     required: true
   },
   paymentMethod: {

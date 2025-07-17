@@ -84,7 +84,7 @@ const ChangePasswordForm = () => {
       <div className="pt-4">
         <button
           onClick={() => setIsUpdatingPassword(!isUpdatingPassword)}
-          className="w-full py-3 px-6 rounded-xl text-white font-semibold
+          className="w-half py-3 px-6 rounded-xl text-white font-semibold
                    bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
                    transition-all duration-200 shadow-xl hover:scale-105"
         >
@@ -121,7 +121,7 @@ const ChangePasswordForm = () => {
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
+              className="w-half px-4 py-3 rounded-2xl border border-orange-200 
                        focus:outline-none focus:ring-2 focus:ring-orange-300/20 
                        focus:border-orange-400 transition-all duration-300
                        bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
@@ -163,7 +163,7 @@ const ChangePasswordForm = () => {
 
           <button
             type="submit"
-            className="w-full py-3 px-6 rounded-2xl text-white font-semibold
+            className="w-half py-3 px-6 rounded-2xl text-white font-semibold
                      bg-gradient-to-r from-orange-600 to-orange-400 hover:from-orange-500 hover:to-orange-300
                      transition-all duration-200 shadow-xl hover:scale-105"
           >

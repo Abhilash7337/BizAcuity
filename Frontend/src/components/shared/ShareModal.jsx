@@ -158,15 +158,15 @@ const ShareModal = ({
 
       // Request backend to set public and get share token
       const updateResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}/public`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          isPublic: true,
-          linkPermission: linkPermission // Update permission
-        }),
-      });
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            isPublic: true,
+            linkPermission: linkPermission // Update permission
+          }),
+        });
 
-      if (!updateResponse.ok) {
+        if (!updateResponse.ok) {
         throw new Error('Failed to update draft as public');
       }
       const updateData = await updateResponse.json();

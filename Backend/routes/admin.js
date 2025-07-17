@@ -81,7 +81,7 @@ router.get('/plans', verifyToken, checkAdmin, async (req, res) => {
 // Create new plan
 router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
 
     // Validate required fields
     if (!name || monthlyPrice === undefined) {
@@ -106,11 +106,10 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
       features: features || [],
       limits: {
         designsPerMonth: limits?.designsPerMonth ?? -1,
-        exportResolution: limits?.exportResolution || 'HD',
-        storageGB: limits?.storageGB || 10,
-        supportLevel: limits?.supportLevel || 'basic'
+        imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
-      isActive: isActive !== undefined ? isActive : true
+      isActive: isActive !== undefined ? isActive : true,
+      exportDrafts: exportDrafts === true
     });
 
     const savedPlan = await newPlan.save();
@@ -134,7 +133,7 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
 router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
 
     const updatedPlan = await Plan.findByIdAndUpdate(
       id,
@@ -146,11 +145,10 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
         features: features || [],
         limits: {
           designsPerMonth: limits?.designsPerMonth ?? -1,
-          exportResolution: limits?.exportResolution || 'HD',
-          storageGB: limits?.storageGB || 10,
-          supportLevel: limits?.supportLevel || 'basic'
+          imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
         },
-        isActive: isActive !== undefined ? isActive : true
+        isActive: isActive !== undefined ? isActive : true,
+        exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined
       },
       { new: true }
     );
