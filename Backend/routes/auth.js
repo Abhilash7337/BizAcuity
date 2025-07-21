@@ -1,8 +1,26 @@
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 const { sendOTPEmail } = require('../utils/emailService');
+
+// Cleanup expired temp registrations
+router.delete('/cleanup-temp-registrations', async (req, res) => {
+    try {
+        const now = new Date();
+        const result = await TempRegistration.deleteMany({
+            $or: [
+                { 'otp.expiresAt': { $lt: now } },
+                { 'otp': { $exists: false } }
+            ]
+        });
+        res.json({ message: 'Expired temp registrations cleaned up', deletedCount: result.deletedCount });
+    } catch (error) {
+        console.error('Cleanup temp registrations error:', error);
+        res.status(500).json({ error: 'Failed to clean up temp registrations' });
+    }
+});
 
 // Temporary registration model for pending users
 const mongoose = require('mongoose');
@@ -23,19 +41,27 @@ router.post('/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Check if user already exists (in permanent or temp collection)
+
+        // Check if user already exists (in permanent collection)
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ error: 'User already exists' });
         }
+
+        // Check for pending registration
         let tempUser = await TempRegistration.findOne({ email });
         if (tempUser) {
-            return res.status(400).json({ error: 'Registration already initiated. Please verify your email.' });
+            // If OTP expired, delete pending registration and allow new registration
+            if (!tempUser.otp || tempUser.otp.expiresAt < new Date()) {
+                await TempRegistration.deleteOne({ _id: tempUser._id });
+            } else {
+                return res.status(400).json({ error: 'Registration already initiated. Please verify your email or request a new OTP.' });
+            }
         }
 
         // Generate OTP
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
+        const otpExpires = new Date(Date.now() + 1 * 60 * 1000); // 1 min expiry
 
         // Save to temp collection
         tempUser = new TempRegistration({
@@ -115,27 +141,22 @@ router.post('/verify-otp', async (req, res) => {
 // Resend OTP
 router.post('/resend-otp', async (req, res) => {
     try {
-        const { userId } = req.body;
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+        // Support resending OTP for pending registrations (before verification)
+        const { email } = req.body;
+        let tempUser = await TempRegistration.findOne({ email });
+        if (!tempUser) {
+            return res.status(404).json({ error: 'No pending registration found for this email.' });
         }
-
-        if (user.isVerified) {
-            return res.status(400).json({ error: 'Email already verified' });
-        }
-
         // Generate new OTP
-        const otp = user.generateOTP();
-        await user.save();
-
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date(Date.now() + 1 * 60 * 1000); // 1 min expiry
+        tempUser.otp = { code: otpCode, expiresAt: otpExpires };
+        await tempUser.save();
         // Send new OTP email
-        const emailSent = await sendOTPEmail(user.email, otp);
+        const emailSent = await sendOTPEmail(email, otpCode);
         if (!emailSent) {
             return res.status(500).json({ error: 'Failed to send verification email' });
         }
-
         res.json({ message: 'OTP resent successfully' });
     } catch (error) {
         console.error('Resend OTP error:', error);

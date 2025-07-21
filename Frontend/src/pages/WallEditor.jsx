@@ -24,6 +24,9 @@ import {
 
 import ExportButton from '../components/shared/ExportButton';
 
+// Custom hooks
+import useWallData from '../components/wall/hooks/useWallData';
+
 const MIN_SIZE = 200;
 const MAX_SIZE = 2000;
 
@@ -35,24 +38,25 @@ const TABS = [
 ];
 
 function WallEditor() {
-  // Wall State
-  const [wallImage, setWallImage] = useState(null);
-  const [wallColor, setWallColor] = useState('#ffffff');
-  const [inputWidth, setInputWidth] = useState(800);
-  const [inputHeight, setInputHeight] = useState(600);
-  const [wallWidth, setWallWidth] = useState(800);
-  const [wallHeight, setWallHeight] = useState(600);
-
-  // Image State
-  const [images, setImages] = useState([]); // All images (user uploads + decors)
-  const [imageStates, setImageStates] = useState([]);
-  const [selectedIdx, setSelectedIdx] = useState(null);
-  const [imageUploadLimit, setImageUploadLimit] = useState(null);
-  const [imageUploadPlan, setImageUploadPlan] = useState('');
-
-  // Derived: Only user-uploaded images (not decors)
-  const userUploadedImages = images.filter((_, idx) => !imageStates[idx]?.isDecor);
-  const userUploadedImageStates = imageStates.filter((img) => !img.isDecor);
+  // Wall state and handlers from custom hook
+  const {
+    wallImage, setWallImage,
+    wallColor, setWallColor,
+    inputWidth, setInputWidth,
+    inputHeight, setInputHeight,
+    wallWidth, setWallWidth,
+    wallHeight, setWallHeight,
+    images, setImages,
+    imageStates, setImageStates,
+    selectedIdx, setSelectedIdx,
+    wallRef, wallImageInputRef, imagesInputRef,
+    userUploadedImages, userUploadedImageStates,
+    handleWallImageChange, handleImageChange, handleRemoveWallImage, handleRemoveImage,
+    handleColorChange, handleSetWallSize, handleShapeChange, handleFrameChange,
+    handleSizeChange, handleRotationChange, handleOpacityChange, handleResetSize,
+    handleFitToWall, handleDelete, handleAddDecor,
+    // keep other state/handlers for now
+  } = useWallData();
 
   // UI State
   const [activeTab, setActiveTab] = useState('editor');
@@ -68,11 +72,12 @@ function WallEditor() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [canExport, setCanExport] = useState(true); // default true for backward compatibility
+  // Image upload limits state
+  const [imageUploadLimit, setImageUploadLimit] = useState(1);
+  const [imageUploadPlan, setImageUploadPlan] = useState('Guest');
 
   // Refs
-  const wallRef = useRef(null);
-  const wallImageInputRef = useRef(null);
-  const imagesInputRef = useRef(null);
+  // (refs provided by useWallData)
 
   // Router and Context
   const { registeredUser } = useContext(UserContext);
@@ -378,343 +383,7 @@ function WallEditor() {
     });
   };
 
-  // Image Handling Functions
-  const handleWallImageChange = async (e) => {
-    console.log('handleWallImageChange called', e.target.files);
-    const file = e.target.files[0];
-    if (file) {
-      console.log('Wall image file selected:', file);
-      try {
-        const formData = new FormData();
-        formData.append('image', file);
-
-        console.log('Uploading wall image to server...');
-        
-        const response = await authFetch('http://localhost:5001/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        console.log('Upload response status:', response.status);
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Upload error response:', errorText);
-          throw new Error(`Failed to upload image: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log('Wall image upload successful:', data);
-        setWallImage(data.url);
-      } catch (error) {
-        console.error('Error uploading wall image:', error);
-        alert('Failed to upload the image. Please try again.');
-      }
-    }
-  };
-
-  // Check image upload limits
-  const checkImageUploadLimits = async (newImagesCount) => {
-    try {
-      if (!registeredUser?.isLoggedIn) {
-        // For non-logged in users, allow up to 1 image (guest limit)
-        const currentCount = userUploadedImages.length;
-        const totalAfterUpload = currentCount + newImagesCount;
-        if (totalAfterUpload > 1) {
-          throw new Error(`Guest users can only upload up to 1 image per design. You currently have ${currentCount} images and are trying to add ${newImagesCount} more.`);
-        }
-        return true;
-      }
-
-      console.log('Checking image upload limits...');
-      const response = await authFetch('http://localhost:5001/drafts/image-upload-status');
-      
-      if (!response.ok) {
-        console.warn('Could not check image upload limits, allowing upload');
-        return true; // Allow upload if we can't check limits
-      }
-
-      const data = await response.json();
-      console.log('Image upload status:', data);
-
-      const { allowedLimit, currentUsage } = data;
-      const currentCount = userUploadedImages.length;
-      const totalAfterUpload = currentCount + newImagesCount;
-
-      // Check if unlimited (-1)
-      if (allowedLimit === -1) {
-        console.log('Unlimited image uploads allowed');
-        return true;
-      }
-
-      // Check if within limit
-      if (totalAfterUpload > allowedLimit) {
-        const planName = data.planName || 'Current plan';
-        throw new Error(
-          `${planName} allows only ${allowedLimit} image${allowedLimit !== 1 ? 's' : ''} per design. ` +
-          `You currently have ${currentCount} image${currentCount !== 1 ? 's' : ''} and are trying to add ${newImagesCount} more. ` +
-          `Please upgrade your plan or remove some existing images.`
-        );
-      }
-
-      console.log(`Image upload allowed: ${totalAfterUpload}/${allowedLimit} images`);
-      return true;
-
-    } catch (error) {
-      console.error('Image upload limit check failed:', error);
-      throw error;
-    }
-  };
-
-  const handleImageChange = async (e) => {
-    console.log('handleImageChange called', e.target.files);
-    const files = Array.from(e.target.files);
-    console.log('Images selected:', files);
-    try {
-      // Check image upload limits before proceeding
-      await checkImageUploadLimits(files.length);
-      
-      const uploadPromises = files.map(async (file) => {
-        const formData = new FormData();
-        formData.append('image', file);
-
-        console.log('Uploading image to server:', file.name);
-        
-        const response = await authFetch('http://localhost:5001/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        console.log('Upload response status:', response.status);
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Upload error response:', errorText);
-          throw new Error(`Failed to upload image: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log('Image upload successful:', data);
-        console.log('Generated URL:', data.url);
-        console.log('URL type:', typeof data.url);
-        console.log('URL length:', data.url?.length);
-        return data.url;
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
-      console.log('All images uploaded:', uploadedUrls);
-      console.log('Sample URL test:', uploadedUrls[0]);
-      
-      // Test if URLs are accessible
-      for (let i = 0; i < uploadedUrls.length; i++) {
-        const url = uploadedUrls[i];
-        try {
-          console.log(`Testing URL ${i}: ${url}`);
-          const testResponse = await fetch(url, { method: 'HEAD' });
-          console.log(`URL ${i} status: ${testResponse.status}`);
-        } catch (error) {
-          console.error(`URL ${i} test failed:`, error);
-        }
-      }
-      
-      const newStates = uploadedUrls.map((_, index) => {
-        const baseX = 100;
-        const baseY = 100;
-        const offset = 20;
-        
-        return {
-          x: baseX + (offset * index),
-          y: baseY + (offset * index),
-          width: 150,
-          height: 150,
-          shape: 'square',
-          frame: 'none',
-          isDecor: false,
-          zIndex: Date.now() + index
-        };
-      });
-
-      setImages(prevImages => [...prevImages, ...uploadedUrls]);
-      setImageStates(prevStates => [...prevStates, ...newStates]);
-      
-      console.log('🎯 Final images array:', [...images, ...uploadedUrls]);
-      console.log('🎯 Final imageStates array:', [...imageStates, ...newStates]);
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      
-      // Show specific error message for limit errors
-      if (error.message && (error.message.includes('allows only') || error.message.includes('Guest users'))) {
-        alert(error.message);
-      } else {
-        alert('Failed to upload one or more images. Please try again.');
-      }
-    }
-  };
-
-  const handleRemoveWallImage = () => setWallImage(null);
-  
-  // Remove only user-uploaded images (not decors)
-  const handleRemoveImage = (userIdx) => {
-    // Find the index in the full images/imageStates arrays
-    let count = -1;
-    const removeIdx = imageStates.findIndex((img) => {
-      if (!img.isDecor) count++;
-      return !img.isDecor && count === userIdx;
-    });
-    if (removeIdx === -1) return;
-
-    const preservedStates = imageStates
-      .filter((_, i) => i !== removeIdx)
-      .map(state => ({
-        ...state,
-        x: state.x,
-        y: state.y,
-        width: state.width,
-        height: state.height,
-        shape: state.shape,
-        frame: state.frame,
-        isDecor: state.isDecor,
-        zIndex: state.zIndex
-      }));
-
-    const preservedImages = images.filter((_, i) => i !== removeIdx);
-
-    setImages(preservedImages);
-    setImageStates(preservedStates);
-
-    if (selectedIdx === removeIdx) {
-      setSelectedIdx(null);
-    } else if (selectedIdx > removeIdx) {
-      setSelectedIdx(selectedIdx - 1);
-    }
-  };
-
-  const handleColorChange = (e) => setWallColor(e.target.value);
-
-  const handleSetWallSize = () => {
-    const width = Number(inputWidth);
-    const height = Number(inputHeight);
-    if (
-      width < MIN_SIZE ||
-      width > MAX_SIZE ||
-      height < MIN_SIZE ||
-      height > MAX_SIZE
-    ) {
-      alert(
-        `Wall size must be between ${MIN_SIZE}px and ${MAX_SIZE}px`
-      );
-      return;
-    }
-    setWallWidth(width);
-    setWallHeight(height);
-  };
-
-  const handleShapeChange = newShape => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, shape: newShape } : img
-      )
-    );
-  };
-
-  const handleFrameChange = newFrame => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, frame: newFrame } : img
-      )
-    );
-  };
-
-  const handleSizeChange = (property, value) => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, [property]: value } : img
-      )
-    );
-  };
-
-  const handleRotationChange = (rotation) => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, rotation: rotation } : img
-      )
-    );
-  };
-
-  const handleOpacityChange = (opacity) => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, opacity: opacity / 100 } : img
-      )
-    );
-  };
-
-  const handleResetSize = () => {
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, width: 150, height: 150 } : img
-      )
-    );
-  };
-
-  const handleFitToWall = () => {
-    const maxSize = Math.min(wallWidth * 0.8, wallHeight * 0.8);
-    setImageStates(states =>
-      states.map((img, i) =>
-        i === selectedIdx ? { ...img, width: maxSize, height: maxSize } : img
-      )
-    );
-  };
-
-  const handleDelete = () => {
-    if (selectedIdx === null) return;
-
-    const preservedStates = imageStates
-      .filter((_, idx) => idx !== selectedIdx)
-      .map(state => ({
-        ...state,
-        x: state.x,
-        y: state.y,
-        width: state.width,
-        height: state.height,
-        shape: state.shape,
-        frame: state.frame,
-        isDecor: state.isDecor,
-        zIndex: state.zIndex
-      }));
-
-    const preservedImages = images.filter((_, idx) => idx !== selectedIdx);
-
-    setImages(preservedImages);
-    setImageStates(preservedStates);
-    setSelectedIdx(null);
-    // Removed automatic tab switching to prevent rendering issues
-  };
-
-  const handleAddDecor = async (decorImage) => {
-    try {
-      const newIndex = images.length;
-      
-      setImages(prevImages => [...prevImages, decorImage.src]);
-      setImageStates(prevStates => [
-        ...prevStates,
-        {
-          x: Math.random() * (wallWidth - decorImage.size.width),
-          y: Math.random() * (wallHeight - decorImage.size.height),
-          width: decorImage.size.width,
-          height: decorImage.size.height,
-          shape: 'square',
-          frame: 'none',
-          isDecor: true,
-          zIndex: Date.now() + newIndex
-        }
-      ]);
-
-      setSelectedIdx(newIndex);
-      // Removed automatic tab switching to prevent rendering issues
-    } catch (error) {
-      console.error('Error adding decor:', error);
-      alert('Failed to add decor item. Please try again.');
-    }
-  };
+  // (refs and handlers provided by useWallData)
 
   // Generate tab content based on active tab
   let tabContent = null;
@@ -820,110 +489,6 @@ function WallEditor() {
 
   return (
     <>
-      {/* Animation Keyframes for Wall Editor */}
-      <style>{`
-        @keyframes cloudDrift {
-          0% { 
-            transform: translateX(-100px) translateY(0px) scale(1);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.3;
-          }
-          50% { 
-            transform: translateX(50vw) translateY(-20px) scale(1.1);
-            opacity: 0.6;
-          }
-          90% {
-            opacity: 0.3;
-          }
-          100% { 
-            transform: translateX(calc(100vw + 100px)) translateY(0px) scale(1);
-            opacity: 0;
-          }
-        }
-
-        @keyframes abstractMorph {
-          0%, 100% { 
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            transform: rotate(0deg) scale(1);
-          }
-          25% { 
-            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-            transform: rotate(90deg) scale(1.1);
-          }
-          50% { 
-            border-radius: 50% 30% 60% 40% / 30% 70% 40% 70%;
-            transform: rotate(180deg) scale(0.9);
-          }
-          75% { 
-            border-radius: 40% 70% 30% 60% / 70% 40% 60% 30%;
-            transform: rotate(270deg) scale(1.05);
-          }
-        }
-
-        @keyframes backgroundFlow {
-          0%, 100% { 
-            transform: translateX(0px) translateY(0px) scale(1); 
-            opacity: 0.6;
-          }
-          25% { 
-            transform: translateX(20px) translateY(-10px) scale(1.05); 
-            opacity: 0.8;
-          }
-          50% { 
-            transform: translateX(-15px) translateY(15px) scale(0.95); 
-            opacity: 0.7;
-          }
-          75% { 
-            transform: translateX(10px) translateY(-5px) scale(1.02); 
-            opacity: 0.9;
-          }
-        }
-
-        @keyframes gentleFloat {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          33% { transform: translateY(-8px) translateX(5px); }
-          66% { transform: translateY(5px) translateX(-3px); }
-        }
-
-        @keyframes drift {
-          0% { transform: translateX(0px) translateY(0px); }
-          25% { transform: translateX(10px) translateY(-5px); }
-          50% { transform: translateX(0px) translateY(-10px); }
-          75% { transform: translateX(-10px) translateY(-5px); }
-          100% { transform: translateX(0px) translateY(0px); }
-        }
-
-        @keyframes slowRotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        @keyframes gradientShift {
-          0%, 100% { 
-            background: linear-gradient(45deg, rgba(251, 146, 60, 0.1), rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1));
-          }
-          33% { 
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(234, 88, 12, 0.1), rgba(194, 65, 12, 0.1));
-          }
-          66% { 
-            background: linear-gradient(225deg, rgba(234, 88, 12, 0.1), rgba(194, 65, 12, 0.1), rgba(251, 146, 60, 0.1));
-          }
-        }
-
-        @keyframes mesh-move {
-          0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
-          25% { transform: translate(20px, -15px) rotate(1deg); }
-          50% { transform: translate(-15px, 25px) rotate(-1deg); }
-          75% { transform: translate(10px, -20px) rotate(0.5deg); }
-        }
-      `}</style>
 
       {/* Error Message UI */}
       {errorMsg && (

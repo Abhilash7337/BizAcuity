@@ -15,7 +15,7 @@ const PlanManagement = () => {
     yearlyPrice: 0,
     description: '',
     features: [],
-    customFeatures: [], // <-- new
+    customFeatures: [],
     limits: {
       designsPerMonth: 1,
       imageUploadsPerDesign: 3
@@ -29,13 +29,47 @@ const PlanManagement = () => {
       watermarkRemoval: false
     },
     isActive: true,
-    exportDrafts: false
+    exportDrafts: false,
+    decors: [] // <-- decor IDs selected for this plan
   });
+  const [allDecors, setAllDecors] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  // Fetch plans on component mount
+
+  // Fetch plans, decors, and categories on mount
   useEffect(() => {
     fetchPlans();
+    fetchAllDecors();
+    fetchCategories();
   }, []);
+
+  const fetchAllDecors = async () => {
+    try {
+      const response = await authFetch('/decors');
+      const data = await response.json();
+      if (response.ok) {
+        setAllDecors(data);
+      } else {
+        setAllDecors([]);
+      }
+    } catch (e) {
+      setAllDecors([]);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await authFetch('/categories');
+      const data = await response.json();
+      if (response.ok) {
+        setCategories(data);
+      } else {
+        setCategories([]);
+      }
+    } catch (e) {
+      setCategories([]);
+    }
+  };
 
   const fetchPlans = async () => {
     try {
@@ -94,11 +128,13 @@ const PlanManagement = () => {
       if (formData.customFeatures && Array.isArray(formData.customFeatures)) {
         featuresList.push(...formData.customFeatures.filter(f => f && f.trim() !== ''));
       }
+
       const submitData = {
         ...formData,
         features: featuresList,
         limits: formData.limits,
-        exportDrafts: formData.exportDrafts
+        exportDrafts: formData.exportDrafts,
+        decors: formData.decors // array of decor IDs
       };
       delete submitData.booleanFeatures;
       delete submitData.customFeatures;
@@ -217,7 +253,8 @@ const PlanManagement = () => {
       },
       booleanFeatures,
       customFeatures,
-      exportDrafts: plan.exportDrafts === true
+      exportDrafts: plan.exportDrafts === true,
+      decors: plan.decors || []
     });
     setShowForm(true);
   };
@@ -482,6 +519,53 @@ const PlanManagement = () => {
                   <span className="text-sm text-gray-700">Remove Watermark</span>
                 </label>
               </div>
+            </div>
+
+
+
+            {/* Decor Selection */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Decors for this Plan</label>
+              <div className="border border-gray-200 rounded-lg p-3 max-h-64 overflow-y-auto bg-gray-50">
+                {categories.length === 0 ? (
+                  <div className="text-gray-500 text-sm">No categories found.</div>
+                ) : (
+                  categories.map(category => {
+                    const decorsInCategory = allDecors.filter(d => d.category === category.name);
+                    if (decorsInCategory.length === 0) return null;
+                    return (
+                      <div key={category._id} className="mb-3">
+                        <div className="font-semibold text-gray-800 mb-1 capitalize">{category.name}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {decorsInCategory.map(decor => (
+                            <label key={decor._id} className="flex items-center gap-2 text-xs bg-white border border-gray-300 rounded px-2 py-1 cursor-pointer min-w-[120px] max-w-[180px]">
+                              <input
+                                type="checkbox"
+                                checked={formData.decors.includes(decor._id)}
+                                onChange={e => {
+                                  if (e.target.checked) {
+                                    setFormData(f => ({ ...f, decors: [...f.decors, decor._id] }));
+                                  } else {
+                                    setFormData(f => ({ ...f, decors: f.decors.filter(id => id !== decor._id) }));
+                                  }
+                                }}
+                              />
+                              <img
+                                src={decor.imageUrl ? `http://localhost:5001${decor.imageUrl}` : ''}
+                                alt={decor.name}
+                                className="w-8 h-8 object-contain rounded border border-gray-200 bg-gray-100"
+                                style={{ minWidth: 32, minHeight: 32 }}
+                              />
+                              <span className="truncate max-w-[80px]">{decor.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              <div className="text-xs text-gray-500 mt-1">Only the selected decors will be available to users of this plan.</div>
             </div>
 
             {/* Custom Features */}

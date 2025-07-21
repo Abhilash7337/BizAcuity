@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Flower2 } from 'lucide-react';
 import { authFetch } from '../../utils/auth';
 
-const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectUserDecor }) => {
+const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectUserDecor, userPlanAllowedDecors = null }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [decors, setDecors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +121,14 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
     setLoadError(prev => ({ ...prev, [decorId]: false }));
   };
 
+  const [upgradeMsg, setUpgradeMsg] = useState('');
   const handleDecorClick = (decor) => {
+    // If userPlanAllowedDecors is provided, restrict access
+    if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id)) {
+      setUpgradeMsg('This decor is not available in your current plan. Upgrade to access more decors.');
+      setTimeout(() => setUpgradeMsg(''), 2500);
+      return;
+    }
     if (onAddDecor && !loadError[decor.id]) {
       onAddDecor({
         id: decor.id,
@@ -152,6 +159,11 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
 
   return (
     <div className="h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+      {upgradeMsg && (
+        <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-700 text-sm rounded text-center animate-pulse">
+          {upgradeMsg}
+        </div>
+      )}
       <div className="flex items-center gap-2 mb-4">
         <Flower2 className="w-5 h-5 text-orange-600" />
         <h3 className="font-semibold text-orange-800">Decors</h3>

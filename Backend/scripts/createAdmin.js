@@ -15,27 +15,35 @@ const connectDB = async () => {
 const createAdminUser = async () => {
   try {
     // Check if admin user already exists
-    let adminUser = await User.findOne({ email: 'admin@example.com' });
+    let adminUser = await User.findOne({ email: 'admin@gmail.com' });
     
     if (!adminUser) {
       adminUser = new User({
         name: 'Admin User',
-        email: 'admin@example.com',
+        email: 'admin@gmail.com',
         password: 'admin123',
-        userType: 'regular',
+        userType: 'admin',
         role: 'admin',
         isVerified: true
       });
       await adminUser.save();
-      console.log('Created admin user: admin@example.com');
+      console.log('Created admin user: admin@gmail.com');
     } else {
-      // Update role if needed
+      // Update userType and role if needed
+      let updated = false;
+      if (adminUser.userType !== 'admin') {
+        adminUser.userType = 'admin';
+        updated = true;
+      }
       if (adminUser.role !== 'admin') {
         adminUser.role = 'admin';
+        updated = true;
+      }
+      if (updated) {
         await adminUser.save();
-        console.log('Updated user role to admin');
+        console.log('Updated userType/role to admin');
       } else {
-        console.log('Admin user already exists: admin@example.com');
+        console.log('Admin user already exists: admin@gmail.com');
       }
     }
 

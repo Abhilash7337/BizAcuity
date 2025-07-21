@@ -10,28 +10,42 @@ const DecorManagement = () => {
   const [editingDecor, setEditingDecor] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    category: 'clocks',
+    category: '',
     description: '',
     image: null
   });
-
-  const categories = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'clocks', label: 'Clocks' },
-    { value: 'tables', label: 'Tables' },
-    { value: 'plants', label: 'Plants' },
-    { value: 'fruits', label: 'Fruits' },
-    { value: 'garlands', label: 'Garlands' },
-    { value: 'lamps', label: 'Lamps' },
-    { value: 'chairs', label: 'Chairs' },
-    { value: 'flowers', label: 'Flowers' },
-    { value: 'frames', label: 'Frames' },
-    { value: 'other', label: 'Other' }
-  ];
+  const [categories, setCategories] = useState([]);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [categoryError, setCategoryError] = useState('');
 
   useEffect(() => {
     fetchDecors();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setCategoryLoading(true);
+      setCategoryError('');
+      const response = await authFetch('/categories');
+      const data = await response.json();
+      if (response.ok) {
+        setCategories(data);
+        // Set default for form
+        if (data.length > 0 && !formData.category) {
+          setFormData(f => ({ ...f, category: data[0].name }));
+        }
+      } else {
+        setCategoryError(data.error || 'Failed to fetch categories');
+      }
+    } catch (error) {
+      setCategoryError('Failed to fetch categories');
+    } finally {
+      setCategoryLoading(false);
+    }
+  };
 
   const fetchDecors = async () => {
     try {
@@ -179,13 +193,22 @@ const DecorManagement = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Decor Management</h1>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-2"
-        >
-          <Plus size={20} />
-          Add New Decor
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsCategoryModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add Category
+          </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add New Decor
+          </button>
+        </div>
       </div>
 
       {/* Category Filter */}
@@ -196,9 +219,10 @@ const DecorManagement = () => {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
         >
+          <option value="all">All Categories</option>
           {categories.map(category => (
-            <option key={category.value} value={category.value}>
-              {category.label}
+            <option key={category._id} value={category.name}>
+              {category.name}
             </option>
           ))}
         </select>
@@ -287,10 +311,11 @@ const DecorManagement = () => {
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  required
                 >
-                  {categories.slice(1).map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.label}
+                  {categories.map(category => (
+                    <option key={category._id} value={category.name}>
+                      {category.name}
                     </option>
                   ))}
                 </select>
@@ -343,6 +368,125 @@ const DecorManagement = () => {
                   className="flex-1 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600"
                 >
                   {editingDecor ? 'Update' : 'Add'} Decor
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Category Modal (moved outside decor modal) */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Manage Categories</h2>
+              <button
+                onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            {/* List existing categories with delete buttons */}
+            <div className="mb-4 max-h-40 overflow-y-auto">
+              {categories.length === 0 ? (
+                <div className="text-gray-500 text-sm">No categories found.</div>
+              ) : (
+                <ul>
+                  {categories.map(category => (
+                    <li key={category._id} className="flex items-center justify-between py-1 group">
+                      <span className="capitalize text-gray-800">{category.name}</span>
+                      <button
+                        className="text-red-500 hover:text-red-700 p-1 ml-2 opacity-70 group-hover:opacity-100"
+                        title="Delete category"
+                        onClick={async () => {
+                          if (!window.confirm(`Delete category '${category.name}'? This cannot be undone.`)) return;
+                          setCategoryLoading(true);
+                          setCategoryError('');
+                          try {
+                            const response = await authFetch(`/admin/categories/${category._id}`, {
+                              method: 'DELETE'
+                            });
+                            const data = await response.json();
+                            if (response.ok) {
+                              setCategories(categories.filter(c => c._id !== category._id));
+                              // If the deleted category was selected in the form, reset it
+                              setFormData(f => f.category === category.name ? { ...f, category: categories[0]?.name || '' } : f);
+                            } else {
+                              setCategoryError(data.error || 'Failed to delete category');
+                            }
+                          } catch (error) {
+                            setCategoryError('Failed to delete category');
+                          } finally {
+                            setCategoryLoading(false);
+                          }
+                        }}
+                        disabled={categoryLoading}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {/* Add new category form */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setCategoryLoading(true);
+                setCategoryError('');
+                try {
+                  const response = await authFetch('/admin/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newCategory })
+                  });
+                  const data = await response.json();
+                  if (response.ok) {
+                    setCategories([...categories, data]);
+                    setNewCategory('');
+                    setCategoryError('');
+                  } else {
+                    setCategoryError(data.error || 'Failed to add category');
+                  }
+                } catch (error) {
+                  setCategoryError('Failed to add category');
+                } finally {
+                  setCategoryLoading(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Add New Category</label>
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={e => setNewCategory(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                  maxLength={50}
+                  disabled={categoryLoading}
+                />
+              </div>
+              {categoryError && <div className="text-red-500 text-sm">{categoryError}</div>}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
+                  className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
+                  disabled={categoryLoading}
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
+                  disabled={categoryLoading}
+                >
+                  {categoryLoading ? 'Adding...' : 'Add Category'}
                 </button>
               </div>
             </form>

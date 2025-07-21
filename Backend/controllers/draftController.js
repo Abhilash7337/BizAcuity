@@ -111,7 +111,15 @@ const getDraftById = async (req, res) => {
       return res.status(404).json({ error: 'Draft not found' });
     }
 
-    // Only allow access for owner or users the draft is shared with
+    // Check for public access via share token (for /drafts/shared/:draftId)
+    // Allow if: draft is public, token matches, and not expired
+    const providedToken = req.query.token;
+    const now = new Date();
+    if (providedToken && draft.isPublic && draft.shareToken === providedToken && draft.shareTokenExpires && draft.shareTokenExpires > now) {
+      return res.json(draft);
+    }
+
+    // Only allow access for owner or users the draft is shared with (authenticated)
     if (!req.userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
@@ -345,16 +353,11 @@ const getDraftsSharedByMe = async (req, res) => {
 // Get shared drafts for a user
 const getSharedDrafts = async (req, res) => {
   try {
-    // Use the userId from the authenticated token
     const userId = req.userId;
-
-    // Find all drafts that are shared with this user
-    const sharedDrafts = await Draft.find({
-      'sharedWith.userId': userId
-    })
-    .populate('userId', 'name email')
-    .sort({ createdAt: -1 });
-
+    // Find all active shared drafts for this user
+    const sharedDrafts = await SharedDraft.find({ sharedWith: userId, isActive: true })
+      .populate({ path: 'draftId', populate: { path: 'userId', select: 'name email' } })
+      .populate('sharedBy', 'name email');
     res.json(sharedDrafts);
   } catch (error) {
     console.error('Get shared drafts error:', error);

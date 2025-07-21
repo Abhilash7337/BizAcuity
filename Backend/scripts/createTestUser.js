@@ -15,21 +15,26 @@ const connectDB = async () => {
 
 const createTestUser = async () => {
   try {
+    // Accept email and password from command line arguments
+    const email = process.argv[2] || 'testuser@example.com';
+    const password = process.argv[3] || 'password123';
+    const name = process.argv[4] || 'Test User';
+
     // Check if test user already exists
-    let testUser = await User.findOne({ email: 'testuser@example.com' });
+    let testUser = await User.findOne({ email });
     
     if (!testUser) {
       testUser = new User({
-        name: 'Test User',
-        email: 'testuser@example.com',
-        password: 'password123',
+        name,
+        email,
+        password,
         userType: 'regular',
         isVerified: true
       });
       await testUser.save();
-      console.log('Created test user: testuser@example.com');
+      console.log(`Created test user: ${email}`);
     } else {
-      console.log('Test user already exists: testuser@example.com');
+      console.log(`Test user already exists: ${email}`);
     }
 
     // Create/Update subscription for test user to free plan (1 draft limit)

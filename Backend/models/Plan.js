@@ -39,6 +39,12 @@ const planSchema = new mongoose.Schema({
       min: -1 // -1 means unlimited
     }
   },
+
+  // Array of decor ObjectIds associated with this plan
+  decors: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Decor'
+  }],
   exportDrafts: {
     type: Boolean,
     default: false
