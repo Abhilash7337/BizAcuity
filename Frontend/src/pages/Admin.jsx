@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from '../components/layout';
 import { UserContext } from '../App';
 import { authFetch } from '../utils/auth';
 import { PlanManagement, DecorManagement } from '../components/admin';
+import PlanUpgradeRequests from '../components/admin/PlanUpgradeRequests';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ const Admin = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dashboardStats, setDashboardStats] = useState(null);
+  const [pendingUpgradeCount, setPendingUpgradeCount] = useState(0);
+  const notificationIntervalRef = useRef(null);
 
   // Check if user is admin
   useEffect(() => {
@@ -19,14 +22,36 @@ const Admin = () => {
       navigate('/login');
       return;
     }
-    
     if (registeredUser.userType !== 'admin' && registeredUser.email !== 'admin@gmail.com') {
       navigate('/dashboard');
       return;
     }
-
     fetchDashboardStats();
+    fetchPendingUpgradeCount();
+    // Poll for new plan upgrade requests every 10 seconds
+    notificationIntervalRef.current = setInterval(fetchPendingUpgradeCount, 10000);
+    return () => {
+      if (notificationIntervalRef.current) clearInterval(notificationIntervalRef.current);
+    };
   }, [registeredUser, navigate]);
+
+  const fetchPendingUpgradeCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch('http://localhost:5001/admin/plan-upgrade-requests?status=pending', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPendingUpgradeCount(data.requests.length);
+      } else {
+        setPendingUpgradeCount(0);
+      }
+    } catch {
+      setPendingUpgradeCount(0);
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -97,10 +122,9 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400">
       <Header />
-      
-      <div className="flex pt-20">
+      <div className="flex pt-20 relative">
         {/* Left Sidebar */}
-        <div className="w-96 bg-white shadow-xl border-r border-orange-300 min-h-screen">
+        <div className="w-96 bg-white shadow-xl border-r border-orange-300 min-h-screen relative">
           <div className="p-8">
             {/* Admin Banner */}
             <div className="h-40 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-8 flex items-center justify-center">
@@ -170,12 +194,44 @@ const Admin = () => {
                 </svg>
                 <span className="font-medium">Decor Management</span>
               </button>
+
+              <button
+                onClick={() => setActiveTab('upgradeRequests')}
+                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                  activeTab === 'upgradeRequests'
+                    ? 'bg-orange-100 text-orange-700 shadow-md'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="font-medium">Plan Upgrade Requests</span>
+              </button>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 p-8">
+          {/* Notification Bell for Plan Upgrade Requests - top right of main content */}
+          <div className="flex justify-end mb-4">
+            <button
+              className="relative focus:outline-none"
+              onClick={() => setActiveTab('upgradeRequests')}
+              title="View Plan Upgrade Requests"
+              style={{ outline: 'none' }}
+            >
+              <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 7.165 6 9.388 6 12v2.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              {pendingUpgradeCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow-lg animate-bounce">
+                  {pendingUpgradeCount}
+                </span>
+              )}
+            </button>
+          </div>
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 shadow-lg">
               <div className="flex items-center">
@@ -294,6 +350,11 @@ const Admin = () => {
           {/* Decors Tab */}
           {activeTab === 'decors' && (
             <DecorManagement />
+          )}
+
+          {/* Plan Upgrade Requests Tab */}
+          {activeTab === 'upgradeRequests' && (
+            <PlanUpgradeRequests />
           )}
         </div>
       </div>

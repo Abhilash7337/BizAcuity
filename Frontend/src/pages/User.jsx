@@ -17,6 +17,8 @@ const User = () => {
     photos: 0,
     designsThisMonth: 0
   });
+  // State for profile photo modal
+
 
   const handleProfileUpdate = (updatedUser) => {
     setUser(updatedUser);
@@ -446,15 +448,17 @@ const User = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <div>
+                <div className="flex-1">
                   <h2 className="text-xl font-bold text-orange-800">Profile Details</h2>
                   <p className="text-orange-600 text-sm">Update your personal information and preferences</p>
                 </div>
+                {/* REMOVE the Profile Photo Upload Button and modal trigger here */}
               </div>
               <div className="p-8">
                 <UserProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
               </div>
             </div>
+            {/* REMOVE the Profile Photo Modal and <UserProfilePhotoUpload /> completely */}
             {/* Security Settings Card */}
             <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.2s'}}>
               <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
