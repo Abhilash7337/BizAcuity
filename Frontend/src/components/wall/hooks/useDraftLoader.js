@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { authFetch } from '../../utils/auth';
+
+import { authFetch } from '../../../utils/auth';
 
 export default function useDraftLoader({ draftId, isCollaborating, searchParams, setWallData, setDraftName, setLoading, setErrorMsg }) {
   useEffect(() => {

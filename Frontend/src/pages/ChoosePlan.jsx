@@ -28,7 +28,7 @@ const ChoosePlan = () => {
   const fetchPlans = async () => {
     try {
       setPlansLoading(true);
-      const response = await fetch('http://localhost:5001/api/plans');
+      const response = await fetch('http://localhost:5001/plans');
       const data = await response.json();
       
       if (response.ok) {
@@ -75,7 +75,7 @@ const ChoosePlan = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch('http://localhost:5001/api/user/choose-plan', {
+      const response = await fetch('http://localhost:5001/user/choose-plan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

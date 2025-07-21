@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import { UserContext } from '../../App';
-import { authFetch } from '../../utils/auth';
+import { UserContext } from '../../../App';
+import { authFetch } from '../../../utils/auth';
 
 export default function useExportPermission() {
   const { registeredUser } = useContext(UserContext);
@@ -20,7 +20,7 @@ export default function useExportPermission() {
           setCanExport(false);
           return;
         }
-        const plansRes = await fetch('http://localhost:5001/api/plans');
+        const plansRes = await fetch('http://localhost:5001/plans');
         const plansData = await plansRes.json();
         let plans = plansData.plans || plansData;
         const userPlan = plans.find(p => p.name.toLowerCase() === profile.plan.toLowerCase());

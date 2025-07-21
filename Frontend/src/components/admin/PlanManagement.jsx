@@ -84,7 +84,7 @@ const PlanManagement = () => {
       // If admin endpoint fails due to auth, try public endpoint for testing
       if (!response.ok) {
         console.log('Admin endpoint failed, trying public endpoint...');
-        response = await fetch('http://localhost:5001/api/plans');
+        response = await fetch('http://localhost:5001/plans');
         console.log('Public response status:', response.status);
       }
       

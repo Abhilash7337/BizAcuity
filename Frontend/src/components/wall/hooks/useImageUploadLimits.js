@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import { UserContext } from '../../App';
-import { authFetch } from '../../utils/auth';
+import { UserContext } from '../../../App';
+import { authFetch } from '../../../utils/auth';
 
 export default function useImageUploadLimits() {
   const { registeredUser } = useContext(UserContext);

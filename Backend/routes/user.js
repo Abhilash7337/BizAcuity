@@ -12,7 +12,7 @@ const {
 } = require('../controllers/userController');
 
 // Public route - Get active plans
-router.get('/api/plans', getPublicPlans);
+router.get('/plans', getPublicPlans);
 
 // Protected route - Get current user profile (use token)
 router.get('/user/profile', verifyToken, getUserProfile);
@@ -24,7 +24,7 @@ router.put('/user/update-password', verifyToken, updatePassword);
 router.put('/user/profile', verifyToken, updateProfile);
 
 // Choose plan - Protected
-router.post('/api/user/choose-plan', verifyToken, choosePlan);
+router.post('/user/choose-plan', verifyToken, choosePlan);
 
 // Search users endpoint - Protected
 router.get('/users/search', verifyToken, searchUsers);

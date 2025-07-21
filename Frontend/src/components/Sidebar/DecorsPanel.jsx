@@ -8,51 +8,33 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState({});
 
+  // Debug: log incoming allowed decors
+  console.log('[DecorsPanel] userPlanAllowedDecors:', userPlanAllowedDecors);
   // Fetch decors from API
   const fetchDecors = async () => {
     try {
       setLoading(true);
       const response = await authFetch('/decors');
       const data = await response.json();
-      
       if (response.ok) {
         // Transform API data to match the component's expected format
-        const transformedDecors = data.map(decor => {
+        let transformedDecors = data.map(decor => {
+          // Debug: log each decor id
+          console.log('[DecorsPanel] decor._id:', decor._id);
           // Set appropriate sizes based on category
           let size = { width: 150, height: 150 }; // Default size
-          
           switch(decor.category) {
-            case 'tables':
-              size = { width: 200, height: 150 };
-              break;
-            case 'plants':
-              size = { width: 150, height: 200 };
-              break;
-            case 'clocks':
-              size = { width: 150, height: 150 };
-              break;
-            case 'fruits':
-              size = { width: 120, height: 120 };
-              break;
-            case 'garlands':
-              size = { width: 250, height: 80 };
-              break;
-            case 'lamps':
-              size = { width: 100, height: 180 };
-              break;
-            case 'chairs':
-              size = { width: 150, height: 160 };
-              break;
-            case 'flowers':
-              size = { width: 130, height: 130 };
-              break;
-            case 'frames':
-              size = { width: 180, height: 240 };
-              break;
-            default:
-              size = { width: 150, height: 150 };
+            case 'tables': size = { width: 200, height: 150 }; break;
+            case 'plants': size = { width: 150, height: 200 }; break;
+            case 'clocks': size = { width: 150, height: 150 }; break;
+            case 'fruits': size = { width: 120, height: 120 }; break;
+            case 'garlands': size = { width: 250, height: 80 }; break;
+            case 'lamps': size = { width: 100, height: 180 }; break;
+            case 'chairs': size = { width: 150, height: 160 }; break;
+            case 'flowers': size = { width: 130, height: 130 }; break;
+            case 'frames': size = { width: 180, height: 240 }; break;
+            default: size = { width: 150, height: 150 };
           }
-          
           return {
             id: decor._id,
             name: decor.name,
@@ -62,6 +44,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             size: size
           };
         });
+        // Do not filter decors here; show all decors, lock those not allowed in UI
         setDecors(transformedDecors);
       } else {
         console.error('Failed to fetch decors:', data.error);
@@ -75,7 +58,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
 
   useEffect(() => {
     fetchDecors();
-  }, []);
+  }, [userPlanAllowedDecors]);
 
   // Listen for storage events to refresh when admin makes changes
   useEffect(() => {
@@ -241,46 +224,54 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                 {category.name}
               </h4>
               <div className="grid grid-cols-2 gap-3">
-                {category.items.map((decor) => (
-                  <div
-                    key={decor.id}
-                    onClick={() => handleDecorClick(decor)}
-                    className="relative group cursor-pointer bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden"
-                  >
-                    <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
-                      <img
-                        src={decor.src}
-                        alt={decor.name}
-                        className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
-                        onError={() => handleImageError(decor.id)}
-                        onLoad={() => handleImageLoad(decor.id)}
-                        style={{ display: loadError[decor.id] ? 'none' : 'block' }}
-                      />
-                      {loadError[decor.id] && (
-                        <div className="flex flex-col items-center justify-center text-orange-400">
-                          <Flower2 className="w-8 h-8 mb-2" />
-                          <span className="text-xs">No image</span>
+                {category.items.map((decor) => {
+                  const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id);
+                  return (
+                    <div
+                      key={decor.id}
+                      onClick={() => handleDecorClick(decor)}
+                      className={`relative group cursor-pointer bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden ${isLocked ? 'opacity-85 pointer-events-auto' : ''}`}
+                    >
+                      <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
+                        <img
+                          src={decor.src}
+                          alt={decor.name}
+                          className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
+                          onError={() => handleImageError(decor.id)}
+                          onLoad={() => handleImageLoad(decor.id)}
+                          style={{ display: loadError[decor.id] ? 'none' : 'block' }}
+                        />
+                        {loadError[decor.id] && (
+                          <div className="flex flex-col items-center justify-center text-orange-400">
+                            <Flower2 className="w-8 h-8 mb-2" />
+                            <span className="text-xs">No image</span>
+                          </div>
+                        )}
+                        {isLocked && (
+                          <div className="absolute inset-0 bg-white/20 flex items-center justify-center z-10">
+                            <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 17v1m-6 4h12a2 2 0 002-2v-7a2 2 0 00-2-2H6a2 2 0 00-2 2v7a2 2 0 002 2zm6-4a2 2 0 11-4 0 2 2 0 014 0zm-2-6V7a4 4 0 118 0v2" /></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3 bg-white/80 backdrop-blur-sm">
+                        <p className="text-sm font-semibold text-orange-800 text-center">
+                          {decor.name}
+                        </p>
+                        {loadError[decor.id] && (
+                          <p className="text-xs text-red-500 text-center mt-1">Image not available</p>
+                        )}
+                      </div>
+                      {/* Size indicator */}
+                      {!loadError[decor.id] && (
+                        <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
+                          <span className="text-xs font-medium text-orange-700">
+                            {decor.size.width}×{decor.size.height}
+                          </span>
                         </div>
                       )}
                     </div>
-                    <div className="p-3 bg-white/80 backdrop-blur-sm">
-                      <p className="text-sm font-semibold text-orange-800 text-center">
-                        {decor.name}
-                      </p>
-                      {loadError[decor.id] && (
-                        <p className="text-xs text-red-500 text-center mt-1">Image not available</p>
-                      )}
-                    </div>
-                    {/* Size indicator */}
-                    {!loadError[decor.id] && (
-                      <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-                        <span className="text-xs font-medium text-orange-700">
-                          {decor.size.width}×{decor.size.height}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))
