@@ -97,7 +97,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 userSchema.methods.generateOTP = function() {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     this.otp.code = otp;
-    this.otp.expiresAt = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
+    this.otp.expiresAt = new Date(Date.now() + 1 * 60 * 1000); // OTP expires in 1 minute
     return otp;
 };
 

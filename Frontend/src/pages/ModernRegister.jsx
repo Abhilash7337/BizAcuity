@@ -58,7 +58,7 @@ const Register = () => {
         throw new Error(data.error || 'Registration failed. Please try again.');
       }
 
-      setTempUserId(data.userId);
+      setTempUserId(data.tempId);
       setShowOTPInput(true);
     } catch (err) {
       setError(err.message || 'An error occurred during registration. Please try again.');
@@ -77,7 +77,7 @@ const Register = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          userId: tempUserId, 
+          tempId: tempUserId, 
           otp: otp.trim() 
         }),
       });

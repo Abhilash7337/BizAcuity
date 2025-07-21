@@ -325,7 +325,7 @@ const getPublicPlans = async (req, res) => {
   try {
     const plans = await Plan.find({ isActive: true })
       .sort({ monthlyPrice: 1 })
-      .select('name monthlyPrice yearlyPrice description features limits exportDrafts');
+      .select('name monthlyPrice yearlyPrice description features limits exportDrafts decors');
 
     res.json({
       success: true,

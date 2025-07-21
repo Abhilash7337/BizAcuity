@@ -9,7 +9,8 @@ const ShareModal = ({
   draftId,
   registeredUser,
   wallData,
-  onDraftCreated
+  onDraftCreated,
+  previewImage // New prop for preview image
 }) => {
   const { fetchSensitiveData } = useUser();
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -83,7 +84,13 @@ const ShareModal = ({
 
       let finalDraftId = draftId;
 
+      // Require previewImage for new draft
       if (!draftId) {
+        if (!previewImage) {
+          setIsLoading(false);
+          setError('A preview image is required to share this wall.');
+          return;
+        }
         // Create a new draft for sharing
         const response = await authFetch('http://localhost:5001/drafts', {
           method: 'POST',
@@ -91,7 +98,7 @@ const ShareModal = ({
           body: JSON.stringify({
             name: `Shared Wall ${new Date().toLocaleDateString()}`,
             wallData: wallData,
-            previewImage: null
+            previewImage: previewImage
           }),
         });
 
@@ -133,7 +140,13 @@ const ShareModal = ({
       let finalDraftId = draftId;
       let shareToken = null;
 
+      // Require previewImage for new draft
       if (!draftId) {
+        if (!previewImage) {
+          setIsLoading(false);
+          setError('A preview image is required to share this wall.');
+          return;
+        }
         // Create a new draft for sharing
         const response = await authFetch('http://localhost:5001/drafts', {
           method: 'POST',
@@ -143,7 +156,7 @@ const ShareModal = ({
             wallData: wallData,
             isPublic: true,
             linkPermission: linkPermission, // Add permission to draft
-            previewImage: null
+            previewImage: previewImage
           }),
         });
 

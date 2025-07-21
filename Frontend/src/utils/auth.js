@@ -86,7 +86,7 @@ export const authFetch = async (url, options = {}) => {
 // Fetch sensitive user data from server when needed (instead of storing in localStorage)
 export const fetchUserProfile = async () => {
     try {
-        const response = await authFetch('/api/user/profile');
+        const response = await authFetch('/user/profile');
         if (response.ok) {
             return await response.json();
         }

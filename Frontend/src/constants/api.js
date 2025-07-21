@@ -23,8 +23,8 @@ export const API_ENDPOINTS = {
   
   // User endpoints
   user: {
-    profile: `${API_BASE_URL}/api/user/profile`,
-    updateProfile: `${API_BASE_URL}/api/user/profile`
+    profile: `${API_BASE_URL}/user/profile`,
+    updateProfile: `${API_BASE_URL}/user/profile`
   },
   
   // Draft endpoints

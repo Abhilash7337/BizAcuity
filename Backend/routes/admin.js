@@ -81,7 +81,7 @@ router.get('/plans', verifyToken, checkAdmin, async (req, res) => {
 // Create new plan
 router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, decors } = req.body;
 
     // Validate required fields
     if (!name || monthlyPrice === undefined) {
@@ -109,7 +109,8 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
         imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
       isActive: isActive !== undefined ? isActive : true,
-      exportDrafts: exportDrafts === true
+      exportDrafts: exportDrafts === true,
+      decors: Array.isArray(decors) ? decors : []
     });
 
     const savedPlan = await newPlan.save();
@@ -133,23 +134,26 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
 router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, decors } = req.body;
+
+    const updateData = {
+      name: name?.trim(),
+      monthlyPrice: parseFloat(monthlyPrice),
+      yearlyPrice: yearlyPrice ? parseFloat(yearlyPrice) : 0,
+      description: description?.trim() || '',
+      features: features || [],
+      limits: {
+        designsPerMonth: limits?.designsPerMonth ?? -1,
+        imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
+      },
+      isActive: isActive !== undefined ? isActive : true,
+      exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined,
+      decors: Array.isArray(decors) ? decors : []
+    };
 
     const updatedPlan = await Plan.findByIdAndUpdate(
       id,
-      {
-        name: name?.trim(),
-        monthlyPrice: parseFloat(monthlyPrice),
-        yearlyPrice: yearlyPrice ? parseFloat(yearlyPrice) : 0,
-        description: description?.trim() || '',
-        features: features || [],
-        limits: {
-          designsPerMonth: limits?.designsPerMonth ?? -1,
-          imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
-        },
-        isActive: isActive !== undefined ? isActive : true,
-        exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined
-      },
+      updateData,
       { new: true }
     );
 
