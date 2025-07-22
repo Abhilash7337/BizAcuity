@@ -541,7 +541,7 @@ const PlanManagement = () => {
                             <label key={decor._id} className="flex items-center gap-2 text-xs bg-white border border-gray-300 rounded px-2 py-1 cursor-pointer min-w-[120px] max-w-[180px]">
                               <input
                                 type="checkbox"
-                                checked={formData.decors.includes(decor._id)}
+                                   checked={Array.isArray(formData.decors) && formData.decors.includes(decor._id)}
                                 onChange={e => {
                                   if (e.target.checked) {
                                     setFormData(f => ({ ...f, decors: [...f.decors, decor._id] }));
@@ -559,6 +559,50 @@ const PlanManagement = () => {
                               <span className="truncate max-w-[80px]">{decor.name}</span>
                             </label>
                           ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                {Array.isArray(categories) && categories.length === 0 ? (
+                  <div className="text-gray-500 text-sm">No categories found.</div>
+                ) : (
+                  (categories || []).map(category => {
+                    if (!category || !category.name) return null;
+                    const decorsInCategory = Array.isArray(allDecors) ? allDecors.filter(d => d && d.category === category.name) : [];
+                    // Always render the category, even if no decors, to avoid undefined errors
+                    return (
+                      <div key={category._id || category.name} className="mb-3">
+                        <div className="font-semibold text-gray-800 mb-1 capitalize">{category.name}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.isArray(decorsInCategory) && decorsInCategory.length > 0 ? (
+                            decorsInCategory.map(decor => (
+                              <label key={decor._id} className="flex items-center gap-2 text-xs bg-white border border-gray-300 rounded px-2 py-1 cursor-pointer min-w-[120px] max-w-[180px]">
+                                <input
+                                  type="checkbox"
+                                  checked={Array.isArray(formData.decors) && formData.decors.includes(decor._id)}
+                                  onChange={e => {
+                                    if (!decor._id) return;
+                                    setFormData(f => ({
+                                      ...f,
+                                      decors: e.target.checked
+                                        ? [...(Array.isArray(f.decors) ? f.decors : []), decor._id]
+                                        : (Array.isArray(f.decors) ? f.decors.filter(id => id !== decor._id) : [])
+                                    }));
+                                  }}
+                                />
+                                <img
+                                  src={decor.imageUrl ? `http://localhost:5001${decor.imageUrl}` : ''}
+                                  alt={decor.name}
+                                  className="w-8 h-8 object-contain rounded border border-gray-200 bg-gray-100"
+                                  style={{ minWidth: 32, minHeight: 32 }}
+                                />
+                                <span className="truncate max-w-[80px]">{decor.name}</span>
+                              </label>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 text-xs">No decors in this category.</span>
+                          )}
                         </div>
                       </div>
                     );

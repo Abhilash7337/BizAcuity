@@ -143,15 +143,35 @@ const Landing = () => {
   const handleSharedDraftRemoveConfirm = async () => {
     if (!sharedDraftToRemove) return;
 
+    // Handle case where sharedDraftToRemove is a string (ID), not an object
+    let draftId = null;
+    if (typeof sharedDraftToRemove === 'string') {
+      draftId = sharedDraftToRemove;
+      console.info('Removing shared draft using string ID:', draftId);
+    } else if (sharedDraftToRemove.draftId && sharedDraftToRemove.draftId._id) {
+      draftId = sharedDraftToRemove.draftId._id;
+      console.info('Removing shared draft using draftId._id:', draftId);
+    } else if (sharedDraftToRemove._id) {
+      draftId = sharedDraftToRemove._id;
+      console.info('Removing shared draft using _id:', draftId);
+    }
+
+    if (!draftId) {
+      // Log the problematic draft object for debugging
+      console.warn('SharedDraft missing both draftId._id and _id:', sharedDraftToRemove);
+      alert('Unable to remove: missing draft ID.');
+      return;
+    }
+
     try {
-      const response = await authFetch(`http://localhost:5001/drafts/shared/${sharedDraftToRemove._id}/remove`, {
+      const response = await authFetch(`http://localhost:5001/drafts/shared/${draftId}/remove`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to remove from shared drafts');
 
       // Remove the draft from sharedDrafts state
-      setSharedDrafts(sharedDrafts.filter(d => d._id !== sharedDraftToRemove._id));
+      setSharedDrafts(sharedDrafts.filter(d => (d.draftId?._id || d._id) !== draftId));
       setShowSharedDeleteModal(false);
       setSharedDraftToRemove(null);
     } catch (error) {

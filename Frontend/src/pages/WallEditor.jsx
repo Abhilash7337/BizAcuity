@@ -213,12 +213,7 @@ function WallEditor() {
         console.log('Wall data updated locally (backend endpoint not implemented yet)');
       }
       
-      // const wall = { wallColor, wallWidth, wallHeight, wallImage, images, imageStates };
-      // authFetch('http://localhost:5001/wall', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ wall }),
-      // });
+
     }
   }, [wallColor, wallWidth, wallHeight, wallImage, images, imageStates, registeredUser]);
 

@@ -105,17 +105,16 @@ const SHARE_TOKEN_EXPIRATION_DAYS = 7;
 const getDraftById = async (req, res) => {
   try {
     const draft = await Draft.findById(req.params.draftId)
-      .populate('userId', 'name email');
+      .populate('userId', 'name email')
+      .populate('sharedWith.userId', 'name email');
       
     if (!draft) {
       return res.status(404).json({ error: 'Draft not found' });
     }
 
     // Check for public access via share token (for /drafts/shared/:draftId)
-    // Allow if: draft is public, token matches, and not expired
-    const providedToken = req.query.token;
-    const now = new Date();
-    if (providedToken && draft.isPublic && draft.shareToken === providedToken && draft.shareTokenExpires && draft.shareTokenExpires > now) {
+    // Allow if: draft is public (remove token restriction)
+    if (draft.isPublic) {
       return res.json(draft);
     }
 
@@ -124,8 +123,13 @@ const getDraftById = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
     const isOwner = draft.userId._id.toString() === req.userId;
+    // sharedWith can be array of objects with userId populated
     const isSharedWithUser = draft.sharedWith && Array.isArray(draft.sharedWith) && 
-      draft.sharedWith.some(share => share.userId && share.userId.toString() === req.userId);
+      draft.sharedWith.some(share => {
+        if (!share.userId) return false;
+        // If populated, userId is an object
+        return (typeof share.userId === 'object' ? share.userId._id.toString() : share.userId.toString()) === req.userId;
+      });
 
     if (!isOwner && !isSharedWithUser) {
       return res.status(403).json({ error: 'Access denied' });
@@ -326,8 +330,17 @@ const revokeShareToken = async (req, res) => {
     draft.shareToken = null;
     draft.shareTokenExpires = null;
     draft.isPublic = false;
+    // Remove all user-to-user shares
+    draft.sharedWith = [];
     await draft.save();
-    res.json({ message: 'Share link revoked' });
+
+    // Mark all SharedDraft records for this draft as inactive
+    await SharedDraft.updateMany(
+      { draftId: draftId, isActive: true },
+      { isActive: false, unsharedAt: new Date() }
+    );
+
+    res.json({ message: 'Share link and all user shares revoked' });
   } catch (error) {
     console.error('Revoke share token error:', error);
     res.status(500).json({ error: 'Failed to revoke share link' });
@@ -358,7 +371,9 @@ const getSharedDrafts = async (req, res) => {
     const sharedDrafts = await SharedDraft.find({ sharedWith: userId, isActive: true })
       .populate({ path: 'draftId', populate: { path: 'userId', select: 'name email' } })
       .populate('sharedBy', 'name email');
-    res.json(sharedDrafts);
+    // Filter out any SharedDrafts where draftId is not populated (null or undefined)
+    const validSharedDrafts = sharedDrafts.filter(d => d.draftId && typeof d.draftId === 'object');
+    res.json(validSharedDrafts);
   } catch (error) {
     console.error('Get shared drafts error:', error);
     res.status(500).json({ 
@@ -385,7 +400,8 @@ const removeFromSharedDraft = async (req, res) => {
       draft.sharedWith.some(share => share.userId.toString() === userId);
 
     if (!isSharedWithUser) {
-      return res.status(404).json({ error: 'Draft not shared with this user' });
+      // Idempotent: return success even if user is not in sharedWith
+      return res.json({ message: 'User was not in shared draft list' });
     }
 
     // Remove user from sharedWith array

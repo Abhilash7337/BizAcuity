@@ -287,6 +287,42 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
             </div>
           </div>
 
+          {/* Profile Photo Controls */}
+          <div className="flex flex-col items-center mt-4">
+            <div className="w-24 h-24 rounded-full border-2 border-orange-300 shadow overflow-hidden mb-2 bg-orange-100 flex items-center justify-center">
+              {photoPreview ? (
+                <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-3xl text-orange-400 font-bold">{formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}</span>
+              )}
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handlePhotoChange}
+            />
+            <button
+              className="text-xs text-orange-700 underline hover:text-orange-900"
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              type="button"
+              disabled={loading}
+            >
+              {photoPreview ? 'Change Photo' : 'Upload Photo'}
+            </button>
+            {photoPreview && (
+              <button
+                className="mt-1 text-xs text-red-600 underline hover:text-red-800"
+                onClick={handleRemovePhoto}
+                disabled={loading}
+                type="button"
+              >
+                Remove Photo
+              </button>
+            )}
+          </div>
+
           {/* Status Messages */}
           {saveStatus.type && (
             <div className={`p-4 rounded-2xl border-2 text-sm font-medium flex items-center gap-3 ${

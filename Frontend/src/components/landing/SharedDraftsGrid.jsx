@@ -5,7 +5,14 @@ const SharedDraftCard = ({ draft, onOpenDraft, onRemoveClick, formatDate }) => {
     <div className="group bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 relative border border-orange-200/30 hover-lift animate-slide-in-up">
       {/* Remove from Shared Button */}
       <button
-        onClick={() => onRemoveClick(draft)}
+        onClick={() => {
+          const id = draft.draftId?._id || draft._id;
+          if (!id) {
+            alert('Unable to remove: missing draft ID.');
+            return;
+          }
+          onRemoveClick(id);
+        }}
         className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-50 z-10 transform scale-90 group-hover:scale-100"
       >
         <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,22 +37,23 @@ const SharedDraftCard = ({ draft, onOpenDraft, onRemoveClick, formatDate }) => {
 
       <div className="p-6">
         <h3 className="text-xl font-bold text-orange-800 mb-2 group-hover:text-orange-700 transition-colors duration-300">
-          {draft.name}
+          {draft.draftName || draft.name}
         </h3>
         <p className="text-sm text-orange-600 mb-2 flex items-center gap-2">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          {draft.userId?.name || 'Unknown User'}
+          {/* Show the user who shared, fallback to owner if needed */}
+          {draft.sharedBy?.name || draft.draftId?.userId?.name || 'Unknown User'}
         </p>
         <p className="text-sm text-gray-600 mb-4 flex items-center gap-2">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {formatDate(draft.updatedAt)}
+          {formatDate(draft.sharedAt || draft.draftId?.updatedAt)}
         </p>
         <button
-          onClick={() => onOpenDraft(draft._id)}
+          onClick={() => onOpenDraft(draft.draftId?._id || draft._id)}
           className="w-full bg-orange-600 hover:bg-orange-700 transition-all duration-300 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-95 relative overflow-hidden btn-interactive"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
