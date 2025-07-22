@@ -63,7 +63,6 @@ router.post('/plan-upgrade-requests/:id/approve', verifyToken, checkAdmin, async
       subscription = new Subscription({
         userId: user._id,
         plan: request.requestedPlan,
-        status: 'active',
         billingCycle: 'monthly',
         amount: planPrice,
         startDate: new Date(),
@@ -75,13 +74,17 @@ router.post('/plan-upgrade-requests/:id/approve', verifyToken, checkAdmin, async
       subscription.amount = planPrice;
       subscription.status = 'active';
       subscription.startDate = new Date();
-      subscription.endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     }
     await subscription.save();
     // Mark request as approved
     request.status = 'approved';
     request.admin = req.adminUser._id;
     await request.save();
+    // Send plan subscription email to user
+    const { sendPlanSubscriptionEmail } = require('../utils/emailService');
+    if (user.email && planDetails) {
+      sendPlanSubscriptionEmail(user.email, user.name, planDetails);
+    }
     res.json({ success: true, message: 'Plan upgrade approved and applied.', request });
   } catch (error) {
     console.error('Approve plan upgrade error:', error);

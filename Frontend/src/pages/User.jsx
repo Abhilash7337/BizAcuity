@@ -439,129 +439,137 @@ const User = () => {
             </div>
           </div>
           {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Profile Settings Card */}
-            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]">
-              <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '0.5s'}}>
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+
+            {/* --- Left Column --- */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Profile Settings Card */}
+              <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]">
+                <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '0.5s'}}>
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-orange-800">Profile Details</h2>
+                    <p className="text-orange-600 text-sm">Update your personal information and preferences</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold text-orange-800">Profile Details</h2>
-                  <p className="text-orange-600 text-sm">Update your personal information and preferences</p>
+                <div className="p-8">
+                  <UserProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
                 </div>
-                {/* REMOVE the Profile Photo Upload Button and modal trigger here */}
               </div>
-              <div className="p-8">
-                <UserProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
+              
+              {/* Additional Cards Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Activity Overview */}
+                <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.3s'}}>
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '0.7s'}}>
+                      <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-orange-800">Activity</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-orange-600 text-sm">Total Designs</span>
+                      <span className="text-orange-800 font-bold">{userStats.designs}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-orange-600 text-sm">This Month</span>
+                      <span className="text-orange-800 font-bold">{userStats.designsThisMonth}</span>
+                    </div>
+                    <div className="w-full bg-orange-200/30 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-orange-500 to-orange-700 h-2 rounded-full transition-all duration-500" 
+                        style={{width: `${Math.min((userStats.designsThisMonth / 10) * 100, 100)}%`}}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                {/* Storage Info */}
+                <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.4s'}}>
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 bg-orange-400/20 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.2s'}}>
+                      <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10M5 6h14l-1 10a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-orange-800">Storage</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-orange-600 text-sm">Photos Used</span>
+                      <span className="text-orange-800 font-bold">{userStats.photos}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-orange-600 text-sm">Storage Limit</span>
+                      <span className="text-orange-800 font-bold">Unlimited</span>
+                    </div>
+                    <div className="w-full bg-orange-200/30 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-500" 
+                        style={{width: `${Math.min((userStats.photos / 100) * 100, 100)}%`}}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                {/* Quick Actions */}
+                <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.5s'}}>
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 bg-orange-300/30 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.5s'}}>
+                      <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-orange-800">Quick Actions</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={() => navigate('/wall')}
+                      className="w-full bg-orange-500/10 hover:bg-orange-500/20 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left"
+                    >
+                      Create New Design
+                    </button>
+                    <button 
+                      onClick={() => navigate('/dashboard')}
+                      className="w-full bg-orange-400/20 hover:bg-orange-400/30 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left"
+                    >
+                      View All Designs
+                    </button>
+                    <button className="w-full bg-orange-300/20 hover:bg-orange-300/30 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left">
+                      Export Portfolio
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            {/* REMOVE the Profile Photo Modal and <UserProfilePhotoUpload /> completely */}
-            {/* Security Settings Card */}
-            <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.2s'}}>
-              <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '1s'}}>
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+            
+            {/* --- Right Column --- */}
+            <div className="space-y-8">
+              {/* Security Settings Card */}
+              <div className="bg-white rounded-3xl shadow-xl border border-orange-300/30 overflow-hidden animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.2s'}}>
+                <div className="p-8 border-b border-orange-200/20 flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center animate-float" style={{animationDelay: '1s'}}>
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-orange-800">Security Settings</h2>
+                    <p className="text-orange-600 text-sm">Manage your password and account security</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-orange-800">Security Settings</h2>
-                  <p className="text-orange-600 text-sm">Manage your password and account security</p>
+                <div className="p-8">
+                  <ChangePasswordForm />
                 </div>
-              </div>
-              <div className="p-8">
-                <ChangePasswordForm />
               </div>
             </div>
           </div>
-          {/* Additional Cards Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Activity Overview */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.3s'}}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '0.7s'}}>
-                  <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-orange-800">Activity</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-600 text-sm">Total Designs</span>
-                  <span className="text-orange-800 font-bold">{userStats.designs}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-600 text-sm">This Month</span>
-                  <span className="text-orange-800 font-bold">{userStats.designsThisMonth}</span>
-                </div>
-                <div className="w-full bg-orange-200/30 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-orange-500 to-orange-700 h-2 rounded-full transition-all duration-500" 
-                    style={{width: `${Math.min((userStats.designsThisMonth / 10) * 100, 100)}%`}}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            {/* Storage Info */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.4s'}}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-400/20 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.2s'}}>
-                  <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10M5 6h14l-1 10a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-orange-800">Storage</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-600 text-sm">Photos Used</span>
-                  <span className="text-orange-800 font-bold">{userStats.photos}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-orange-600 text-sm">Storage Limit</span>
-                  <span className="text-orange-800 font-bold">Unlimited</span>
-                </div>
-                <div className="w-full bg-orange-200/30 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full transition-all duration-500" 
-                    style={{width: `${Math.min((userStats.photos / 100) * 100, 100)}%`}}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl shadow-lg border border-orange-300/30 p-6 animate-[cardFadeIn_0.8s_ease]" style={{animationDelay: '0.5s'}}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-orange-300/30 rounded-xl flex items-center justify-center animate-float" style={{animationDelay: '1.5s'}}>
-                  <svg className="w-5 h-5 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h3 className="font-bold text-orange-800">Quick Actions</h3>
-              </div>
-              <div className="space-y-3">
-                <button 
-                  onClick={() => navigate('/wall')}
-                  className="w-full bg-orange-500/10 hover:bg-orange-500/20 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left"
-                >
-                  Create New Design
-                </button>
-                <button 
-                  onClick={() => navigate('/dashboard')}
-                  className="w-full bg-orange-400/20 hover:bg-orange-400/30 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left"
-                >
-                  View All Designs
-                </button>
-                <button className="w-full bg-orange-300/20 hover:bg-orange-300/30 text-orange-800 font-medium py-3 px-4 rounded-xl text-sm transition-all duration-300 text-left">
-                  Export Portfolio
-                </button>
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
       <Footer />
