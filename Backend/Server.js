@@ -44,8 +44,8 @@ app.use('/', fallbackAuthRoutes);           // Fallback auth routes (direct logi
 app.use('/', userRoutes);                   // User management routes
 app.use('/', draftRoutes);                  // Draft management routes
 app.use('/', uploadRoutes);                 // File upload routes
-app.use('/admin', adminRoutes);             // Admin management routes
 app.use('/admin', newAdminRoutes);          // New admin endpoints (plan upgrade requests, etc)
+app.use('/admin', adminRoutes);             // Admin management routes
 app.use('/', sharingRoutes);                // Sharing management routes
 app.use('/', decorRoutes);                  // Decor management routes
 app.use('/', categoryRoutes);               // Category management routes

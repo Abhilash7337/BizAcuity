@@ -7,6 +7,16 @@ import { PlanManagement, DecorManagement } from '../components/admin';
 import PlanUpgradeRequests from '../components/admin/PlanUpgradeRequests';
 
 const Admin = () => {
+  // Email modal state
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [emailSuccess, setEmailSuccess] = useState('');
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectAllUsers, setSelectAllUsers] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendTestEmail, setSendTestEmail] = useState(false);
   const navigate = useNavigate();
   const { registeredUser } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
@@ -15,6 +25,36 @@ const Admin = () => {
   const [dashboardStats, setDashboardStats] = useState(null);
   const [pendingUpgradeCount, setPendingUpgradeCount] = useState(0);
   const notificationIntervalRef = useRef(null);
+
+  // User edit modal state
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const [editUserLoading, setEditUserLoading] = useState(false);
+  const [editUserError, setEditUserError] = useState('');
+  const [availablePlans, setAvailablePlans] = useState([]);
+  // Fetch available plans for dropdown
+useEffect(() => {
+  if (showEditUserModal) {
+    (async () => {
+      try {
+        const response = await authFetch('http://localhost:5001/admin/plans');
+        if (!response.ok) throw new Error('Failed to fetch plans');
+        const data = await response.json();
+        let plans = data.plans || [];
+        // If user's plan is not in the list, add it as a temporary option
+        if (
+          editUser?.plan &&
+          !plans.some((plan) => plan.name === editUser.plan)
+        ) {
+          plans = [{ _id: 'custom', name: editUser.plan }, ...plans];
+        }
+        setAvailablePlans(plans);
+      } catch {
+        setAvailablePlans([]);
+      }
+    })();
+  }
+}, [showEditUserModal, editUser?.plan]);
 
   // Check if user is admin
   useEffect(() => {
@@ -58,7 +98,6 @@ const Admin = () => {
       setLoading(true);
       const response = await authFetch('http://localhost:5001/admin/dashboard');
       if (!response.ok) throw new Error('Failed to fetch dashboard stats');
-      
       const data = await response.json();
       setDashboardStats(data.stats);
     } catch (error) {
@@ -66,6 +105,75 @@ const Admin = () => {
       setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle edit user button click
+  const handleEditUserClick = (user) => {
+    setEditUser({ ...user });
+    setEditUserError('');
+    setShowEditUserModal(true);
+  };
+
+  // Handle user field change
+  const handleEditUserFieldChange = (e) => {
+    const { name, value } = e.target;
+    setEditUser((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle user update submit
+  const handleEditUserSubmit = async (e) => {
+    e.preventDefault();
+    setEditUserLoading(true);
+    setEditUserError('');
+    try {
+      const response = await authFetch(`http://localhost:5001/admin/users/${editUser._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editUser.name,
+          email: editUser.email,
+          plan: editUser.plan,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to update user');
+      // Update user in dashboardStats.recentUsers
+      setDashboardStats((prev) => ({
+        ...prev,
+        recentUsers: prev.recentUsers.map((u) =>
+          u._id === editUser._id ? { ...u, ...editUser } : u
+        ),
+      }));
+      setShowEditUserModal(false);
+      setEditUser(null);
+    } catch (err) {
+      setEditUserError(err.message || 'Failed to update user');
+    } finally {
+      setEditUserLoading(false);
+    }
+  };
+
+  // Handle user delete
+  const handleDeleteUser = async () => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    setEditUserLoading(true);
+    setEditUserError('');
+    try {
+      const response = await authFetch(`http://localhost:5001/admin/users/${editUser._id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete user');
+      // Remove user from dashboardStats.recentUsers
+      setDashboardStats((prev) => ({
+        ...prev,
+        recentUsers: prev.recentUsers.filter((u) => u._id !== editUser._id),
+      }));
+      setShowEditUserModal(false);
+      setEditUser(null);
+    } catch (err) {
+      setEditUserError(err.message || 'Failed to delete user');
+    } finally {
+      setEditUserLoading(false);
     }
   };
 
@@ -153,6 +261,17 @@ const Admin = () => {
 
             {/* Navigation */}
             <div className="space-y-2">
+            {/* Mail Icon Button */}
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
+              title="Send Email to Users"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H8m8 0a4 4 0 01-8 0m8 0V8a4 4 0 00-8 0v4m8 0v4a4 4 0 01-8 0v-4" />
+              </svg>
+              <span className="font-medium">Send Email</span>
+            </button>
               <button
                 onClick={() => setActiveTab('dashboard')}
                 className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
@@ -214,6 +333,145 @@ const Admin = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
+          {/* Email Modal */}
+          {showEmailModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-fadeIn">
+                <button
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
+                  onClick={() => { setShowEmailModal(false); setEmailError(''); setEmailSuccess(''); setEmailLoading(false); setSelectedUserIds([]); setSelectAllUsers(false); setEmailSubject(''); setEmailBody(''); setSendTestEmail(false); }}
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+                <h3 className="text-2xl font-bold text-orange-700 mb-4 text-center">Send Email to Users</h3>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setEmailLoading(true);
+                    setEmailError('');
+                    setEmailSuccess('');
+                    try {
+                      const payload = {
+                        userIds: sendTestEmail ? [] : (selectAllUsers ? [] : selectedUserIds),
+                        subject: emailSubject,
+                        body: emailBody,
+                        sendTest: sendTestEmail
+                      };
+                      const response = await authFetch('http://localhost:5001/admin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                      });
+                      const data = await response.json();
+                      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send email');
+                      setEmailSuccess(`Sent to ${data.sent} user(s)`);
+                      setEmailError(data.failed && data.failed.length > 0 ? `Failed: ${data.failed.map(f => f.email).join(', ')}` : '');
+                    } catch (err) {
+                      setEmailError(err.message || 'Failed to send email');
+                    } finally {
+                      setEmailLoading(false);
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  {/* Multi-select dropdown of users */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={selectAllUsers}
+                        onChange={(e) => {
+                          setSelectAllUsers(e.target.checked);
+                          setSelectedUserIds(e.target.checked ? [] : selectedUserIds);
+                        }}
+                        id="selectAllUsers"
+                        disabled={sendTestEmail}
+                      />
+                      <label htmlFor="selectAllUsers" className="text-sm">Select All Users</label>
+                    </div>
+                    <div className="mb-2">
+                      <select
+                        multiple
+                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 h-32"
+                        value={selectedUserIds}
+                        onChange={(e) => {
+                          const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                          setSelectedUserIds(options);
+                          setSelectAllUsers(false);
+                        }}
+                        disabled={selectAllUsers || sendTestEmail}
+                      >
+                        {dashboardStats?.recentUsers?.map((user) => (
+                          <option key={user._id} value={user._id}>{user.name} ({user.email})</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={sendTestEmail}
+                        onChange={(e) => {
+                          setSendTestEmail(e.target.checked);
+                          setSelectAllUsers(false);
+                          setSelectedUserIds([]);
+                        }}
+                        id="sendTestEmail"
+                      />
+                      <label htmlFor="sendTestEmail" className="text-sm">Send test email to self ({registeredUser?.email})</label>
+                    </div>
+                  </div>
+                  {/* Subject */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                      value={emailSubject}
+                      onChange={e => setEmailSubject(e.target.value)}
+                      required
+                      disabled={emailLoading}
+                    />
+                  </div>
+                  {/* Body */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
+                    <textarea
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 min-h-[100px]"
+                      value={emailBody}
+                      onChange={e => setEmailBody(e.target.value)}
+                      required
+                      disabled={emailLoading}
+                    />
+                  </div>
+                  {emailError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700 text-sm text-center">{emailError}</div>
+                  )}
+                  {emailSuccess && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-green-700 text-sm text-center">{emailSuccess}</div>
+                  )}
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      type="submit"
+                      className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                      disabled={emailLoading || !emailSubject || !emailBody || (!sendTestEmail && !selectAllUsers && selectedUserIds.length === 0)}
+                    >
+                      {emailLoading ? 'Sending...' : 'Send Email'}
+                    </button>
+                    <button
+                      type="button"
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                      onClick={() => { setShowEmailModal(false); setEmailError(''); setEmailSuccess(''); setEmailLoading(false); setSelectedUserIds([]); setSelectAllUsers(false); setEmailSubject(''); setEmailBody(''); setSendTestEmail(false); }}
+                      disabled={emailLoading}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
           {/* Notification Bell for Plan Upgrade Requests - top right of main content */}
           <div className="flex justify-end mb-4">
             <button
@@ -318,6 +576,7 @@ const Admin = () => {
                         <th className="text-left py-3 px-4 font-medium text-gray-600">Email</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-600">Plan</th>
                         <th className="text-left py-3 px-4 font-medium text-gray-600">Joined</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -333,12 +592,97 @@ const Admin = () => {
                           <td className="py-3 px-4 text-gray-500 text-sm">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </td>
+                          <td className="py-3 px-4">
+                            <button
+                              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium shadow transition-all duration-200"
+                              onClick={() => handleEditUserClick(user)}
+                            >
+                              Edit
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
+
+              {/* Edit User Modal */}
+              {showEditUserModal && editUser && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                  <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fadeIn">
+                    <button
+                      className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
+                      onClick={() => { setShowEditUserModal(false); setEditUser(null); }}
+                      aria-label="Close"
+                    >
+                      &times;
+                    </button>
+                    <h3 className="text-2xl font-bold text-orange-700 mb-4 text-center">Edit User</h3>
+                    <form onSubmit={handleEditUserSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={editUser.name}
+                          onChange={handleEditUserFieldChange}
+                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={editUser.email}
+                          onChange={handleEditUserFieldChange}
+                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                        <select
+                          name="plan"
+                          value={editUser.plan}
+                          onChange={handleEditUserFieldChange}
+                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                          required
+                        >
+                          {availablePlans.length === 0 && (
+                            <option value="" disabled>Loading plans...</option>
+                          )}
+                          {availablePlans.map((plan) => (
+                            <option key={plan._id} value={plan.name}>{plan.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {editUserError && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700 text-sm text-center">{editUserError}</div>
+                      )}
+                      <div className="flex flex-col gap-3 mt-6">
+                        <button
+                          type="submit"
+                          className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200"
+                          disabled={editUserLoading}
+                        >
+                          {editUserLoading ? 'Saving...' : 'Save Changes'}
+                        </button>
+                        <button
+                          type="button"
+                          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200"
+                          disabled={editUserLoading}
+                          onClick={handleDeleteUser}
+                        >
+                          {editUserLoading ? 'Deleting...' : 'Delete User'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

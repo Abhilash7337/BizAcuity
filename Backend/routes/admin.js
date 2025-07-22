@@ -233,9 +233,87 @@ router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
       success: true,
       message: 'Plan deleted successfully'
     });
+// Send email to users (single, multiple, all, or test to self)
+router.post('/', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { userIds = [], subject, body, sendTest = false } = req.body;
+    if (!subject || !body) {
+      return res.status(400).json({ error: 'Subject and body are required.' });
+    }
+
+    let recipients = [];
+    if (sendTest) {
+      recipients = [{ name: req.adminUser.name, email: req.adminUser.email }];
+    } else if (Array.isArray(userIds) && userIds.length > 0) {
+      recipients = await User.find({ _id: { $in: userIds } }).select('name email');
+    } else {
+      recipients = await User.find({}).select('name email');
+    }
+
+    const { sendCustomEmail } = require('../utils/emailService');
+    let results = [];
+    for (const user of recipients) {
+      try {
+        await sendCustomEmail(user.email, user.name, subject, body);
+        results.push({ email: user.email, success: true });
+      } catch (err) {
+        results.push({ email: user.email, success: false, error: err.message });
+      }
+    }
+
+    const successCount = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success);
+    res.json({ success: true, sent: successCount, failed });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send emails', details: error.message });
+  }
+});
   } catch (error) {
     console.error('Delete plan error:', error);
     res.status(500).json({ error: 'Failed to delete plan' });
+  }
+});
+
+// Delete plan upgrade request
+router.delete('/plan-upgrade-requests/:id', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const PlanUpgradeRequest = require('../models/PlanUpgradeRequest');
+    const deletedRequest = await PlanUpgradeRequest.findByIdAndDelete(id);
+    if (!deletedRequest) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+    res.json({ success: true, message: 'Request deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete request' });
+  }
+});
+// Update user details (name, email, plan)
+router.put('/users/:id', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, plan } = req.body;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.plan = plan || user.plan;
+    await user.save();
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// Delete user
+router.delete('/users/:id', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 

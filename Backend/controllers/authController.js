@@ -12,8 +12,12 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
+    // Find the correct FREE plan name from the database
+    const Plan = require('../models/Plan');
+    let freePlan = await Plan.findOne({ name: 'FREE' });
+    let planName = freePlan ? freePlan.name : 'FREE';
     // Create new user (password will be hashed by the model middleware)
-    const user = new User({ name, email, password });
+    const user = new User({ name, email, password, plan: planName });
     await user.save();
 
     // Generate JWT token

@@ -55,8 +55,8 @@ const PlanUpgradeRequests = () => {
   // Filter: Only show the latest request per user (pending or most recent approved/rejected)
   const latestRequestsMap = {};
   requests.forEach((req) => {
+    // If user is deleted, req.user may be null or missing fields
     const userId = req.user?._id || req.user?.email || req.user?.name || req._id;
-    if (!userId) return;
     // Always show pending requests, or the most recent approved/rejected
     if (!latestRequestsMap[userId] || new Date(req.createdAt) > new Date(latestRequestsMap[userId].createdAt) || req.status === 'pending') {
       latestRequestsMap[userId] = req;
@@ -109,8 +109,12 @@ const PlanUpgradeRequests = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {latestRequests.map((req) => (
                 <tr key={req._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{req.user?.name || req.user?.email || 'Unknown'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{req.user?.plan || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {req.user?.name || req.user?.email || req.user?._id || 'Deleted User'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {req.user?.plan || (req.user ? '-' : 'N/A')}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-700 font-semibold">{req.requestedPlan}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${STATUS_COLORS[req.status]}`}>{req.status}</span>

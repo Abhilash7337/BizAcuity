@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
-const { sendOTPEmail } = require('../utils/emailService');
+const { sendOTPEmail, sendWelcomeEmail } = require('../utils/emailService');
 
 // Cleanup expired temp registrations
 router.delete('/cleanup-temp-registrations', async (req, res) => {
@@ -106,13 +106,22 @@ router.post('/verify-otp', async (req, res) => {
         }
 
         // Create user in permanent collection
+        // Find the correct FREE plan name from the database
+        const Plan = require('../models/Plan');
+        let freePlan = await Plan.findOne({ name: 'FREE' });
+        let planName = freePlan ? freePlan.name : 'FREE';
+
         const newUser = new User({
             name: tempUser.name,
             email: tempUser.email,
             password: tempUser.password,
-            isVerified: true
+            isVerified: true,
+            plan: planName
         });
         await newUser.save();
+
+        // Send welcome email (non-blocking)
+        sendWelcomeEmail(newUser.email, newUser.name);
 
         // Remove temp registration
         await TempRegistration.deleteOne({ _id: tempUser._id });
