@@ -60,7 +60,22 @@ app.get('/health', (req, res) => {
   });
 });
 
-// 404 handler for undefined routes
+// Serve static files from frontend build
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// SPA fallback: serve index.html for non-API, non-upload, non-health routes
+app.get('*', (req, res, next) => {
+  if (
+    req.originalUrl.startsWith('/api') ||
+    req.originalUrl.startsWith('/uploads') ||
+    req.originalUrl.startsWith('/health')
+  ) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// 404 handler for undefined API routes
 app.use('*', (req, res) => {
   res.status(404).json({ 
     error: 'Route not found',
