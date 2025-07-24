@@ -1,21 +1,3 @@
-/*
- * SECURITY NOTE: 
- * This auth utility implements secure data storage practices:
- * 
- * STORED IN LOCALHOST (Safe, non-sensitive):
- * - name: User's display name
- * - isLoggedIn: Authentication status
- * - userType: User role (regular, admin, etc.)
- * - plan: User's subscription plan
- * 
- * NOT STORED IN LOCALHOST (Sensitive data):
- * - id: User database ID
- * - email: User email address  
- * - profilePhoto: User avatar/photo
- * - Any other PII (Personally Identifiable Information)
- * 
- * Sensitive data is fetched from server when needed using fetchUserProfile()
- */
 
 // Store token in localStorage
 export const setToken = (token) => {
