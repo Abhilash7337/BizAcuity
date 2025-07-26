@@ -5,7 +5,10 @@ import { UserContext } from '../App';
 import { Image } from 'lucide-react';
 
 // Components
-import { Header, Footer } from '../components/layout';
+import { 
+  Header, 
+  Footer 
+} from '../components/layout';
 import { 
   WallHeader, 
   WallSidebar, 
@@ -14,13 +17,12 @@ import {
   ImagePropertiesPanel 
 } from '../components/wall';
 
-// Sidebar Components for Tab Content
-
-
 import TabContentBackground from '../components/wall/TabContentBackground';
 import TabContentUploads from '../components/wall/TabContentUploads';
 import TabContentEditor from '../components/wall/TabContentEditor';
 import TabContentDecors from '../components/wall/TabContentDecors';
+
+// Sidebar Components for Tab Content
 
 
 // Modular floating UI components
