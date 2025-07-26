@@ -410,9 +410,14 @@ function WallEditor() {
       <div
         className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400"
         onClick={(e) => {
-          // ...existing code...
           const clickedElement = e.target;
-          // ...existing code...
+          // Define what counts as a button, input, sidebar, canvas, modal, interactive
+          const isClickOnButton = clickedElement.tagName === 'BUTTON' || clickedElement.closest('button');
+          const isClickOnInput = clickedElement.tagName === 'INPUT' || clickedElement.closest('input');
+          const isClickOnSidebar = clickedElement.closest('.sidebar') || clickedElement.classList.contains('sidebar');
+          const isClickOnCanvas = clickedElement.closest('.wall-canvas') || clickedElement.classList.contains('wall-canvas');
+          const isClickOnModal = clickedElement.closest('.modal') || clickedElement.classList.contains('modal');
+          const isClickOnInteractive = clickedElement.closest('.interactive') || clickedElement.classList.contains('interactive');
           if (!isClickOnButton && !isClickOnInput && !isClickOnSidebar &&
               !isClickOnCanvas && !isClickOnModal && !isClickOnInteractive) {
             setSelectedIdx(null);

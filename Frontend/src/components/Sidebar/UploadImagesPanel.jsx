@@ -101,36 +101,39 @@ const UploadImagesPanel = ({
         </div>
         
         <div className="grid grid-cols-2 gap-3">
-          {images.map((src, idx) => (
-            <div 
-              key={idx} 
-              className="relative group rounded-xl overflow-hidden border-2 border-white/40 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in-up"
-              style={{ animationDelay: `${idx * 0.1}s` }}
-            >
-              <img 
-                src={src} 
-                alt={`preview ${idx + 1}`} 
-                className="w-full h-24 object-cover transition-transform duration-300 group-hover:scale-110" 
-              />
-              
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <button
-                  type="button"
-                  className="bg-red-500 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-110 hover:bg-red-600"
-                  onClick={() => handleRemoveImage(idx)}
-                  aria-label={`Remove image ${idx + 1}`}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+          {images.map((src, idx) => {
+            // Patch: Always use backend URL safely
+            const BACKEND_DOMAIN = "http://51.21.170.148:5001"; // Change to your backend domain if needed
+            const safeSrc = src && src.startsWith('http') ? src : `${BACKEND_DOMAIN}${src && src.startsWith('/') ? src : `/${src}`}`;
+            return (
+              <div 
+                key={idx} 
+                className="relative group rounded-xl overflow-hidden border-2 border-white/40 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in-up"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                <img 
+                  src={safeSrc} 
+                  alt={`preview ${idx + 1}`} 
+                  className="w-full h-24 object-cover transition-transform duration-300 group-hover:scale-110" 
+                />
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-110 hover:bg-red-600"
+                    onClick={() => handleRemoveImage(idx)}
+                    aria-label={`Remove image ${idx + 1}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                {/* Image index */}
+                <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
+                  <span className="text-xs font-bold text-orange-700">{idx + 1}</span>
+                </div>
               </div>
-              
-              {/* Image index */}
-              <div className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
-                <span className="text-xs font-bold text-orange-700">{idx + 1}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         {/* Quick Actions */}
