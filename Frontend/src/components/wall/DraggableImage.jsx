@@ -148,18 +148,30 @@ function DraggableImage({
       onDragStart={() => !isViewOnly && setSelectedIdx(idx)}
       onDragStop={(e, d) => {
         if (isViewOnly) return;
-        const x = Math.max(0, Math.min(d.x, wallWidth - imageState.width));
-        const y = Math.max(0, Math.min(d.y, wallHeight - imageState.height));
+        let x = d.x;
+        let y = d.y;
+        // Clamp so the image stays fully within the wall
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x + imageState.width > wallWidth) x = wallWidth - imageState.width;
+        if (y + imageState.height > wallHeight) y = wallHeight - imageState.height;
         updateImageState({ x, y });
       }}
       onResizeStart={() => !isViewOnly && setSelectedIdx(idx)}
       onResizeStop={(e, direction, ref, delta, position) => {
         if (isViewOnly) return;
-        const width = Math.min(parseInt(ref.style.width, 10), wallWidth);
-        const height = Math.min(parseInt(ref.style.height, 10), wallHeight);
-        const x = Math.max(0, Math.min(position.x, wallWidth - width));
-        const y = Math.max(0, Math.min(position.y, wallHeight - height));
-        
+        let width = parseInt(ref.style.width, 10);
+        let height = parseInt(ref.style.height, 10);
+        let x = position.x;
+        let y = position.y;
+        // Clamp width/height so image stays within wall
+        if (width > wallWidth) width = wallWidth;
+        if (height > wallHeight) height = wallHeight;
+        // If resizing causes overflow, adjust position so image is flush with wall edge
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+        if (x + width > wallWidth) x = wallWidth - width;
+        if (y + height > wallHeight) y = wallHeight - height;
         updateImageState({
           width,
           height,

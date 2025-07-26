@@ -212,118 +212,44 @@ const PublicLanding = () => {
       
       {/* Interactive Wall Layout Preview Section */}
       <section className="py-20 bg-gradient-to-b from-white to-orange-100 relative overflow-hidden">
-        {/* Enhanced subtle background animation layer */}
+        {/* Subtle animated background */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Flowing abstract background */}
           <div 
-            className="absolute top-20 left-10 w-40 h-40 bg-orange-300 opacity-8 blur-3xl rounded-full"
-            style={{animation: 'backgroundFlow 90s ease-in-out infinite'}}
+            className="absolute top-20 left-10 w-40 h-40 bg-orange-200 opacity-5 blur-2xl rounded-full animate-[backgroundFlow_90s_ease-in-out_infinite]"
           ></div>
-          <div 
-            className="absolute bottom-20 right-10 w-32 h-32 bg-orange-400 opacity-6 blur-2xl"
-            style={{animation: 'abstractMorph 70s ease-in-out infinite reverse'}}
-          ></div>
-          
-          {/* Flowing lines for this section */}
-          <svg className="absolute inset-0 w-full h-full opacity-3" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path 
-              d="M0,20 Q50,5 100,20" 
-              stroke="rgba(234, 88, 12, 0.4)" 
-              strokeWidth="0.2" 
-              fill="none"
-              style={{animation: 'backgroundFlow 60s ease-in-out infinite'}}
-            />
-            <path 
-              d="M0,80 Q50,95 100,80" 
-              stroke="rgba(249, 115, 22, 0.3)" 
-              strokeWidth="0.15" 
-              fill="none"
-              style={{animation: 'backgroundFlow 45s ease-in-out infinite reverse'}}
-            />
-          </svg>
         </div>
-        
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-20 h-20 border border-orange-600 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 border border-orange-500 rounded-lg animate-pulse" style={{animationDuration: '4s'}}></div>
-          <div className="absolute top-1/3 left-1/4 w-16 h-16 border-2 border-orange-400 rounded-full" style={{animation: 'float 15s ease-in-out infinite'}}></div>
-          <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border border-orange-300 transform rotate-45" style={{animation: 'drift 25s linear infinite'}}></div>
-        </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold font-poppins text-orange-800 mb-4 hover:text-orange-700 transition-colors duration-300">
-              See What You Can Create
-            </h2>
+            <div className="flex flex-col items-center justify-center mb-4">
+              <img 
+                src="/mialtar-logo.png" 
+                alt="MIALTAR Logo" 
+                className="h-16 mb-2 select-none" 
+                style={{ userSelect: 'none' }} 
+              />
+              <h2 className="text-4xl sm:text-5xl font-bold font-poppins text-orange-700 mb-2 tracking-wider">
+                MIALTAR
+              </h2>
+            </div>
             <p className="text-lg text-gray-600 font-inter max-w-2xl mx-auto">
-              Get inspired by these beautiful wall layouts created with our designer
+              Get inspired by these beautiful wall layouts created with <span className="font-bold text-orange-500">MIALTAR</span>
             </p>
           </div>
-          
-          {/* Interactive Sample Wall Layout */}
-          <div className="relative max-w-4xl mx-auto group">
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-200 hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-              {/* Wall mockup with hover effects */}
-              <div className="relative bg-gradient-to-b from-gray-50 to-gray-100 rounded-xl p-8 min-h-[400px] overflow-hidden">
-                {/* Interactive Gallery wall layout */}
-                <div className="grid grid-cols-4 grid-rows-3 gap-4 h-full">
-                  <div className="col-span-2 bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-sm font-medium group-hover/item:text-orange-700">Large Photo</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Medium</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Medium</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Small</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Small</span>
-                  </div>
-                  <div className="col-span-2 bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-sm font-medium group-hover/item:text-orange-700">Wide Photo</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Square</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Square</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Square</span>
-                  </div>
-                  <div className="bg-white border-4 border-orange-600 rounded-lg shadow-md flex items-center justify-center hover:bg-orange-50 hover:scale-105 transition-all duration-300 cursor-pointer group/item">
-                    <span className="text-orange-600 text-xs font-medium group-hover/item:text-orange-700">Square</span>
-                  </div>
-                </div>
-                
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-center justify-center">
-                  <div className="text-center text-orange-700">
-                    <svg className="w-12 h-12 mx-auto mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <p className="font-medium">Click to explore</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-center mt-6">
-                <p className="text-gray-600 font-inter group-hover:text-orange-700 transition-colors duration-300">
-                  Arrange your photos in beautiful, balanced layouts with precise spacing and alignment
-                </p>
-                <button 
-                  onClick={handleCreateWall}
-                  className="mt-4 text-orange-600 hover:text-orange-700 font-medium transition-colors duration-300 underline hover:no-underline"
-                >
-                  Try it yourself →
-                </button>
-              </div>
-            </div>
+
+          {/* Wall Layout Preview */}
+          <div className="group relative mx-auto rounded-2xl sm:rounded-[2.5rem] p-0 sm:p-2 bg-gradient-to-br from-orange-50 via-white to-orange-100 shadow-xl flex items-center justify-center w-full max-w-[99vw] sm:w-[800px] md:w-[1100px] h-auto sm:h-[600px] md:h-[800px] max-h-[80vw] sm:max-h-none transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-300/30">
+            {/* Image - bigger, no border */}
+            <img
+              src="/sample-modern-wall.png"
+              alt="MIALTAR Wall Layout Example"
+              className="w-full h-auto max-h-[70vw] sm:max-h-[580px] md:max-h-[780px] object-contain rounded-xl sm:rounded-2xl shadow-lg transition-all duration-300 ease-in-out group-hover:brightness-105 group-hover:shadow-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)',
+                display: 'block'
+              }}
+            />
           </div>
         </div>
       </section>

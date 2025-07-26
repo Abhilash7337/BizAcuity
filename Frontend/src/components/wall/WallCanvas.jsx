@@ -16,14 +16,14 @@ const WallCanvas = ({
   isViewOnly = false
 }) => {
   return (
-    <main 
-      className="canvas-area min-h-screen flex items-center justify-center relative overflow-hidden" 
-      style={{ 
-        marginLeft: '360px', // Space for floating sidebar
-        padding: '2rem',
+    <main
+      className="canvas-area min-h-screen flex items-center justify-center relative overflow-hidden px-1 py-2 sm:px-4 sm:py-6 lg:px-8 lg:py-8 pb-[90px] lg:pb-0 lg:pl-[360px]"
+      style={{
+        marginLeft: undefined,
+        padding: undefined,
         minHeight: 'calc(100vh - 80px)', // Account for header
-        paddingTop: '1rem',
-        background: 'transparent' // Let the main page animations show through
+        paddingTop: undefined,
+        background: 'transparent',
       }}
       onClick={(e) => {
         // Unselect when clicking on the canvas area background (but not on the wall itself)
@@ -83,19 +83,16 @@ const WallCanvas = ({
       
       <div
         ref={wallRef}
-        className="relative bg-cover bg-center bg-no-repeat overflow-hidden rounded-2xl shadow-2xl backdrop-blur-sm z-10"
+        className="relative bg-cover bg-center bg-no-repeat overflow-hidden rounded-2xl shadow-2xl backdrop-blur-sm z-10 mx-auto"
         style={{
           backgroundColor: wallColor,
-          width: wallWidth,
+          width: '100%',
+          maxWidth: wallWidth,
           height: wallHeight,
           backgroundImage: wallImage ? `url(${wallImage})` : undefined,
           position: 'relative',
           flexShrink: 0,
-          boxShadow: `
-            0 25px 50px -12px rgba(234, 88, 12, 0.15),
-            0 0 0 1px rgba(255, 255, 255, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3)
-          `
+          boxShadow: `0 25px 50px -12px rgba(234, 88, 12, 0.15),0 0 0 1px rgba(255,255,255,0.2),inset 0 1px 0 rgba(255,255,255,0.3)`
         }}
         onClick={(e) => {
           if (!isViewOnly && e.target === e.currentTarget) {

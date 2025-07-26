@@ -179,15 +179,15 @@ const Register = () => {
       </div>
       {/* Navigation */}
       <nav className="relative z-50 bg-white/95 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
-              Picture Wall Designer
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-2 sm:gap-0">
+            <Link to="/" className="flex items-center text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
+              <span className="truncate max-w-[180px] sm:max-w-none">MIALTAR</span>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 mt-2 sm:mt-0">
               <Link 
                 to="/" 
-                className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-100"
+                className="text-orange-700 hover:text-orange-600 font-medium font-inter px-3 sm:px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-100 text-sm sm:text-base"
               >
                 ← Back to Home
               </Link>
@@ -196,8 +196,8 @@ const Register = () => {
         </div>
       </nav>
       {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md">
+      <main className="relative z-10 min-h-screen flex items-center justify-center px-2 sm:px-4 py-8">
+        <div className="w-full max-w-md sm:max-w-md md:max-w-lg lg:max-w-md xl:max-w-md mx-auto">
           {!showOTPInput ? (
             <>
               {/* Welcome Section with Animation */}

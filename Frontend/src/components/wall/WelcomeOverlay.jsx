@@ -42,7 +42,7 @@ export default function WelcomeOverlay({ isInitialized }) {
           </div>
           
           <h2 className="text-3xl font-bold font-poppins mb-2 tracking-wider animate-pulse" style={{animationDelay: '0.5s', animationDuration: '3s'}}>
-            Picture Wall Designer
+            MIALTAR
           </h2>
           <p className="text-orange-600/80 font-inter text-lg animate-pulse" style={{animationDelay: '1s', animationDuration: '3s'}}>
             Preparing your creative workspace...

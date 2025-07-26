@@ -15,6 +15,7 @@ const DecorManagement = () => {
     image: null
   });
   const [categories, setCategories] = useState([]);
+  const [categoryNumbers, setCategoryNumbers] = useState({});
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategory, setNewCategory] = useState('');
   const [categoryLoading, setCategoryLoading] = useState(false);
@@ -37,6 +38,12 @@ const DecorManagement = () => {
         if (data.length > 0 && !formData.category) {
           setFormData(f => ({ ...f, category: data[0].name }));
         }
+        // Load numbers for each category (default to -1 if not present)
+        const numbers = {};
+        data.forEach(cat => {
+          numbers[cat.name] = typeof cat.number === 'number' ? cat.number : -1;
+        });
+        setCategoryNumbers(numbers);
       } else {
         setCategoryError(data.error || 'Failed to fetch categories');
       }
@@ -211,24 +218,62 @@ const DecorManagement = () => {
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex items-center gap-4">
-        <Filter size={20} className="text-gray-600" />
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-        >
-          <option value="all">All Categories</option>
+      {/* Category Filter with number input */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-4">
+          <Filter size={20} className="text-gray-600" />
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+            <option value="all">All Categories</option>
+            {categories.map(category => (
+              <option key={category._id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <span className="text-gray-600">
+            {filteredDecors.length} decor{filteredDecors.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+        {/* Show number input for each category */}
+        <div className="flex flex-wrap gap-4 items-center mt-2">
           {categories.map(category => (
-            <option key={category._id} value={category.name}>
-              {category.name}
-            </option>
+            <div key={category._id} className="flex items-center gap-2 bg-orange-50 px-2 py-1 rounded">
+              <span className="capitalize text-gray-700">{category.name}:</span>
+              <input
+                type="number"
+                className="w-16 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                value={categoryNumbers[category.name] ?? -1}
+                onChange={async (e) => {
+                  const value = parseInt(e.target.value, 10);
+                  setCategoryNumbers({ ...categoryNumbers, [category.name]: value });
+                  // Optionally, update on server
+                  await authFetch(`/admin/categories/${category._id}/number`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: value })
+                  });
+                }}
+                min={-1}
+              />
+              <button
+                className="text-xs text-orange-600 underline ml-1"
+                title="Set all decors in this category to -1"
+                onClick={async () => {
+                  if (!window.confirm(`Set all decors in '${category.name}' to -1?`)) return;
+                  // Update all decors in this category to -1 (API call)
+                  await authFetch(`/admin/decors/category/${category.name}/set-all-minus-one`, {
+                    method: 'PUT',
+                  });
+                  fetchDecors();
+                }}
+              >Set all -1</button>
+            </div>
           ))}
-        </select>
-        <span className="text-gray-600">
-          {filteredDecors.length} decor{filteredDecors.length !== 1 ? 's' : ''}
-        </span>
+        </div>
       </div>
 
       {/* Decors Grid */}
@@ -303,23 +348,7 @@ const DecorManagement = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                >
-                  {categories.map(category => (
-                    <option key={category._id} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Category selection removed as per new logic */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

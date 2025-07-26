@@ -28,35 +28,29 @@ const Header = () => {
   };
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center py-4">
-          {/* Logo - Far Left */}
-          <div className="flex items-center">
-            <Link to="/home" className="text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
-              Picture Wall Designer
-            </Link>
-          </div>
+    <nav className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-lg px-0">
+      <div className="w-full">
 
-          {/* Desktop Navigation Links - Left Side */}
-          <div className="hidden md:flex items-center space-x-8 ml-12">
+        <div className="flex items-center py-4 w-full">
+          {/* Navigation Links - Far Left */}
+          <div className="hidden md:flex items-center space-x-8">
             {isLoggedIn ? (
               <>
-                <Link 
+                <Link
                   to="/dashboard" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Dashboard
                 </Link>
-                <Link 
+                <Link
                   to="/wall" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Wall Designer
                 </Link>
-                <Link 
+                <Link
                   to="/user" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Profile
                 </Link>
@@ -65,7 +59,7 @@ const Header = () => {
               <>
                 <Link 
                   to="/" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
+                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
                 >
                   Home
                 </Link>
@@ -91,8 +85,18 @@ const Header = () => {
             )}
           </div>
 
-          {/* Spacer to push user actions to far right */}
-          <div className="flex-1"></div>
+          {/* Logo - Centered */}
+          <div className="flex items-center flex-shrink-0 mx-auto">
+            <Link to="/home" className="flex items-center group">
+              <img
+                src="/mialtar-logo.png"
+                alt="MIALTAR Logo"
+                className="h-16 w-auto mr-4 select-none transition-transform duration-200 group-hover:scale-110"
+                style={{userSelect:'none'}}
+              />
+              <span className="text-4xl font-bold font-poppins text-orange-700 group-hover:text-orange-600 transition-colors duration-300 tracking-wide" style={{letterSpacing:'0.04em'}}>MIALTAR</span>
+            </Link>
+          </div>
 
           {/* Desktop Action Buttons - Far Right */}
           <div className="hidden md:flex items-center space-x-4">
