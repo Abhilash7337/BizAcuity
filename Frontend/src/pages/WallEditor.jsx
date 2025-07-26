@@ -16,7 +16,7 @@ import {
 
 // Sidebar Components for Tab Content
 
-import { DecorsPanel } from '../components/sidebar';
+
 import TabContentBackground from '../components/wall/TabContentBackground';
 import TabContentUploads from '../components/wall/TabContentUploads';
 import TabContentEditor from '../components/wall/TabContentEditor';
