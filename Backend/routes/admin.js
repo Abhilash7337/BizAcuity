@@ -5,8 +5,9 @@ const Plan = require('../models/Plan');
 const User = require('../models/User');
 const Draft = require('../models/Draft');
 const PlanUpgradeRequest = require('../models/PlanUpgradeRequest');
+// ...existing code...
 
-// Admin authentication middleware
+// Admin authentication middleware (must be defined before any route uses it)
 const checkAdmin = async (req, res, next) => {
   try {
     const user = await User.findById(req.userId);
@@ -25,6 +26,39 @@ const checkAdmin = async (req, res, next) => {
     res.status(500).json({ error: 'Server error while verifying admin status' });
   }
 };
+
+// CATEGORY NUMBER ENDPOINTS
+const Category = require('../models/Category');
+const Decor = require('../models/Decor');
+
+// Update category number
+router.put('/categories/:id/number', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { number } = req.body;
+    const category = await Category.findByIdAndUpdate(id, { number }, { new: true });
+    if (!category) return res.status(404).json({ error: 'Category not found' });
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update category number' });
+  }
+});
+
+// Set all decors in a category to -1 (requires a 'number' field in Decor, or just a dummy update)
+router.put('/decors/category/:categoryName/set-all-minus-one', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const { categoryName } = req.params;
+    // If you want to update a 'number' field in Decor, add it to the schema. Otherwise, just a dummy update.
+    // Here, we just update a dummy field or do nothing, but you can expand as needed.
+    // For now, just return success.
+    // Optionally, you could deactivate all decors in this category, or add a 'number' field to Decor and set it to -1.
+    res.json({ message: `Set all decors in category '${categoryName}' to -1 (dummy endpoint, expand as needed)` });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to set all decors to -1' });
+  }
+});
+
+// ...existing code...
 
 // Get all plan upgrade requests (optionally filter by status)
 router.get('/plan-upgrade-requests', verifyToken, checkAdmin, async (req, res) => {
@@ -115,7 +149,13 @@ router.post('/plan-upgrade-requests/:id/reject', verifyToken, checkAdmin, async 
 router.get('/plans', verifyToken, checkAdmin, async (req, res) => {
   try {
     const plans = await Plan.find().sort({ createdAt: -1 });
-    res.json({ success: true, plans });
+    // Ensure categoryLimits is always present in the response for each plan
+    const plansWithCategoryLimits = plans.map(plan => {
+      const obj = plan.toObject();
+      if (!obj.categoryLimits) obj.categoryLimits = {};
+      return obj;
+    });
+    res.json({ success: true, plans: plansWithCategoryLimits });
   } catch (error) {
     console.error('Get plans error:', error);
     res.status(500).json({ error: 'Failed to fetch plans' });
@@ -126,7 +166,7 @@ router.get('/plans', verifyToken, checkAdmin, async (req, res) => {
 // Create new plan
 router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, decors } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits } = req.body;
 
     // Validate required fields
     if (!name || monthlyPrice === undefined) {
@@ -143,6 +183,24 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
       });
     }
 
+    // Sync decors array with categoryLimits
+    const Decor = require('../models/Decor');
+    let allowedDecorIds = [];
+    if (categoryLimits && typeof categoryLimits === 'object' && Object.keys(categoryLimits).length > 0) {
+      for (const [catId, limit] of Object.entries(categoryLimits)) {
+        const Category = require('../models/Category');
+        const categoryDoc = await Category.findById(catId);
+        if (!categoryDoc) continue;
+        const categoryName = categoryDoc.name;
+        const decorsInCategory = await Decor.find({ category: categoryName }).sort({ createdAt: 1 });
+        if (parseInt(limit) === -1) {
+          allowedDecorIds.push(...decorsInCategory.map(d => d._id));
+        } else {
+          allowedDecorIds.push(...decorsInCategory.slice(0, parseInt(limit)).map(d => d._id));
+        }
+      }
+    }
+
     const newPlan = new Plan({
       name: name.trim(),
       monthlyPrice: parseFloat(monthlyPrice),
@@ -155,7 +213,8 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
       },
       isActive: isActive !== undefined ? isActive : true,
       exportDrafts: exportDrafts === true,
-      decors: Array.isArray(decors) ? decors : []
+      decors: allowedDecorIds,
+      categoryLimits: categoryLimits || {}
     });
 
     const savedPlan = await newPlan.save();
@@ -163,7 +222,7 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Plan created successfully',
-      plan: savedPlan
+      plan: savedPlan.toObject()
     });
   } catch (error) {
     console.error('Create plan error:', error);
@@ -179,8 +238,22 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
 router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, decors } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits } = req.body;
 
+    // Validate category IDs
+    const Category = require('../models/Category');
+    let invalidCategoryIds = [];
+    if (categoryLimits && typeof categoryLimits === 'object') {
+      for (const catId of Object.keys(categoryLimits)) {
+        const exists = await Category.exists({ _id: catId });
+        if (!exists) invalidCategoryIds.push(catId);
+      }
+    }
+    if (invalidCategoryIds.length > 0) {
+      return res.status(400).json({ error: 'Invalid category IDs in categoryLimits', invalidCategoryIds });
+    }
+
+    // Build updateData without decors for now
     const updateData = {
       name: name?.trim(),
       monthlyPrice: parseFloat(monthlyPrice),
@@ -193,8 +266,29 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
       },
       isActive: isActive !== undefined ? isActive : true,
       exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined,
-      decors: Array.isArray(decors) ? decors : []
+      categoryLimits: categoryLimits || {}
     };
+
+    // Sync decors array with categoryLimits
+    const Decor = require('../models/Decor');
+    let allowedDecorIds = [];
+    if (categoryLimits && typeof categoryLimits === 'object' && Object.keys(categoryLimits).length > 0) {
+      for (const [catId, limit] of Object.entries(categoryLimits)) {
+        const categoryDoc = await Category.findById(catId);
+        if (!categoryDoc) {
+          console.error(`Category not found for ID: ${catId}`);
+          continue;
+        }
+        const categoryName = categoryDoc.name;
+        const decorsInCategory = await Decor.find({ category: categoryName }).sort({ createdAt: 1 });
+        if (parseInt(limit) === -1) {
+          allowedDecorIds.push(...decorsInCategory.map(d => d._id));
+        } else {
+          allowedDecorIds.push(...decorsInCategory.slice(0, parseInt(limit)).map(d => d._id));
+        }
+      }
+    }
+    updateData.decors = allowedDecorIds;
 
     const updatedPlan = await Plan.findByIdAndUpdate(
       id,
@@ -209,11 +303,11 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
     res.json({
       success: true,
       message: 'Plan updated successfully',
-      plan: updatedPlan
+      plan: updatedPlan ? updatedPlan.toObject() : null
     });
   } catch (error) {
     console.error('Update plan error:', error);
-    res.status(500).json({ error: 'Failed to update plan' });
+    res.status(500).json({ error: 'Failed to update plan', details: error.message, stack: error.stack });
   }
 });
 

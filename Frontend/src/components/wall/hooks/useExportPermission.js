@@ -13,14 +13,14 @@ export default function useExportPermission() {
         return;
       }
       try {
-        const profileRes = await authFetch('http://localhost:5001/user/profile');
+        const profileRes = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`);
         if (!profileRes.ok) throw new Error('Failed to fetch user profile');
         const profile = await profileRes.json();
         if (!profile.plan) {
           setCanExport(false);
           return;
         }
-        const plansRes = await fetch('http://localhost:5001/plans');
+        const plansRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
         const plansData = await plansRes.json();
         let plans = plansData.plans || plansData;
         const userPlan = plans.find(p => p.name.toLowerCase() === profile.plan.toLowerCase());

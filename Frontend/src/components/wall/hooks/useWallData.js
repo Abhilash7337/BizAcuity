@@ -79,7 +79,7 @@ export default function useWallData() {
       try {
         const formData = new FormData();
         formData.append('image', file);
-        const response = await authFetch('http://localhost:5001/upload', {
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -220,7 +220,7 @@ export default function useWallData() {
       for (const file of files) {
         const formData = new FormData();
         formData.append('image', file);
-        const response = await authFetch('http://localhost:5001/upload', {
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
           method: 'POST',
           body: formData,
         });

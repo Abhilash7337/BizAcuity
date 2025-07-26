@@ -8,6 +8,10 @@ const categorySchema = new mongoose.Schema({
     trim: true,
     maxlength: 50
   },
+  number: {
+    type: Number,
+    default: -1
+  },
   createdAt: {
     type: Date,
     default: Date.now

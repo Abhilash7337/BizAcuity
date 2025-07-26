@@ -52,7 +52,7 @@ const ShareModal = ({
   const searchUsers = async (query) => {
     try {
       setIsSearching(true);
-      const response = await authFetch(`http://localhost:5001/users/search?query=${encodeURIComponent(query)}`);
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/users/search?query=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Failed to search users');
       const users = await response.json();
       // Filter out the current user and already selected users
@@ -92,7 +92,7 @@ const ShareModal = ({
           return;
         }
         // Create a new draft for sharing
-        const response = await authFetch('http://localhost:5001/drafts', {
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -112,7 +112,7 @@ const ShareModal = ({
       }
 
       // Share with selected users
-      const shareResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}/share`, {
+      const shareResponse = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${finalDraftId}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +148,7 @@ const ShareModal = ({
           return;
         }
         // Create a new draft for sharing
-        const response = await authFetch('http://localhost:5001/drafts', {
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -170,7 +170,7 @@ const ShareModal = ({
       }
 
       // Request backend to set public and get share token
-      const updateResponse = await authFetch(`http://localhost:5001/drafts/${finalDraftId}/public`, {
+      const updateResponse = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${finalDraftId}/public`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

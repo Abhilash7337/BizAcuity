@@ -24,7 +24,8 @@ const saveUploadedFile = (fileBuffer, originalname, PORT) => {
   // Check if file already exists
   if (fs.existsSync(fullPath)) {
     // File already exists, return existing URL
-    const fileUrl = `http://localhost:${PORT}/uploads/${filename}`;
+    const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+    const fileUrl = `${baseUrl}/uploads/${filename}`;
     return { 
       url: fileUrl, 
       message: 'Image already exists',
@@ -34,8 +35,8 @@ const saveUploadedFile = (fileBuffer, originalname, PORT) => {
 
   // Save new file
   fs.writeFileSync(fullPath, fileBuffer);
-  const fileUrl = `http://localhost:${PORT}/uploads/${filename}`;
-  
+  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+  const fileUrl = `${baseUrl}/uploads/${filename}`;
   return { 
     url: fileUrl, 
     message: 'Image uploaded successfully',

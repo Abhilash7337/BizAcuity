@@ -28,15 +28,9 @@ export const getAuthUser = () => {
 
 // Set authenticated user data (filter out sensitive information)
 export const setAuthUser = (user) => {
-    // Only store non-sensitive information
-    const safeUserData = {
-        name: user.name,
-        isLoggedIn: user.isLoggedIn || true,
-        userType: user.userType || 'regular',
-        plan: user.plan || 'regular'
-        // Intentionally exclude: id, email, profilePhoto and other sensitive data
-    };
-    localStorage.setItem('user', JSON.stringify(safeUserData));
+    // Store the full user object (except sensitive fields if needed)
+    // This prevents plan from being overwritten with a stale value after rejection
+    localStorage.setItem('user', JSON.stringify(user));
 };
 
 // Remove authenticated user data
@@ -52,10 +46,12 @@ export const logout = () => {
 // Create authenticated fetch function
 export const authFetch = async (url, options = {}) => {
     const token = getToken();
-    // Add base URL for backend API
-    const baseURL = 'http://localhost:5001';
+    // Use VITE_API_BASE_URL if set, otherwise fallback to localhost
+    const baseURL = import.meta.env && import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL
+        : 'http://localhost:5001';
     const fullURL = url.startsWith('http') ? url : `${baseURL}${url}`;
-    
+
     if (token) {
         options.headers = {
             ...options.headers,

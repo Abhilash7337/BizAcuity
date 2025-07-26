@@ -20,7 +20,7 @@ const PublicNavbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold font-poppins text-primary-dark hover:text-primary transition-colors duration-300">
-              Picture Wall Designer
+              MIALTAR
             </Link>
           </div>
 

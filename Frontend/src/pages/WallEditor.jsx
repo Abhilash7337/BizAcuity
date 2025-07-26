@@ -97,7 +97,7 @@ function WallEditor() {
         return;
       }
       try {
-        const profileRes = await authFetch('http://localhost:5001/user/profile');
+        const profileRes = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`);
         if (!profileRes.ok) {
           console.log('[WallEditor] /user/profile not ok:', profileRes.status);
           return;
@@ -108,7 +108,7 @@ function WallEditor() {
           console.log('[WallEditor] No plan in profile.');
           return;
         }
-        const plansRes = await fetch('http://localhost:5001/plans');
+        const plansRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
         const plansData = await plansRes.json();
         let plans = plansData.plans || plansData;
         console.log('[WallEditor] plans:', plans);
@@ -279,7 +279,7 @@ function WallEditor() {
         imageStates
       };
 
-      authFetch(`http://localhost:5001/drafts/${draftId}/update`, {
+      authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${draftId}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wallData }),
@@ -407,40 +407,21 @@ function WallEditor() {
 
   return (
     <>
-
       {/* Error Message UI (modular) */}
       <ErrorBanner errorMsg={errorMsg} />
 
-      <div 
+      <div
         className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400"
         onClick={(e) => {
-          // Unselect when clicking on background (but not on sidebar, buttons, or inputs)
+          // ...existing code...
           const clickedElement = e.target;
-          
-          // Check if click is on interactive elements
-          const isClickOnButton = clickedElement.tagName === 'BUTTON' || 
-                                  clickedElement.closest('button') ||
-                                  clickedElement.closest('[role="button"]');
-          const isClickOnInput = clickedElement.tagName === 'INPUT' || 
-                                clickedElement.closest('input');
-          const isClickOnSidebar = clickedElement.closest('.sidebar-container') || 
-                                   clickedElement.closest('[class*="sidebar"]') ||
-                                   clickedElement.closest('.wall-sidebar');
-          const isClickOnCanvas = clickedElement.closest('.canvas-area');
-          const isClickOnModal = clickedElement.closest('[class*="modal"]') || 
-                                clickedElement.closest('[role="dialog"]');
-          const isClickOnInteractive = clickedElement.closest('a') || 
-                                      clickedElement.closest('[onclick]') ||
-                                      clickedElement.closest('label');
-          
-          // Only unselect if clicking on the main background area
-          if (!isClickOnButton && !isClickOnInput && !isClickOnSidebar && 
+          // ...existing code...
+          if (!isClickOnButton && !isClickOnInput && !isClickOnSidebar &&
               !isClickOnCanvas && !isClickOnModal && !isClickOnInteractive) {
             setSelectedIdx(null);
           }
         }}
       >
-        
         {/* Hidden file inputs - positioned off-screen but accessible */}
         <input
           ref={wallImageInputRef}
@@ -471,175 +452,128 @@ function WallEditor() {
           }}
           onChange={handleImageChange}
         />
-        
+
         {/* Enhanced Background Animation Layer (modular) */}
         <FloatingFramesLayer />
 
         {/* Enhanced Background Pattern with Floating Elements */}
         <div className="absolute inset-0 opacity-20">
+          {/* ...existing code... */}
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.1) 0%, transparent 40%),
                              radial-gradient(circle at 80% 20%, rgba(251, 146, 60, 0.08) 0%, transparent 50%),
                              radial-gradient(circle at 40% 70%, rgba(234, 88, 12, 0.06) 0%, transparent 60%),
                              radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 45%)`
           }}></div>
-          
-          {/* Floating Picture Frame Elements */}
-          <div className="absolute top-20 left-10 w-32 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-12 hover:scale-110 transition-all duration-500" style={{animation: 'gentleFloat 20s ease-in-out infinite'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          <div className="absolute top-32 left-32 w-20 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-6 hover:rotate-0 transition-all duration-700" style={{animation: 'drift 25s ease-in-out infinite, slowRotate 40s linear infinite'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          
-          {/* Right side floating frames */}
-          <div className="absolute top-40 right-20 w-28 h-20 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-6 hover:-rotate-3 transition-all duration-500" style={{animation: 'float 18s ease-in-out infinite reverse'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          <div className="absolute top-16 right-40 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-12 hover:rotate-6 transition-all duration-700" style={{animation: 'gentleFloat 22s ease-in-out infinite, slowRotate 35s linear infinite reverse'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          
-          {/* Bottom floating frames */}
-          <div className="absolute bottom-40 left-20 w-36 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-3 hover:scale-105 transition-all duration-500" style={{animation: 'drift 30s ease-in-out infinite reverse'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          <div className="absolute bottom-20 right-16 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-8 hover:rotate-4 transition-all duration-700" style={{animation: 'float 16s ease-in-out infinite, slowRotate 45s linear infinite'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          
-          {/* Center floating frame */}
-          <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-lg rotate-3 hover:scale-110 hover:rotate-0 transition-all duration-700" style={{animation: 'gentleFloat 24s ease-in-out infinite reverse, slowRotate 50s linear infinite'}}>
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
-          </div>
-          
-
-          
-          {/* Modern Floating Elements */}
-          <div className="absolute top-20 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-orange-300/30 rounded-full blur-xl animate-pulse backdrop-blur-sm"></div>
-          <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-orange-400/20 to-orange-600/25 rounded-full blur-2xl animate-pulse delay-1000 backdrop-blur-sm"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-gradient-to-br from-orange-700/15 to-orange-500/20 rounded-full blur-xl animate-pulse delay-2000 backdrop-blur-sm"></div>
-          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-gradient-to-br from-secondary/30 to-accent/20 rounded-full blur-lg animate-pulse delay-3000 backdrop-blur-sm"></div>
-          
-          {/* Animated Mesh Grid */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `linear-gradient(rgba(152, 161, 188, 0.3) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(152, 161, 188, 0.3) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
-            animation: 'mesh-move 20s ease-in-out infinite'
-          }}></div>
-          
-          {/* Gradient Overlay for Depth */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-dark/5 to-primary-dark/10"></div>
+          {/* ...existing code... */}
         </div>
-        
+
         <Header />
-        
+
         {/* Welcome Animation Overlay (modular) */}
         <WelcomeOverlay isInitialized={isInitialized} />
-        
-        {/* Modern Full-Screen Layout */}
-        <main className={`full-width-layout relative z-10 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          {/* Header Section */}
-          <WallHeader
-            isSharedView={isSharedView}
-            isCollaborating={isCollaborating}
-            setShowSaveModal={setShowSaveModal}
-            setShowShareModal={setShowShareModal}
-            wallRef={wallRef}
-            isViewOnly={isViewOnly}
-            className="relative z-20 animate-fade-in-up"
-          />
 
-          {/* Floating Sidebar */}
-          <WallSidebar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            TABS={TABS}
-            tabContent={tabContent}
-            inputWidth={inputWidth}
-            inputHeight={inputHeight}
-            setInputWidth={setInputWidth}
-            setInputHeight={setInputHeight}
-            handleSetWallSize={handleSetWallSize}
-            MIN_SIZE={MIN_SIZE}
-            MAX_SIZE={MAX_SIZE}
-            selectedIdx={selectedIdx}
-            isViewOnly={isViewOnly}
-            className="animate-slide-in-left delay-200"
-          />
+        {/* Responsive Full-Screen Layout */}
+        <main
+          className={`full-width-layout relative z-10 transition-all duration-1000 flex flex-col-reverse lg:flex-row ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} gap-4 lg:gap-0 px-2 sm:px-4 md:px-8`}
+        >
+          {/* Sidebar: stacks on top on mobile, left on desktop */}
+          <div
+            className="w-full lg:w-auto flex-shrink-0"
+            style={{ zIndex: 50 }}
+          >
+            <WallSidebar
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              TABS={TABS}
+              tabContent={tabContent}
+              inputWidth={inputWidth}
+              inputHeight={inputHeight}
+              setInputWidth={setInputWidth}
+              setInputHeight={setInputHeight}
+              handleSetWallSize={handleSetWallSize}
+              MIN_SIZE={MIN_SIZE}
+              MAX_SIZE={MAX_SIZE}
+              selectedIdx={selectedIdx}
+              isViewOnly={isViewOnly}
+              className="animate-slide-in-left delay-200 w-full lg:w-80 bg-white/90 border-t-2 border-orange-300 shadow-2xl rounded-t-3xl backdrop-blur-md p-2 sm:p-4 lg:fixed lg:left-4 lg:top-24 lg:bottom-4 lg:rounded-2xl lg:p-6 lg:flex-col lg:gap-6 lg:bg-none lg:border-none lg:shadow-none lg:rounded-none"
+            />
+          </div>
 
-          {/* Canvas Area - Full Screen */}
-          <WallCanvas
-            wallRef={wallRef}
-            wallColor={wallColor}
-            wallWidth={wallWidth}
-            wallHeight={wallHeight}
-            wallImage={wallImage}
-            images={images}
-            imageStates={imageStates}
-            selectedIdx={selectedIdx}
-            setSelectedIdx={setSelectedIdx}
-            setActiveTab={setActiveTab}
-            setImageStates={setImageStates}
-            isViewOnly={isViewOnly}
-            className="animate-slide-in-right delay-400"
-          />
+          {/* Main content for desktop, below sidebar for mobile */}
+          <div className="flex-1 flex flex-col w-full min-w-0 pb-4 lg:pb-0">
+            {/* Canvas Area - Full Screen */}
+            <WallCanvas
+              wallRef={wallRef}
+              wallColor={wallColor}
+              wallWidth={wallWidth}
+              wallHeight={wallHeight}
+              wallImage={wallImage}
+              images={images}
+              imageStates={imageStates}
+              selectedIdx={selectedIdx}
+              setSelectedIdx={setSelectedIdx}
+              setActiveTab={setActiveTab}
+              setImageStates={setImageStates}
+              isViewOnly={isViewOnly}
+              className="animate-slide-in-right delay-400"
+            />
+          </div>
+        </main>
 
-          {/* View-Only Notification Banner */}
-          {isViewOnly && (
-            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-slide-in-down">
-              <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg backdrop-blur-sm border border-amber-300/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-4 4a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <span className="font-semibold text-sm">
-                    You're viewing this design in read-only mode
-                  </span>
+        {/* View-Only Notification Banner */}
+        {isViewOnly && (
+          <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-slide-in-down">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full shadow-lg backdrop-blur-sm border border-amber-300/30">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-4 4a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
                 </div>
+                <span className="font-semibold text-sm">
+                  You're viewing this design in read-only mode
+                </span>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Enhanced WallModals with Animation */}
-          <WallModals
-            showSaveModal={showSaveModal}
-            setShowSaveModal={setShowSaveModal}
-            showShareModal={showShareModal}
-            setShowShareModal={setShowShareModal}
-            wallRef={wallRef}
-            draftId={draftId}
-            registeredUser={registeredUser}
-            wallData={{
-              wallColor,
-              wallWidth,
-              wallHeight,
-              wallImage,
-              images,
-              imageStates
-            }}
-            draftName={draftName}
-            onDraftCreated={(newDraftId) => {
-              if (newDraftId && !draftId) {
-                let url = `/wall?draftId=${newDraftId}`;
-                if (shareToken) url += `&shared=true&token=${shareToken}`;
-                window.history.replaceState(null, '', url);
-              }
-            }}
-            className="animate-modal-fade-in"
-          />
-          
-          {/* Floating Action Buttons (modular) */}
-          <FloatingActionButtons
-            onSave={() => setShowSaveModal(true)}
-            onShare={() => setShowShareModal(true)}
-            wallRef={wallRef}
-            canExport={canExport}
-          />
-        </main>
+        {/* Enhanced WallModals with Animation */}
+        <WallModals
+          showSaveModal={showSaveModal}
+          setShowSaveModal={setShowSaveModal}
+          showShareModal={showShareModal}
+          setShowShareModal={setShowShareModal}
+          wallRef={wallRef}
+          draftId={draftId}
+          registeredUser={registeredUser}
+          wallData={{
+            wallColor,
+            wallWidth,
+            wallHeight,
+            wallImage,
+            images,
+            imageStates
+          }}
+          draftName={draftName}
+          onDraftCreated={(newDraftId) => {
+            if (newDraftId && !draftId) {
+              let url = `/wall?draftId=${newDraftId}`;
+              if (shareToken) url += `&shared=true&token=${shareToken}`;
+              window.history.replaceState(null, '', url);
+            }
+          }}
+          className="animate-modal-fade-in"
+        />
+
+        {/* Floating Action Buttons (modular) */}
+        <FloatingActionButtons
+          onSave={() => setShowSaveModal(true)}
+          onShare={() => setShowShareModal(true)}
+          wallRef={wallRef}
+          canExport={canExport}
+        />
 
         {/* Footer */}
         <Footer />

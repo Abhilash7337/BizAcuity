@@ -45,7 +45,7 @@ const Landing = () => {
     const fetchDrafts = async () => {
       try {
         setLoading(true);
-        const response = await authFetch(`http://localhost:5001/drafts`);
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts`);
         if (!response.ok) throw new Error('Failed to fetch drafts');
         const data = await response.json();
         setDrafts(data);
@@ -60,7 +60,7 @@ const Landing = () => {
     const fetchSharedDrafts = async () => {
       try {
         setSharedLoading(true);
-        const response = await authFetch(`http://localhost:5001/drafts/shared`);
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/shared`);
         if (!response.ok) throw new Error('Failed to fetch shared drafts');
         const data = await response.json();
         setSharedDrafts(data);
@@ -75,7 +75,7 @@ const Landing = () => {
     const fetchSharedByYouDrafts = async () => {
       try {
         setSharedByYouLoading(true);
-        const response = await authFetch('http://localhost:5001/drafts/shared-by-me');
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/shared-by-me`);
         if (!response.ok) throw new Error('Failed to fetch drafts shared by you');
         const data = await response.json();
         setSharedByYouDrafts(data);
@@ -119,7 +119,7 @@ const Landing = () => {
     if (!draftToDelete) return;
 
     try {
-      const response = await authFetch(`http://localhost:5001/drafts/${draftToDelete._id}`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${draftToDelete._id}`, {
         method: 'DELETE',
       });
 
@@ -164,7 +164,7 @@ const Landing = () => {
     }
 
     try {
-      const response = await authFetch(`http://localhost:5001/drafts/shared/${draftId}/remove`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/shared/${draftId}/remove`, {
         method: 'DELETE',
       });
 
@@ -185,7 +185,7 @@ const Landing = () => {
     setRevokeLoading(true);
     setRevokeError(null);
     try {
-      const response = await authFetch(`http://localhost:5001/drafts/${draft._id}/revoke-share`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${draft._id}/revoke-share`, {
         method: 'PUT',
       });
       if (!response.ok) throw new Error('Failed to revoke share link');

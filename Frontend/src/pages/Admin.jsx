@@ -37,7 +37,7 @@ useEffect(() => {
   if (showEditUserModal) {
     (async () => {
       try {
-        const response = await authFetch('http://localhost:5001/admin/plans');
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plans`);
         if (!response.ok) throw new Error('Failed to fetch plans');
         const data = await response.json();
         let plans = data.plans || [];
@@ -79,7 +79,7 @@ useEffect(() => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-      const res = await fetch('http://localhost:5001/admin/plan-upgrade-requests?status=pending', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plan-upgrade-requests?status=pending`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -96,7 +96,7 @@ useEffect(() => {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const response = await authFetch('http://localhost:5001/admin/dashboard');
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard`);
       if (!response.ok) throw new Error('Failed to fetch dashboard stats');
       const data = await response.json();
       setDashboardStats(data.stats);
@@ -127,7 +127,7 @@ useEffect(() => {
     setEditUserLoading(true);
     setEditUserError('');
     try {
-      const response = await authFetch(`http://localhost:5001/admin/users/${editUser._id}`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${editUser._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,7 +159,7 @@ useEffect(() => {
     setEditUserLoading(true);
     setEditUserError('');
     try {
-      const response = await authFetch(`http://localhost:5001/admin/users/${editUser._id}`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${editUser._id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete user');
@@ -358,7 +358,7 @@ useEffect(() => {
                         body: emailBody,
                         sendTest: sendTestEmail
                       };
-                      const response = await authFetch('http://localhost:5001/admin', {
+                      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
