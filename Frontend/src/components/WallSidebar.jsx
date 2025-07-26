@@ -1,5 +1,5 @@
 import React from 'react';
-import WallSizePanel from './Sidebar/WallSizePanel';
+import WallSizePanel from './sidebar/WallSizePanel';
 
 const WallSidebar = ({
   activeTab,
