@@ -4,26 +4,21 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../App';
 import { Image } from 'lucide-react';
 
-// Components
+
 import { 
   Header, 
   Footer 
 } from '../components/layout';
 import { 
-  WallHeader, 
   WallSidebar, 
   WallCanvas, 
   WallModals, 
   ImagePropertiesPanel 
 } from '../components/wall';
-
 import TabContentBackground from '../components/wall/TabContentBackground';
 import TabContentUploads from '../components/wall/TabContentUploads';
 import TabContentEditor from '../components/wall/TabContentEditor';
 import TabContentDecors from '../components/wall/TabContentDecors';
-
-// Sidebar Components for Tab Content
-
 
 // Modular floating UI components
 import ErrorBanner from '../components/wall/ErrorBanner';
