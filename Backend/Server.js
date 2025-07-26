@@ -61,7 +61,7 @@ app.get('/health', (req, res) => {
 });
 
 // Serve static files from frontend build
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
 // SPA fallback: serve index.html for non-API, non-upload, non-health routes
 app.get('*', (req, res, next) => {
@@ -72,7 +72,7 @@ app.get('*', (req, res, next) => {
   ) {
     return next();
   }
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname,'../Frontend/dist/index.html'));
 });
 
 // 404 handler for undefined API routes

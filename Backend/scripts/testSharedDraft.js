@@ -6,7 +6,7 @@ const SharedDraft = require('../models/SharedDraft');
 const User = require('../models/User'); // Register User model for populate
 
 // Replace with your MongoDB URI
-const MONGO_URI = 'mongodb://localhost:27017/picture-wall-test';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/picture-wall-test';
 
 async function testSharedDraft() {
   await mongoose.connect(MONGO_URI);

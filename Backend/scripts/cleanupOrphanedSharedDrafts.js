@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const SharedDraft = require('../models/SharedDraft');
 const Draft = require('../models/Draft');
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/YOUR_DB_NAME'; // <-- update if needed
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/YOUR_DB_NAME'; // Use env variable or fallback
 
 async function cleanupOrphanedSharedDrafts() {
   await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });

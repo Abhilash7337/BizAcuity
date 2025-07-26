@@ -29,7 +29,7 @@ const SaveDraftModal = ({
   const fetchDraftStatus = async () => {
     try {
       setStatusLoading(true);
-      const response = await authFetch('http://localhost:5001/drafts/status');
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/status`);
       
       if (response.ok) {
         const status = await response.json();
@@ -80,7 +80,7 @@ const SaveDraftModal = ({
       const formData = new FormData();
       formData.append('image', blob, 'preview.jpg');
       
-      const response = await authFetch('http://localhost:5001/upload', {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -125,8 +125,8 @@ const SaveDraftModal = ({
       }
 
       const url = draftId 
-        ? `http://localhost:5001/drafts/${draftId}`
-        : 'http://localhost:5001/drafts';
+        ? `${import.meta.env.VITE_API_BASE_URL}/drafts/${draftId}`
+        : `${import.meta.env.VITE_API_BASE_URL}/drafts`;
       
       const method = draftId ? 'PUT' : 'POST';
       

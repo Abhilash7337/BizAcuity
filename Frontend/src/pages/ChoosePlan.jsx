@@ -32,7 +32,7 @@ const ChoosePlan = () => {
   const fetchPlans = async () => {
     try {
       setPlansLoading(true);
-      const response = await fetch('http://localhost:5001/plans');
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
       const data = await response.json();
       
       if (response.ok) {
@@ -75,7 +75,7 @@ const ChoosePlan = () => {
       if (!token) {
         throw new Error('No authentication token found');
       }
-      const response = await fetch('http://localhost:5001/user/choose-plan', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/choose-plan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const ChoosePlan = () => {
     const poll = async () => {
       try {
         setPollError('');
-        const res = await fetch('http://localhost:5001/user/plan-upgrade-request', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/plan-upgrade-request`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -118,7 +118,7 @@ const ChoosePlan = () => {
               if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
               // Fetch updated user info and update context/localStorage before redirect
               try {
-                const userRes = await fetch('http://localhost:5001/user/profile', {
+                const userRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
                   headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const userData = await userRes.json();

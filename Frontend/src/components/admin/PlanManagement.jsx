@@ -75,16 +75,16 @@ const PlanManagement = () => {
     try {
       setLoading(true);
       setError('');
-      console.log('Fetching plans from:', 'http://localhost:5001/admin/plans');
+      console.log('Fetching plans from:', `${import.meta.env.VITE_API_BASE_URL}/admin/plans`);
       
       // Try admin endpoint first
-      let response = await authFetch('http://localhost:5001/admin/plans');
+      let response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plans`);
       console.log('Admin response status:', response.status);
       
       // If admin endpoint fails due to auth, try public endpoint for testing
       if (!response.ok) {
         console.log('Admin endpoint failed, trying public endpoint...');
-        response = await fetch('http://localhost:5001/plans');
+        response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
         console.log('Public response status:', response.status);
       }
       
@@ -140,8 +140,8 @@ const PlanManagement = () => {
       delete submitData.customFeatures;
 
       const url = editingPlan 
-        ? `http://localhost:5001/admin/plans/${editingPlan._id}`
-        : 'http://localhost:5001/admin/plans';
+        ? `${import.meta.env.VITE_API_BASE_URL}/admin/plans/${editingPlan._id}`
+        : `${import.meta.env.VITE_API_BASE_URL}/admin/plans`;
       
       const method = editingPlan ? 'PUT' : 'POST';
       
@@ -171,7 +171,7 @@ const PlanManagement = () => {
     if (!planToDelete) return;
 
     try {
-      const response = await authFetch(`http://localhost:5001/admin/plans/${planToDelete}`, {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plans/${planToDelete}`, {
         method: 'DELETE'
       });
 
@@ -551,7 +551,7 @@ const PlanManagement = () => {
                                 }}
                               />
                               <img
-                                src={decor.imageUrl ? `http://localhost:5001${decor.imageUrl}` : ''}
+                                src={decor.imageUrl ? `${import.meta.env.VITE_API_BASE_URL}${decor.imageUrl}` : ''}
                                 alt={decor.name}
                                 className="w-8 h-8 object-contain rounded border border-gray-200 bg-gray-100"
                                 style={{ minWidth: 32, minHeight: 32 }}
@@ -592,7 +592,7 @@ const PlanManagement = () => {
                                   }}
                                 />
                                 <img
-                                  src={decor.imageUrl ? `http://localhost:5001${decor.imageUrl}` : ''}
+                                  src={decor.imageUrl ? `${import.meta.env.VITE_API_BASE_URL}${decor.imageUrl}` : ''}
                                   alt={decor.name}
                                   className="w-8 h-8 object-contain rounded border border-gray-200 bg-gray-100"
                                   style={{ minWidth: 32, minHeight: 32 }}

@@ -97,7 +97,7 @@ function WallEditor() {
         return;
       }
       try {
-        const profileRes = await authFetch('http://localhost:5001/user/profile');
+        const profileRes = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`);
         if (!profileRes.ok) {
           console.log('[WallEditor] /user/profile not ok:', profileRes.status);
           return;
@@ -108,7 +108,7 @@ function WallEditor() {
           console.log('[WallEditor] No plan in profile.');
           return;
         }
-        const plansRes = await fetch('http://localhost:5001/plans');
+        const plansRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
         const plansData = await plansRes.json();
         let plans = plansData.plans || plansData;
         console.log('[WallEditor] plans:', plans);
@@ -279,7 +279,7 @@ function WallEditor() {
         imageStates
       };
 
-      authFetch(`http://localhost:5001/drafts/${draftId}/update`, {
+      authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/${draftId}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wallData }),

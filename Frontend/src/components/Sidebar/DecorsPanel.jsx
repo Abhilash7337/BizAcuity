@@ -38,7 +38,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
           return {
             id: decor._id,
             name: decor.name,
-            src: `http://localhost:5001${decor.imageUrl}`,
+            src: `${import.meta.env.VITE_API_BASE_URL}${decor.imageUrl}`,
             category: decor.category,
             description: decor.description,
             size: size

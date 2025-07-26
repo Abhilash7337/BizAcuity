@@ -27,7 +27,7 @@ const User = () => {
   const fetchUserStats = async () => {
     try {
       // Fetch user drafts to get designs count
-      const draftsResponse = await authFetch('http://localhost:5001/drafts');
+      const draftsResponse = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts`);
       if (draftsResponse.ok) {
         const drafts = await draftsResponse.json();
         
@@ -72,7 +72,7 @@ const User = () => {
 
     if (registeredUser && registeredUser.isLoggedIn) {
       setLoading(true);
-      authFetch(`http://localhost:5001/user/profile`)
+      authFetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`)
         .then(res => res.json())
         .then(data => {
           setUser(data);

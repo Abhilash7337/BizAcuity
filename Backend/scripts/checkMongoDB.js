@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 async function checkMongoDB() {
-    const uri = 'mongodb://localhost:27017';
+    const uri = process.env.MONGO_URI || 'mongodb://localhost:27017';
     const client = new MongoClient(uri);
 
     try {

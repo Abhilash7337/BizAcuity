@@ -15,7 +15,7 @@ export default function useImageUploadLimits() {
           setImageUploadPlan('Guest');
           return;
         }
-        const response = await authFetch('http://localhost:5001/drafts/image-upload-status');
+        const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/drafts/image-upload-status`);
         if (!response.ok) {
           setImageUploadLimit(1);
           setImageUploadPlan('Unknown');
