@@ -201,13 +201,6 @@ const PublicLanding = () => {
           </div>
         </div>
         
-        {/* Interactive Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer group">
-          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center group-hover:border-orange-200 transition-colors duration-300">
-            <div className="w-1 h-3 bg-white rounded-full mt-2 animate-pulse group-hover:bg-orange-200 transition-colors duration-300"></div>
-          </div>
-          <div className="text-xs text-white mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Scroll down</div>
-        </div>
       </section>
       
       {/* Interactive Wall Layout Preview Section */}
