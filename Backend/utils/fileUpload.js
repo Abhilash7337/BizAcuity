@@ -3,29 +3,33 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 // Ensure uploads directory exists
+
+// Ensure uploads/images directory exists
 const createUploadsDir = () => {
   const uploadsDir = path.join(__dirname, '../uploads');
+  const imagesDir = path.join(uploadsDir, 'images');
   if (!fs.existsSync(uploadsDir)){
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
-  return uploadsDir;
+  if (!fs.existsSync(imagesDir)){
+    fs.mkdirSync(imagesDir, { recursive: true });
+  }
+  return imagesDir;
 };
 
 // Save uploaded file with hash-based naming
 const saveUploadedFile = (fileBuffer, originalname, PORT) => {
-  const uploadsDir = createUploadsDir();
-  
+  const imagesDir = createUploadsDir();
   // Create hash from file content
   const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
   const ext = path.extname(originalname);
   const filename = `${hash}${ext}`;
-  const fullPath = path.join(uploadsDir, filename);
+  const fullPath = path.join(imagesDir, filename);
 
   // Check if file already exists
   if (fs.existsSync(fullPath)) {
     // File already exists, return existing URL
-    const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-    const fileUrl = `${baseUrl}/uploads/${filename}`;
+    const fileUrl = `/uploads/images/${filename}`;
     return { 
       url: fileUrl, 
       message: 'Image already exists',
@@ -35,8 +39,7 @@ const saveUploadedFile = (fileBuffer, originalname, PORT) => {
 
   // Save new file
   fs.writeFileSync(fullPath, fileBuffer);
-  const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
-  const fileUrl = `${baseUrl}/uploads/${filename}`;
+  const fileUrl = `/uploads/images/${filename}`;
   return { 
     url: fileUrl, 
     message: 'Image uploaded successfully',
