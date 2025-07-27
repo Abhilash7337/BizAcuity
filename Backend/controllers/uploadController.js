@@ -4,7 +4,9 @@ const multer = require('multer');
 // Handle file upload
 const uploadImage = async (req, res) => {
   try {
+    console.log('Upload endpoint hit. req.file:', req.file);
     if (!req.file) {
+      console.log('No file uploaded in request.');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
