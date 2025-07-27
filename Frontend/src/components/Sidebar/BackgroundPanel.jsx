@@ -56,7 +56,13 @@ const BackgroundPanel = ({ wallImageInputRef, wallImage, handleRemoveWallImage, 
       
       {wallImage && (
         <div className="relative group rounded-xl overflow-hidden border-2 border-white/40 shadow-lg animate-fade-in-up">
-          <img src={wallImage} alt="background preview" className="w-full h-32 object-cover" />
+          {(() => {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+            const safeSrc = wallImage && wallImage.startsWith('http') ? wallImage : `${API_BASE}${wallImage && wallImage.startsWith('/') ? wallImage : `/${wallImage}`}`;
+            return (
+              <img src={safeSrc} alt="background preview" className="w-full h-32 object-cover" />
+            );
+          })()}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <button
               type="button"

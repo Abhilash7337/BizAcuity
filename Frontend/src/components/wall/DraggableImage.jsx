@@ -213,30 +213,37 @@ function DraggableImage({
         </div>
       ) : (
         <div className="relative">
-          <img
-            src={src}
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none',
-              objectFit: 'cover',
-              transform: `rotate(${imageState.rotation || 0}deg)`,
-              transition: 'transform 0.2s ease-in-out',
-              ...styleOverrides,
-            }}
-            draggable={false}
-            onLoad={() => {
-              console.log(`✅ Image ${idx} loaded successfully: ${src}`);
-              setImageLoading(false);
-              setImageLoadError(false);
-            }}
-            onError={(e) => {
-              console.error(`❌ Image ${idx} failed to load: ${src}`, e);
-              setImageLoading(false);
-              setImageLoadError(true);
-            }}
-          />
+          {/* Use VITE_API_BASE_URL for uploads if not absolute URL */}
+          {(() => {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+            const safeSrc = src && src.startsWith('http') ? src : `${API_BASE}${src && src.startsWith('/') ? src : `/${src}`}`;
+            return (
+              <img
+                src={safeSrc}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                  objectFit: 'cover',
+                  transform: `rotate(${imageState.rotation || 0}deg)`,
+                  transition: 'transform 0.2s ease-in-out',
+                  ...styleOverrides,
+                }}
+                draggable={false}
+                onLoad={() => {
+                  console.log(`✅ Image ${idx} loaded successfully: ${safeSrc}`);
+                  setImageLoading(false);
+                  setImageLoadError(false);
+                }}
+                onError={(e) => {
+                  console.error(`❌ Image ${idx} failed to load: ${safeSrc}`, e);
+                  setImageLoading(false);
+                  setImageLoadError(true);
+                }}
+              />
+            );
+          })()}
           {imageLoadError && (
             <div className="absolute inset-0 bg-red-100 border-2 border-red-300 rounded flex items-center justify-center text-red-600 text-xs p-2">
               <div className="text-center">
