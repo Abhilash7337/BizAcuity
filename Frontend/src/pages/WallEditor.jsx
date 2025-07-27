@@ -412,12 +412,20 @@ function WallEditor() {
         onClick={(e) => {
           const clickedElement = e.target;
           // Define what counts as a button, input, sidebar, canvas, modal, interactive
-          const isClickOnButton = clickedElement.tagName === 'BUTTON' || clickedElement.closest('button');
-          const isClickOnInput = clickedElement.tagName === 'INPUT' || clickedElement.closest('input');
-          const isClickOnSidebar = clickedElement.closest('.sidebar') || clickedElement.classList.contains('sidebar');
-          const isClickOnCanvas = clickedElement.closest('.wall-canvas') || clickedElement.classList.contains('wall-canvas');
-          const isClickOnModal = clickedElement.closest('.modal') || clickedElement.classList.contains('modal');
-          const isClickOnInteractive = clickedElement.closest('.interactive') || clickedElement.classList.contains('interactive');
+          let isClickOnButton = false;
+          let isClickOnInput = false;
+          let isClickOnSidebar = false;
+          let isClickOnCanvas = false;
+          let isClickOnModal = false;
+          let isClickOnInteractive = false;
+          if (clickedElement) {
+            isClickOnButton = clickedElement.tagName === 'BUTTON' || clickedElement.closest('button');
+            isClickOnInput = clickedElement.tagName === 'INPUT' || clickedElement.closest('input');
+            isClickOnSidebar = clickedElement.closest('.sidebar') || clickedElement.classList.contains('sidebar');
+            isClickOnCanvas = clickedElement.closest('.wall-canvas') || clickedElement.classList.contains('wall-canvas');
+            isClickOnModal = clickedElement.closest('.modal') || clickedElement.classList.contains('modal');
+            isClickOnInteractive = clickedElement.closest('.interactive') || clickedElement.classList.contains('interactive');
+          }
           if (!isClickOnButton && !isClickOnInput && !isClickOnSidebar &&
               !isClickOnCanvas && !isClickOnModal && !isClickOnInteractive) {
             setSelectedIdx(null);
