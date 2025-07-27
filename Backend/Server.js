@@ -21,8 +21,28 @@ const sharingRoutes = require('./routes/sharing');
 const decorRoutes = require('./routes/decor');
 const categoryRoutes = require('./routes/category');
 
+
 const app = express();
 const PORT = 5001;
+const HTTPS_PORT = 5443; // You can change this if needed
+
+// SSL certificate paths from environment variables (optional)
+const SSL_KEY_PATH = process.env.SSL_KEY_PATH || './ssl/key.pem';
+const SSL_CERT_PATH = process.env.SSL_CERT_PATH || './ssl/cert.pem';
+let httpsOptions = null;
+try {
+  if (fs.existsSync(SSL_KEY_PATH) && fs.existsSync(SSL_CERT_PATH)) {
+    httpsOptions = {
+      key: fs.readFileSync(SSL_KEY_PATH),
+      cert: fs.readFileSync(SSL_CERT_PATH)
+    };
+    console.log('SSL certificates loaded for HTTPS.');
+  } else {
+    console.log('SSL cert or key not found, HTTPS will not be enabled.');
+  }
+} catch (err) {
+  console.error('Error loading SSL certs:', err);
+}
 
 // Ensure uploads directory exists
 createUploadsDir();
@@ -91,16 +111,29 @@ app.use((error, req, res, next) => {
   });
 });
 
+
 // Start server after database connection
+const http = require('http');
+const https = require('https');
+
 const startServer = async () => {
   try {
     await connectDB();
-    
-    app.listen(PORT,'0.0.0.0', () => {
-      console.log(`Server running on port ${PORT}`);
+
+    // Start HTTP server
+    http.createServer(app).listen(PORT, '0.0.0.0', () => {
+      console.log(`HTTP server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
     });
+
+    // Start HTTPS server if certs are available
+    if (httpsOptions) {
+      https.createServer(httpsOptions, app).listen(HTTPS_PORT, '0.0.0.0', () => {
+        console.log(`HTTPS server running on port ${HTTPS_PORT}`);
+        console.log(`Health check: https://localhost:${HTTPS_PORT}/health`);
+      });
+    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
