@@ -197,26 +197,51 @@ function DraggableImage({
     >
       {Object.keys(wrapperStyle).length > 0 ? (
         <div style={wrapperStyle}>
-          <img
-            src={src}
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none',
-              objectFit: 'cover',
-              transform: `rotate(${imageState.rotation || 0}deg)`,
-              transition: 'transform 0.2s ease-in-out',
-            }}
-            draggable={false}
-          />
+          {(() => {
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+            // If src is not absolute, ensure it uses /uploads/images/
+            let safeSrc = src;
+            if (src && !src.startsWith('http')) {
+              if (src.startsWith('/uploads/')) {
+                safeSrc = `${API_BASE}${src}`;
+              } else if (src.startsWith('/')) {
+                safeSrc = `${API_BASE}/uploads/images${src}`;
+              } else {
+                safeSrc = `${API_BASE}/uploads/images/${src}`;
+              }
+            }
+            return (
+              <img
+                src={safeSrc}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  pointerEvents: 'none',
+                  objectFit: 'cover',
+                  transform: `rotate(${imageState.rotation || 0}deg)`,
+                  transition: 'transform 0.2s ease-in-out',
+                }}
+                draggable={false}
+              />
+            );
+          })()}
         </div>
       ) : (
         <div className="relative">
           {/* Use VITE_API_BASE_URL for uploads if not absolute URL */}
           {(() => {
             const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-            const safeSrc = src && src.startsWith('http') ? src : `${API_BASE}${src && src.startsWith('/') ? src : `/${src}`}`;
+            let safeSrc = src;
+            if (src && !src.startsWith('http')) {
+              if (src.startsWith('/uploads/')) {
+                safeSrc = `${API_BASE}${src}`;
+              } else if (src.startsWith('/')) {
+                safeSrc = `${API_BASE}/uploads/images${src}`;
+              } else {
+                safeSrc = `${API_BASE}/uploads/images/${src}`;
+              }
+            }
             return (
               <img
                 src={safeSrc}
