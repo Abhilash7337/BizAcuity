@@ -246,7 +246,14 @@ const DecorManagement = () => {
           <div key={decor._id} className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="h-48 bg-gray-100 flex items-center justify-center">
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${decor.imageUrl}`}
+                src={(() => {
+                  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+                  let fileName = decor.imageUrl;
+                  if (fileName && !fileName.startsWith('/uploads/')) {
+                    fileName = `/uploads/images/${fileName.replace(/^images\//, '').replace(/^\/+/, '')}`;
+                  }
+                  return `${API_BASE}${fileName}`;
+                })()}
                 alt={decor.name}
                 className="max-h-full max-w-full object-contain"
               />
