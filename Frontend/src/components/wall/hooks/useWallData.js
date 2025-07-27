@@ -1,6 +1,17 @@
+
 import { useState, useRef, useEffect, useContext } from 'react';
 import { UserContext } from '../../../App';
 import { authFetch } from '../../../utils/auth';
+
+// Helper to resolve image URLs for display
+function resolveImageUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/uploads/')) {
+    return `${import.meta.env.VITE_API_BASE_URL}${url}`;
+  }
+  return url;
+}
 
 export default function useWallData() {
   const [wallImage, setWallImage] = useState(null);
@@ -73,6 +84,7 @@ export default function useWallData() {
   }, []);
 
   // Handlers
+  // Unified handler for uploading wall background image
   const handleWallImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -85,7 +97,7 @@ export default function useWallData() {
         });
         if (!response.ok) throw new Error('Failed to upload image');
         const data = await response.json();
-        setWallImage(data.url);
+        setWallImage(data.url); // Always use backend returned URL
       } catch (error) {
         setErrorMsg('Failed to upload the image. Please try again.');
       }
@@ -226,7 +238,7 @@ export default function useWallData() {
         });
         if (!response.ok) throw new Error('Failed to upload image');
         const data = await response.json();
-        uploadedUrls.push(data.url);
+        uploadedUrls.push(data.url); // Always use backend returned URL
       }
       setImages(prev => [...prev, ...uploadedUrls]);
       setImageStates(prev => [
@@ -279,6 +291,7 @@ export default function useWallData() {
     handleFitToWall,
     handleDelete,
     handleAddDecor,
-    registeredUser
+    registeredUser,
+    resolveImageUrl // Export helper for use in components
   };
 }
