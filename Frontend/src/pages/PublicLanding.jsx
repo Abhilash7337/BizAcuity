@@ -207,10 +207,24 @@ const PublicLanding = () => {
       <section className="py-20 bg-gradient-to-b from-white to-orange-100 relative overflow-hidden">
         {/* Subtle animated background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div 
-            className="absolute top-20 left-10 w-40 h-40 bg-orange-200 opacity-5 blur-2xl rounded-full animate-[backgroundFlow_90s_ease-in-out_infinite]"
-          ></div>
+         
         </div>
+        <svg className="absolute inset-0 w-full h-full opacity-4" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path 
+              d="M20,10 Q60,25 80,10" 
+              stroke="rgba(251, 146, 60, 0.3)" 
+              strokeWidth="0.1" 
+              fill="none"
+              style={{animation: 'backgroundFlow 50s ease-in-out infinite'}}
+            />
+            <path 
+              d="M10,90 Q40,75 90,90" 
+              stroke="rgba(234, 88, 12, 0.2)" 
+              strokeWidth="0.12" 
+              fill="none"
+              style={{animation: 'backgroundFlow 65s ease-in-out infinite reverse'}}
+            />
+          </svg>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Header */}
@@ -237,7 +251,7 @@ const PublicLanding = () => {
             <img
               src="/sample-modern-wall.png"
               alt="MIALTAR Wall Layout Example"
-              className="w-full h-auto max-h-[70vw] sm:max-h-[580px] md:max-h-[780px] object-contain rounded-xl sm:rounded-2xl shadow-lg transition-all duration-300 ease-in-out group-hover:brightness-105 group-hover:shadow-2xl"
+              className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"
               style={{
                 background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%)',
                 display: 'block'
@@ -251,11 +265,7 @@ const PublicLanding = () => {
       <section className="py-20 bg-white relative overflow-hidden">
         {/* Enhanced subtle background animation layer */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Gentle flowing background elements */}
-          <div 
-            className="absolute top-32 left-1/4 w-48 h-48 bg-orange-200 opacity-6 blur-3xl rounded-full"
-            style={{animation: 'cloudDrift 120s linear infinite'}}
-          ></div>
+          {/* Gentle flowing background elements - orange circle removed as requested */}
           <div 
             className="absolute bottom-32 right-1/4 w-36 h-36 bg-orange-300 opacity-8 blur-2xl"
             style={{animation: 'abstractMorph 80s ease-in-out infinite'}}
@@ -384,17 +394,8 @@ const PublicLanding = () => {
       
       {/* Interactive Newsletter/CTA Section */}
       <section className="py-20 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 relative overflow-hidden">
-        {/* Enhanced subtle background animation layer */}
+        {/* Subtle animated background */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Gentle flowing background elements for newsletter */}
-          <div 
-            className="absolute top-20 left-20 w-40 h-40 bg-white opacity-5 blur-3xl rounded-full"
-            style={{animation: 'cloudDrift 100s linear infinite'}}
-          ></div>
-          <div 
-            className="absolute bottom-20 right-20 w-32 h-32 bg-orange-300 opacity-8 blur-2xl"
-            style={{animation: 'abstractMorph 60s ease-in-out infinite reverse'}}
-          ></div>
           
           {/* Flowing lines effect */}
           <svg className="absolute inset-0 w-full h-full opacity-8" viewBox="0 0 100 100" preserveAspectRatio="none">

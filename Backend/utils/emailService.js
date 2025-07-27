@@ -123,10 +123,30 @@ const sendWelcomeEmail = async (email, name) => {
         return false;
     }
 };
+const sendCustomEmail = async (email, name, subject, body) => {
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #625d8c;">Hello ${name || ''}</h2>
+                    <div>${body}</div>
+                </div>
+            `
+        });
+        return true;
+    } catch (error) {
+        console.error('Custom email sending failed:', error);
+        return false;
+    }
+};
 
 module.exports = {
     sendOTPEmail,
     sendPlanSubscriptionEmail,
-    sendWelcomeEmail
+    sendWelcomeEmail,
+    sendCustomEmail
 };
 

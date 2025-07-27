@@ -218,7 +218,7 @@ const DecorManagement = () => {
         </div>
       </div>
 
-      {/* Category Filter with number input */}
+      {/* Category Filter (removed per-category number input and Set all -1) */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
           <Filter size={20} className="text-gray-600" />
@@ -237,42 +237,6 @@ const DecorManagement = () => {
           <span className="text-gray-600">
             {filteredDecors.length} decor{filteredDecors.length !== 1 ? 's' : ''}
           </span>
-        </div>
-        {/* Show number input for each category */}
-        <div className="flex flex-wrap gap-4 items-center mt-2">
-          {categories.map(category => (
-            <div key={category._id} className="flex items-center gap-2 bg-orange-50 px-2 py-1 rounded">
-              <span className="capitalize text-gray-700">{category.name}:</span>
-              <input
-                type="number"
-                className="w-16 border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                value={categoryNumbers[category.name] ?? -1}
-                onChange={async (e) => {
-                  const value = parseInt(e.target.value, 10);
-                  setCategoryNumbers({ ...categoryNumbers, [category.name]: value });
-                  // Optionally, update on server
-                  await authFetch(`/admin/categories/${category._id}/number`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ number: value })
-                  });
-                }}
-                min={-1}
-              />
-              <button
-                className="text-xs text-orange-600 underline ml-1"
-                title="Set all decors in this category to -1"
-                onClick={async () => {
-                  if (!window.confirm(`Set all decors in '${category.name}' to -1?`)) return;
-                  // Update all decors in this category to -1 (API call)
-                  await authFetch(`/admin/decors/category/${category.name}/set-all-minus-one`, {
-                    method: 'PUT',
-                  });
-                  fetchDecors();
-                }}
-              >Set all -1</button>
-            </div>
-          ))}
         </div>
       </div>
 

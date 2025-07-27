@@ -102,9 +102,9 @@ const UploadImagesPanel = ({
         
         <div className="grid grid-cols-2 gap-3">
           {images.map((src, idx) => {
-            // Patch: Always use backend URL safely
-            const BACKEND_DOMAIN = "http://51.21.170.148:5001"; // Change to your backend domain if needed
-            const safeSrc = src && src.startsWith('http') ? src : `${BACKEND_DOMAIN}${src && src.startsWith('/') ? src : `/${src}`}`;
+            // Use VITE_API_BASE_URL from environment variables
+            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+            const safeSrc = src && src.startsWith('http') ? src : `${API_BASE}${src && src.startsWith('/') ? src : `/${src}`}`;
             return (
               <div 
                 key={idx} 
