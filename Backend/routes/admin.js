@@ -5,7 +5,6 @@ const Plan = require('../models/Plan');
 const User = require('../models/User');
 const Draft = require('../models/Draft');
 const PlanUpgradeRequest = require('../models/PlanUpgradeRequest');
-// ...existing code...
 
 // Admin authentication middleware (must be defined before any route uses it)
 const checkAdmin = async (req, res, next) => {
@@ -26,6 +25,43 @@ const checkAdmin = async (req, res, next) => {
     res.status(500).json({ error: 'Server error while verifying admin status' });
   }
 };
+
+// Admin dashboard stats
+router.get('/dashboard', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalDrafts = await Draft.countDocuments();
+    const totalPlans = await Plan.countDocuments();
+    const activePlans = await Plan.countDocuments({ isActive: true });
+
+    const recentUsers = await User.find({})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('name email plan createdAt');
+
+    const planDistribution = await User.aggregate([
+      { $group: { _id: '$plan', count: { $sum: 1 } } }
+    ]);
+
+    const stats = {
+      totalUsers,
+      totalDrafts,
+      totalPlans,
+      activePlans,
+      recentUsers,
+      planDistribution: planDistribution.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {})
+    };
+
+    res.json({ stats });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard stats' });
+  }
+});
+// ...existing code...
 
 // CATEGORY NUMBER ENDPOINTS
 const Category = require('../models/Category');
@@ -327,6 +363,12 @@ router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
       success: true,
       message: 'Plan deleted successfully'
     });
+  } catch (error) {
+    console.error('Delete plan error:', error);
+    res.status(500).json({ error: 'Failed to delete plan' });
+  }
+});
+
 // Send email to users (single, multiple, all, or test to self)
 router.post('/', verifyToken, checkAdmin, async (req, res) => {
   try {
@@ -360,11 +402,6 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
     res.json({ success: true, sent: successCount, failed });
   } catch (error) {
     res.status(500).json({ error: 'Failed to send emails', details: error.message });
-  }
-});
-  } catch (error) {
-    console.error('Delete plan error:', error);
-    res.status(500).json({ error: 'Failed to delete plan' });
   }
 });
 

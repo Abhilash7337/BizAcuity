@@ -261,17 +261,7 @@ useEffect(() => {
 
             {/* Navigation */}
             <div className="space-y-2">
-            {/* Mail Icon Button */}
-            <button
-              onClick={() => setShowEmailModal(true)}
-              className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 text-gray-600 hover:bg-gray-50"
-              title="Send Email to Users"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H8m8 0a4 4 0 01-8 0m8 0V8a4 4 0 00-8 0v4m8 0v4a4 4 0 01-8 0v-4" />
-              </svg>
-              <span className="font-medium">Send Email</span>
-            </button>
+            {/* Removed sidebar Send Email button */}
               <button
                 onClick={() => setActiveTab('dashboard')}
                 className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
@@ -345,130 +335,7 @@ useEffect(() => {
                   &times;
                 </button>
                 <h3 className="text-2xl font-bold text-orange-700 mb-4 text-center">Send Email to Users</h3>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    setEmailLoading(true);
-                    setEmailError('');
-                    setEmailSuccess('');
-                    try {
-                      const payload = {
-                        userIds: sendTestEmail ? [] : (selectAllUsers ? [] : selectedUserIds),
-                        subject: emailSubject,
-                        body: emailBody,
-                        sendTest: sendTestEmail
-                      };
-                      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                      });
-                      const data = await response.json();
-                      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send email');
-                      setEmailSuccess(`Sent to ${data.sent} user(s)`);
-                      setEmailError(data.failed && data.failed.length > 0 ? `Failed: ${data.failed.map(f => f.email).join(', ')}` : '');
-                    } catch (err) {
-                      setEmailError(err.message || 'Failed to send email');
-                    } finally {
-                      setEmailLoading(false);
-                    }
-                  }}
-                  className="space-y-4"
-                >
-                  {/* Multi-select dropdown of users */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
-                    <div className="flex items-center gap-2 mb-2">
-                      <input
-                        type="checkbox"
-                        checked={selectAllUsers}
-                        onChange={(e) => {
-                          setSelectAllUsers(e.target.checked);
-                          setSelectedUserIds(e.target.checked ? [] : selectedUserIds);
-                        }}
-                        id="selectAllUsers"
-                        disabled={sendTestEmail}
-                      />
-                      <label htmlFor="selectAllUsers" className="text-sm">Select All Users</label>
-                    </div>
-                    <div className="mb-2">
-                      <select
-                        multiple
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 h-32"
-                        value={selectedUserIds}
-                        onChange={(e) => {
-                          const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                          setSelectedUserIds(options);
-                          setSelectAllUsers(false);
-                        }}
-                        disabled={selectAllUsers || sendTestEmail}
-                      >
-                        {dashboardStats?.recentUsers?.map((user) => (
-                          <option key={user._id} value={user._id}>{user.name} ({user.email})</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={sendTestEmail}
-                        onChange={(e) => {
-                          setSendTestEmail(e.target.checked);
-                          setSelectAllUsers(false);
-                          setSelectedUserIds([]);
-                        }}
-                        id="sendTestEmail"
-                      />
-                      <label htmlFor="sendTestEmail" className="text-sm">Send test email to self ({registeredUser?.email})</label>
-                    </div>
-                  </div>
-                  {/* Subject */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                      value={emailSubject}
-                      onChange={e => setEmailSubject(e.target.value)}
-                      required
-                      disabled={emailLoading}
-                    />
-                  </div>
-                  {/* Body */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
-                    <textarea
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 min-h-[100px]"
-                      value={emailBody}
-                      onChange={e => setEmailBody(e.target.value)}
-                      required
-                      disabled={emailLoading}
-                    />
-                  </div>
-                  {emailError && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700 text-sm text-center">{emailError}</div>
-                  )}
-                  {emailSuccess && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-green-700 text-sm text-center">{emailSuccess}</div>
-                  )}
-                  <div className="flex gap-3 mt-6">
-                    <button
-                      type="submit"
-                      className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
-                      disabled={emailLoading || !emailSubject || !emailBody || (!sendTestEmail && !selectAllUsers && selectedUserIds.length === 0)}
-                    >
-                      {emailLoading ? 'Sending...' : 'Send Email'}
-                    </button>
-                    <button
-                      type="button"
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
-                      onClick={() => { setShowEmailModal(false); setEmailError(''); setEmailSuccess(''); setEmailLoading(false); setSelectedUserIds([]); setSelectAllUsers(false); setEmailSubject(''); setEmailBody(''); setSendTestEmail(false); }}
-                      disabled={emailLoading}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                {/* ...modal form code here... */}
               </div>
             </div>
           )}
@@ -685,6 +552,137 @@ useEffect(() => {
               )}
             </div>
           )}
+
+        {/* Send Email Form - always visible at the bottom of dashboard */}
+        {activeTab === 'dashboard' && dashboardStats && (
+          <div className="bg-white rounded-2xl shadow-xl p-8 mt-8">
+            <h2 className="text-2xl font-bold text-orange-700 mb-4 text-center">Send Email to Users</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setEmailLoading(true);
+                setEmailError('');
+                setEmailSuccess('');
+                try {
+                  const payload = {
+                    userIds: sendTestEmail ? [] : (selectAllUsers ? [] : selectedUserIds),
+                    subject: emailSubject,
+                    body: emailBody,
+                    sendTest: sendTestEmail
+                  };
+                  const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                  });
+                  const data = await response.json();
+                  if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send email');
+                  setEmailSuccess(`Sent to ${data.sent} user(s)`);
+                  setEmailError(data.failed && data.failed.length > 0 ? `Failed: ${data.failed.map(f => f.email).join(', ')}` : '');
+                } catch (err) {
+                  setEmailError(err.message || 'Failed to send email');
+                } finally {
+                  setEmailLoading(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              {/* Multi-select dropdown of users */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="checkbox"
+                    checked={selectAllUsers}
+                    onChange={(e) => {
+                      setSelectAllUsers(e.target.checked);
+                      setSelectedUserIds(e.target.checked ? [] : selectedUserIds);
+                    }}
+                    id="selectAllUsers"
+                    disabled={sendTestEmail}
+                  />
+                  <label htmlFor="selectAllUsers" className="text-sm">Select All Users</label>
+                </div>
+                <div className="mb-2">
+                  <select
+                    multiple
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 h-32"
+                    value={selectedUserIds}
+                    onChange={(e) => {
+                      const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                      setSelectedUserIds(options);
+                      setSelectAllUsers(false);
+                    }}
+                    disabled={selectAllUsers || sendTestEmail}
+                  >
+                    {dashboardStats?.recentUsers?.map((user) => (
+                      <option key={user._id} value={user._id}>{user.name} ({user.email})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={sendTestEmail}
+                    onChange={(e) => {
+                      setSendTestEmail(e.target.checked);
+                      setSelectAllUsers(false);
+                      setSelectedUserIds([]);
+                    }}
+                    id="sendTestEmail"
+                  />
+                  <label htmlFor="sendTestEmail" className="text-sm">Send test email to self ({registeredUser?.email})</label>
+                </div>
+              </div>
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  value={emailSubject}
+                  onChange={e => setEmailSubject(e.target.value)}
+                  required
+                  disabled={emailLoading}
+                />
+              </div>
+              {/* Body */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
+                <textarea
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 min-h-[100px]"
+                  value={emailBody}
+                  onChange={e => setEmailBody(e.target.value)}
+                  required
+                  disabled={emailLoading}
+                />
+              </div>
+              {emailError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700 text-sm text-center">{emailError}</div>
+              )}
+              {emailSuccess && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-green-700 text-sm text-center">{emailSuccess}</div>
+              )}
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="submit"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                  disabled={emailLoading || !emailSubject || !emailBody || (!sendTestEmail && !selectAllUsers && selectedUserIds.length === 0)}
+                >
+                  {emailLoading ? 'Sending...' : 'Send Email'}
+                </button>
+                <button
+                  type="button"
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                  onClick={() => { setEmailError(''); setEmailSuccess(''); setEmailLoading(false); setSelectedUserIds([]); setSelectAllUsers(false); setEmailSubject(''); setEmailBody(''); setSendTestEmail(false); }}
+                  disabled={emailLoading}
+                >
+                  Clear
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
           {/* Plans Tab */}
           {activeTab === 'plans' && (

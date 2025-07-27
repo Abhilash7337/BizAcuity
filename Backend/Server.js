@@ -16,7 +16,6 @@ const fallbackAuthRoutes = require('./routes/fallbackAuth');
 const userRoutes = require('./routes/user');
 const draftRoutes = require('./routes/draft');
 const uploadRoutes = require('./routes/upload');
-const adminRoutes = require('./routes/admin-simple');
 const newAdminRoutes = require('./routes/admin');
 const sharingRoutes = require('./routes/sharing');
 const decorRoutes = require('./routes/decor');
@@ -44,8 +43,7 @@ app.use('/', fallbackAuthRoutes);           // Fallback auth routes (direct logi
 app.use('/', userRoutes);                   // User management routes
 app.use('/', draftRoutes);                  // Draft management routes
 app.use('/', uploadRoutes);                 // File upload routes
-app.use('/admin', newAdminRoutes);          // New admin endpoints (plan upgrade requests, etc)
-app.use('/admin', adminRoutes);             // Admin management routes
+app.use('/admin', newAdminRoutes);          // Admin endpoints (plan upgrade requests, email, etc)
 app.use('/', sharingRoutes);                // Sharing management routes
 app.use('/', decorRoutes);                  // Decor management routes
 app.use('/', categoryRoutes);               // Category management routes
