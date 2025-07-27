@@ -38,7 +38,14 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
           return {
             id: decor._id,
             name: decor.name,
-            src: `${import.meta.env.VITE_API_BASE_URL}${decor.imageUrl}`,
+            src: (() => {
+              const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+              let fileName = decor.imageUrl;
+              if (fileName && !fileName.startsWith('/uploads/')) {
+                fileName = `/uploads/images/${fileName.replace(/^images\//, '').replace(/^\/+/, '')}`;
+              }
+              return `${API_BASE}${fileName}`;
+            })(),
             category: decor.category,
             description: decor.description,
             size: size

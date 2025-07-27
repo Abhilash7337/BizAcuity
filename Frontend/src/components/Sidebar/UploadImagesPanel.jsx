@@ -104,7 +104,14 @@ const UploadImagesPanel = ({
           {images.map((src, idx) => {
             // Use VITE_API_BASE_URL from environment variables
             const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-            const safeSrc = src && src.startsWith('http') ? src : `${API_BASE}${src && src.startsWith('/') ? src : `/${src}`}`;
+            let safeSrc = src;
+            if (src && !src.startsWith('http')) {
+              if (src.startsWith('/uploads/')) {
+                safeSrc = `${API_BASE}${src}`;
+              } else {
+                safeSrc = `${API_BASE}/uploads/images/${src.replace(/^images\//, '').replace(/^\/+/, '')}`;
+              }
+            }
             return (
               <div 
                 key={idx} 
