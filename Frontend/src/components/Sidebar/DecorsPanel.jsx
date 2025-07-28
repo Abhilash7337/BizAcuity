@@ -34,6 +34,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       console.log('[DecorsPanel] Response data length:', data.length);
       console.log('[DecorsPanel] First decor sample:', data[0]);
       
+      // Log the raw response data to see what we're actually receiving
+      console.log('[DecorsPanel] Raw response data:', JSON.stringify(data, null, 2));
+      
       // Check if first decor has image data
       if (data[0]) {
         console.log('[DecorsPanel] First decor image check:');
