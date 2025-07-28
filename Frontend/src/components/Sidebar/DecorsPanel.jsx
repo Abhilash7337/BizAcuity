@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Flower2 } from 'lucide-react';
 import { authFetch } from '../../utils/auth';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-
 const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectUserDecor, userPlanAllowedDecors = null }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [decors, setDecors] = useState([]);
@@ -17,6 +15,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       const response = await authFetch('/decors');
       const data = await response.json();
       if (response.ok) {
+        // Only add id and size fields, do not flatten image
         let transformedDecors = data.map(decor => {
           let size = { width: 150, height: 150 };
           switch(decor.category) {
@@ -98,7 +97,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       onAddDecor({
         id: decor.id,
         name: decor.name,
-        src: decor.imageUrl ? `${API_BASE}${decor.imageUrl}` : '',
+        src: decor.image && decor.image.data && decor.image.contentType
+          ? `data:${decor.image.contentType};base64,${decor.image.data}`
+          : '',
         size: decor.size
       });
     }
@@ -216,7 +217,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.imageUrl ? `${API_BASE}${decor.imageUrl}` : 'https://via.placeholder.com/150?text=No+Image'}
+                          src={decor.image && decor.image.data && decor.image.contentType
+                            ? `data:${decor.image.contentType};base64,${decor.image.data}`
+                            : 'https://via.placeholder.com/150?text=No+Image'}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={() => handleImageError(decor.id)}
