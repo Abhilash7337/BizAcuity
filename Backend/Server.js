@@ -48,7 +48,10 @@ try {
 createUploadsDir();
 
 // CORS configuration
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: ['http://13.201.99.90', 'http://13.201.99.90:5001'],
+  credentials: true
+}));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
