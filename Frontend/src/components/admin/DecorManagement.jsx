@@ -246,16 +246,12 @@ const DecorManagement = () => {
           <div key={decor._id} className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="h-48 bg-gray-100 flex items-center justify-center">
               <img
-                src={(() => {
-                  const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-                  let fileName = decor.imageUrl;
-                  if (fileName && !fileName.startsWith('/uploads/')) {
-                    fileName = `/uploads/images/${fileName.replace(/^images\//, '').replace(/^\/+/, '')}`;
-                  }
-                  return `${API_BASE}${fileName}`;
-                })()}
+                src={decor.image && decor.image.data && decor.image.contentType
+                  ? `data:${decor.image.contentType};base64,${decor.image.data}`
+                  : ''}
                 alt={decor.name}
                 className="max-h-full max-w-full object-contain"
+                onError={e => { e.target.src = 'https://via.placeholder.com/150?text=No+Image'; }}
               />
             </div>
             <div className="p-4">
