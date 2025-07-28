@@ -228,6 +228,8 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
               <div className="grid grid-cols-2 gap-3">
                 {category.items.map((decor) => {
                   const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id);
+                  // Debug: log src for each decor
+                  console.log('[DecorsPanel] Render decor:', decor.id, decor.name, decor.src);
                   return (
                     <div
                       key={decor.id}
@@ -236,7 +238,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.src}
+                          src={decor.image && decor.image.data && decor.image.contentType
+                            ? `data:${decor.image.contentType};base64,${decor.image.data}`
+                            : decor.src || 'https://via.placeholder.com/150?text=No+Image'}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={() => handleImageError(decor.id)}
@@ -247,6 +251,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                           <div className="flex flex-col items-center justify-center text-orange-400">
                             <Flower2 className="w-8 h-8 mb-2" />
                             <span className="text-xs">No image</span>
+                            <span className="text-xs break-all">{decor.src && decor.src.length > 40 ? decor.src.substring(0, 40) + '...' : decor.src}</span>
                           </div>
                         )}
                         {isLocked && (
