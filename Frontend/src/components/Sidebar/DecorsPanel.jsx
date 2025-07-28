@@ -238,9 +238,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.image && decor.image.data && decor.image.contentType
-                            ? `data:${decor.image.contentType};base64,${decor.image.data}`
-                            : decor.src || 'https://via.placeholder.com/150?text=No+Image'}
+                          src={decor.src || 'https://via.placeholder.com/150?text=No+Image'}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={() => handleImageError(decor.id)}
