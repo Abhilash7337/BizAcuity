@@ -23,14 +23,15 @@ const getAllDecors = async (req, res) => {
         image
       };
     });
-    
-    res.json(decorsWithImage);
-  } catch (error) {
-    console.error('Error fetching decors:', error);
-    res.status(500).json({ error: 'Failed to fetch decors' });
-  }
-};
 
+    res.json(decorsWithImage);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+} // Closing brace added for getAllDecors function
+
+// Create new decor (admin only)
+// Create new decor (admin only)
 // Create new decor (admin only)
 const createDecor = async (req, res) => {
   try {

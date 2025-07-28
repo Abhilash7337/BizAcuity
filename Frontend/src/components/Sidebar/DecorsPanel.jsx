@@ -15,7 +15,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       const response = await authFetch('/decors');
       const data = await response.json();
       if (response.ok) {
-        // Add src property for base64 preview, matching admin panel logic
+        // Add src property for static file serving
         let transformedDecors = data.map(decor => {
           let size = { width: 150, height: 150 };
           switch(decor.category) {
@@ -30,16 +30,12 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             case 'frames': size = { width: 180, height: 240 }; break;
             default: size = { width: 150, height: 150 };
           }
-          let src = '';
-          if (decor.image && decor.image.data && decor.image.contentType) {
-            src = `data:${decor.image.contentType};base64,${decor.image.data}`;
-          }
-          // Defensive fallback: if src is empty, set to placeholder
-          if (!src || typeof src !== 'string' || src === 'undefined') {
-            src = 'https://via.placeholder.com/150?text=No+Image';
-          }
+          // Use imageUrl from backend, fallback to placeholder
+          let src = decor.imageUrl
+            ? `${process.env.VITE_API_BASE_URL || ''}${decor.imageUrl}`
+            : 'https://via.placeholder.com/150?text=No+Image';
           // Debug log for each decor
-          console.log('Decor:', decor.name, 'src:', src, 'image:', decor.image);
+          console.log('Decor:', decor.name, 'src:', src, 'imageUrl:', decor.imageUrl);
           return {
             ...decor,
             id: decor._id,
@@ -108,9 +104,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       onAddDecor({
         id: decor.id,
         name: decor.name,
-        src: decor.image && decor.image.data && decor.image.contentType
-          ? `data:${decor.image.contentType};base64,${decor.image.data}`
-          : '',
+        src: decor.src,
         size: decor.size
       });
     }
@@ -228,7 +222,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.src && decor.src.startsWith('data:image') ? decor.src : 'https://via.placeholder.com/150?text=No+Image'}
+                          src={decor.src}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={() => handleImageError(decor.id)}

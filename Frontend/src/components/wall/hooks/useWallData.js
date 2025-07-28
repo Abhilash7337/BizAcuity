@@ -208,29 +208,10 @@ export default function useWallData() {
   const handleAddDecor = async (decorImage) => {
     try {
       const newIndex = images.length;
-      // Extract base64 and contentType from src
-      let base64Data = '';
-      let contentType = 'image/png';
-      let valid = false;
-      if (decorImage.src && decorImage.src.startsWith('data:')) {
-        const match = decorImage.src.match(/^data:(.*);base64,(.*)$/);
-        if (match && match[1] && match[2]) {
-          contentType = match[1];
-          base64Data = match[2];
-          valid = true;
-        } else {
-          console.error('❌ Invalid decor src format:', decorImage.src);
-        }
-      } else {
-        console.error('❌ decorImage.src does not start with data:', decorImage.src);
-      }
-      if (!valid || !base64Data || !contentType) {
-        setErrorMsg('Failed to add decor item. Invalid image data.');
-        return;
-      }
+      // For decors, src is now a static URL
       setImages(prevImages => [
         ...prevImages,
-        { data: base64Data, contentType }
+        { src: decorImage.src }
       ]);
       setImageStates(prevStates => [
         ...prevStates,
