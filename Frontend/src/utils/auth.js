@@ -43,26 +43,28 @@ export const logout = () => {
     clearAuthData();
 };
 
-export async function authFetch(url, options = {}) {
-  const token = localStorage.getItem('token');
-  const headers = options.headers ? { ...options.headers } : {};
+// Create authenticated fetch function
+export const authFetch = async (url, options = {}) => {
+    const token = getToken();
+    // Use VITE_API_BASE_URL if set, otherwise fallback to localhost
+    const baseURL = import.meta.env && import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL
+        : 'http://localhost:5001';
+    const fullURL = url.startsWith('http') ? url : `${baseURL}${url}`;
 
-  // Only set Content-Type for JSON, not for FormData
-  if (options.body && !(options.body instanceof FormData)) {
-    headers['Content-Type'] = 'application/json';
-  }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+    console.log('[authFetch] URL:', url);
+    console.log('[authFetch] Base URL:', baseURL);
+    console.log('[authFetch] Full URL:', fullURL);
+    console.log('[authFetch] Token exists:', !!token);
 
-  return fetch(
-    `${import.meta.env.VITE_API_BASE_URL || ''}${url}`,
-    {
-      ...options,
-      headers,
+    if (token) {
+        options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        };
     }
-  );
-}
+    return fetch(fullURL, options);
+};
 
 // Fetch sensitive user data from server when needed (instead of storing in localStorage)
 export const fetchUserProfile = async () => {
