@@ -30,13 +30,21 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             case 'frames': size = { width: 180, height: 240 }; break;
             default: size = { width: 150, height: 150 };
           }
+          let src = '';
+          if (decor.image && decor.image.data && decor.image.contentType) {
+            src = `data:${decor.image.contentType};base64,${decor.image.data}`;
+          }
+          // Defensive fallback: if src is empty, set to placeholder
+          if (!src || typeof src !== 'string' || src === 'undefined') {
+            src = 'https://via.placeholder.com/150?text=No+Image';
+          }
+          // Debug log for each decor
+          console.log('Decor:', decor.name, 'src:', src, 'image:', decor.image);
           return {
             ...decor,
             id: decor._id,
             size,
-            src: decor.image && decor.image.data && decor.image.contentType
-              ? `data:${decor.image.contentType};base64,${decor.image.data}`
-              : ''
+            src
           };
         });
         setDecors(transformedDecors);
