@@ -15,7 +15,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       const response = await authFetch('/decors');
       const data = await response.json();
       if (response.ok) {
-        // Only add id and size fields, do not flatten image
+        // Add src property for base64 preview, matching admin panel logic
         let transformedDecors = data.map(decor => {
           let size = { width: 150, height: 150 };
           switch(decor.category) {
@@ -33,7 +33,10 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
           return {
             ...decor,
             id: decor._id,
-            size
+            size,
+            src: decor.image && decor.image.data && decor.image.contentType
+              ? `data:${decor.image.contentType};base64,${decor.image.data}`
+              : ''
           };
         });
         setDecors(transformedDecors);
