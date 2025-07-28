@@ -49,7 +49,7 @@ createUploadsDir();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://13.201.99.90', 'http://13.201.99.90:5001'],
+  origin: ['http://13.201.99.90', 'http://13.201.99.90:5001', 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
   credentials: true
 }));
 

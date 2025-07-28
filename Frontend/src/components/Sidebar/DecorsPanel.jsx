@@ -8,19 +8,45 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState({});
 
+  // Debug: check authentication
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    console.log('[DecorsPanel] Authentication check - Token exists:', !!token);
+    console.log('[DecorsPanel] Authentication check - User exists:', !!user);
+    if (user) {
+      console.log('[DecorsPanel] User data:', JSON.parse(user));
+    }
+  }, []);
+
   // Debug: log incoming allowed decors
   console.log('[DecorsPanel] userPlanAllowedDecors:', userPlanAllowedDecors);
   // Fetch decors from API
   const fetchDecors = async () => {
     try {
       setLoading(true);
+      console.log('[DecorsPanel] Fetching decors from API...');
       const response = await authFetch('/decors');
+      console.log('[DecorsPanel] Response status:', response.status);
+      console.log('[DecorsPanel] Response headers:', response.headers);
+      
       const data = await response.json();
+      console.log('[DecorsPanel] Response data length:', data.length);
+      console.log('[DecorsPanel] First decor sample:', data[0]);
+      console.log('[DecorsPanel] All decors data:', data);
+      
       if (response.ok) {
         // Transform API data to match the component's expected format
         let transformedDecors = data.map(decor => {
-          // Debug: log each decor id
+          // Debug: log each decor id and image data
           console.log('[DecorsPanel] decor._id:', decor._id);
+          console.log('[DecorsPanel] decor.image:', decor.image);
+          console.log('[DecorsPanel] decor.image.data exists:', !!decor.image?.data);
+          console.log('[DecorsPanel] decor.image.contentType exists:', !!decor.image?.contentType);
+          if (decor.image?.contentType) {
+            console.log('[DecorsPanel] decor.image.contentType:', decor.image.contentType);
+          }
+          
           // Set appropriate sizes based on category
           let size = { width: 150, height: 150 }; // Default size
           switch(decor.category) {
@@ -35,12 +61,38 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             case 'frames': size = { width: 180, height: 240 }; break;
             default: size = { width: 150, height: 150 };
           }
+          
+          const src = decor.image && decor.image.data && decor.image.contentType
+            ? `data:${decor.image.contentType};base64,${decor.image.data}`
+            : '';
+            
+          console.log('[DecorsPanel] Generated src for decor', decor._id, ':', src ? 'has data' : 'no data');
+          if (src) {
+            console.log('[DecorsPanel] Src starts with:', src.substring(0, 50));
+            console.log('[DecorsPanel] Src length:', src.length);
+            
+            // Validate base64 data
+            try {
+              const base64Data = decor.image.data;
+              if (base64Data && base64Data.length > 0) {
+                // Check if it's valid base64
+                const testDecode = atob(base64Data.substring(0, 100));
+                console.log('[DecorsPanel] Base64 validation passed for decor', decor._id);
+                
+                // Check image size
+                if (base64Data.length > 5000000) { // ~3.7MB in base64
+                  console.warn('[DecorsPanel] Large image detected for decor', decor._id, 'size:', base64Data.length, 'characters');
+                }
+              }
+            } catch (error) {
+              console.error('[DecorsPanel] Base64 validation failed for decor', decor._id, ':', error.message);
+            }
+          }
+          
           return {
             id: decor._id,
             name: decor.name,
-            src: decor.image && decor.image.data && decor.image.contentType
-              ? `data:${decor.image.contentType};base64,${decor.image.data}`
-              : '',
+            src: src,
             category: decor.category,
             description: decor.description,
             size: size
@@ -50,9 +102,13 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
         setDecors(transformedDecors);
       } else {
         console.error('Failed to fetch decors:', data.error);
+        console.error('Response status:', response.status);
+        console.error('Response data:', data);
       }
     } catch (error) {
       console.error('Error fetching decors:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
     } finally {
       setLoading(false);
     }
@@ -99,11 +155,18 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   }, {});
 
   const handleImageError = (decorId) => {
+    console.log('[DecorsPanel] Image error for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: true }));
   };
 
   const handleImageLoad = (decorId) => {
+    console.log('[DecorsPanel] Image loaded successfully for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: false }));
+  };
+
+  const handleImageTimeout = (decorId) => {
+    console.log('[DecorsPanel] Image timeout for decor:', decorId);
+    setLoadError(prev => ({ ...prev, [decorId]: true }));
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
@@ -238,14 +301,28 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.image && decor.image.data && decor.image.contentType
-                            ? `data:${decor.image.contentType};base64,${decor.image.data}`
-                            : decor.src || 'https://via.placeholder.com/150?text=No+Image'}
+                          src={decor.src || 'https://via.placeholder.com/150?text=No+Image'}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
-                          onError={() => handleImageError(decor.id)}
-                          onLoad={() => handleImageLoad(decor.id)}
+                          onError={(e) => {
+                            console.log('[DecorsPanel] Image error event:', e);
+                            console.log('[DecorsPanel] Failed src:', decor.src);
+                            console.log('[DecorsPanel] Error target:', e.target);
+                            handleImageError(decor.id);
+                          }}
+                          onLoad={(e) => {
+                            console.log('[DecorsPanel] Image load event:', e);
+                            console.log('[DecorsPanel] Successful src:', decor.src);
+                            console.log('[DecorsPanel] Loaded image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight);
+                            handleImageLoad(decor.id);
+                          }}
+                          onAbort={(e) => {
+                            console.log('[DecorsPanel] Image abort event:', e);
+                            handleImageError(decor.id);
+                          }}
                           style={{ display: loadError[decor.id] ? 'none' : 'block' }}
+                          loading="lazy"
+                          crossOrigin="anonymous"
                         />
                         {loadError[decor.id] && (
                           <div className="flex flex-col items-center justify-center text-orange-400">

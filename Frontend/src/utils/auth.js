@@ -52,6 +52,11 @@ export const authFetch = async (url, options = {}) => {
         : 'http://localhost:5001';
     const fullURL = url.startsWith('http') ? url : `${baseURL}${url}`;
 
+    console.log('[authFetch] URL:', url);
+    console.log('[authFetch] Base URL:', baseURL);
+    console.log('[authFetch] Full URL:', fullURL);
+    console.log('[authFetch] Token exists:', !!token);
+
     if (token) {
         options.headers = {
             ...options.headers,
