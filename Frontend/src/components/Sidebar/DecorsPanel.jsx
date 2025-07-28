@@ -360,9 +360,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={(e) => {
                             console.log('[DecorsPanel] Image error event:', e);
-                            console.log('[DecorsPanel] Failed src:', decor.src);
-                            console.log('[DecorsPanel] Error target:', e.target);
+                            console.log('[DecorsPanel] Failed src for decor:', decor.id);
                             console.log('[DecorsPanel] Error details:', e.target.error);
+                            e.target.src = 'https://via.placeholder.com/150?text=No+Image';
                             handleImageError(decor.id);
                           }}
                           onLoad={(e) => {
@@ -375,7 +375,11 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                             console.log('[DecorsPanel] Image abort event:', e);
                             handleImageError(decor.id);
                           }}
-                          style={{ display: loadError[decor.id] ? 'none' : 'block' }}
+                          style={{ 
+                            display: loadError[decor.id] ? 'none' : 'block',
+                            maxWidth: '100px', 
+                            maxHeight: '100px' 
+                          }}
                           loading="lazy"
                           crossOrigin="anonymous"
                         />
