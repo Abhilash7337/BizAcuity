@@ -1,68 +1,53 @@
 const Decor = require('../models/Decor');
 const multer = require('multer');
+const path = require('path');
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/decors/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+  }
+});
 const upload = multer({ storage });
 
 // Get all decors
 const getAllDecors = async (req, res) => {
   try {
     const decors = await Decor.find({ isActive: true });
-    
-    // Ensure image object is always present and well-formed
-    const decorsWithImage = decors.map(decor => {
-      let image = { data: '', contentType: '' };
-      if (decor.image && decor.image.data && decor.image.contentType) {
-        image = {
-          data: decor.image.data,
-          contentType: decor.image.contentType
-        };
-      }
-      return {
-        ...decor.toObject(),
-        image
-      };
-    });
-    
-    res.json(decorsWithImage);
+    res.json(decors);
   } catch (error) {
-    console.error('Error fetching decors:', error);
     res.status(500).json({ error: 'Failed to fetch decors' });
   }
 };
 
 // Create new decor (admin only)
-const createDecor = async (req, res) => {
-  try {
-    const { name, category, description } = req.body;
-    
-    if (!req.file) {
-      return res.status(400).json({ error: 'Image file is required' });
+const createDecor = (req, res) => {
+  upload.single('image')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
     }
-    
-    // Convert image to base64 and store in MongoDB
-    const imageBuffer = req.file.buffer;
-    const base64Image = imageBuffer.toString('base64');
-    const imageObj = {
-      data: base64Image,
-      contentType: req.file.mimetype
-    };
-    
-    const decor = new Decor({
-      name,
-      category,
-      description,
-      image: imageObj,
-      isActive: true,
-      createdBy: req.user.id
-    });
-    
-    await decor.save();
-    res.status(201).json(decor);
-  } catch (error) {
-    console.error('Error creating decor:', error);
-    res.status(500).json({ error: 'Failed to create decor' });
-  }
+    try {
+      const { name, category, description } = req.body;
+      if (!req.file) {
+        return res.status(400).json({ error: 'Image file is required' });
+      }
+      const imageUrl = `/uploads/decors/${req.file.filename}`;
+      const decor = new Decor({
+        name,
+        category,
+        description,
+        imageUrl,
+        isActive: true,
+        createdBy: req.user.id
+      });
+      await decor.save();
+      res.status(201).json(decor);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to create decor' });
+    }
+  });
 };
 
 // Update decor (admin only)
@@ -71,41 +56,25 @@ const updateDecor = (req, res) => {
     if (err) {
       return res.status(400).json({ error: err.message });
     }
-
     try {
       const { id } = req.params;
       const { name, category, description, isActive } = req.body;
-      
       const updateData = { name, category, description, isActive };
-      
       if (req.file) {
-        // Convert new image to base64 and update
-        const imageBuffer = req.file.buffer;
-        const base64Image = imageBuffer.toString('base64');
-        updateData.image = {
-          data: base64Image,
-          contentType: req.file.mimetype
-        };
+        updateData.imageUrl = `/uploads/decors/${req.file.filename}`;
       } else {
-        // If no new image, preserve the existing image data
+        // If no new image, preserve the existing imageUrl
         const existingDecor = await Decor.findById(id);
-        if (existingDecor && existingDecor.image) {
-          updateData.image = {
-            data: existingDecor.image.data,
-            contentType: existingDecor.image.contentType
-          };
+        if (existingDecor && existingDecor.imageUrl) {
+          updateData.imageUrl = existingDecor.imageUrl;
         }
       }
-
       const decor = await Decor.findByIdAndUpdate(id, updateData, { new: true });
-      
       if (!decor) {
         return res.status(404).json({ error: 'Decor not found' });
       }
-
       res.json(decor);
     } catch (error) {
-      console.error('Error updating decor:', error);
       res.status(500).json({ error: 'Failed to update decor' });
     }
   });
@@ -115,20 +84,16 @@ const updateDecor = (req, res) => {
 const deleteDecor = async (req, res) => {
   try {
     const { id } = req.params;
-    
     const decor = await Decor.findByIdAndUpdate(
       id, 
       { isActive: false }, 
       { new: true }
     );
-    
     if (!decor) {
       return res.status(404).json({ error: 'Decor not found' });
     }
-
     res.json({ message: 'Decor deleted successfully' });
   } catch (error) {
-    console.error('Error deleting decor:', error);
     res.status(500).json({ error: 'Failed to delete decor' });
   }
 };
