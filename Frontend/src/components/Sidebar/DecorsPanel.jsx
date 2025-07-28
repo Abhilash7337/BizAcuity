@@ -33,6 +33,16 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       const data = await response.json();
       console.log('[DecorsPanel] Response data length:', data.length);
       console.log('[DecorsPanel] First decor sample:', data[0]);
+      
+      // Check if first decor has image data
+      if (data[0]) {
+        console.log('[DecorsPanel] First decor image check:');
+        console.log('[DecorsPanel] - Has image property:', !!data[0].image);
+        console.log('[DecorsPanel] - Image data length:', data[0].image?.data?.length || 0);
+        console.log('[DecorsPanel] - Content type:', data[0].image?.contentType || 'none');
+        console.log('[DecorsPanel] - Image data preview:', data[0].image?.data?.substring(0, 100) || 'none');
+      }
+      
       console.log('[DecorsPanel] All decors data:', data);
       
       if (response.ok) {
@@ -67,6 +77,19 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             : '';
             
           console.log('[DecorsPanel] Generated src for decor', decor._id, ':', src ? 'has data' : 'no data');
+          
+          // Test if we can create a valid image source
+          if (decor.image && decor.image.data && decor.image.contentType) {
+            console.log('[DecorsPanel] Testing image source creation for decor', decor._id);
+            console.log('[DecorsPanel] - Content type:', decor.image.contentType);
+            console.log('[DecorsPanel] - Data length:', decor.image.data.length);
+            console.log('[DecorsPanel] - Data starts with:', decor.image.data.substring(0, 50));
+            console.log('[DecorsPanel] - Generated src starts with:', src.substring(0, 100));
+            
+            // Test base64 validation
+            const isValid = testBase64Image(decor.image.data, decor.image.contentType);
+            console.log('[DecorsPanel] Base64 validation result for decor', decor._id, ':', isValid);
+          }
           if (src) {
             console.log('[DecorsPanel] Src starts with:', src.substring(0, 50));
             console.log('[DecorsPanel] Src length:', src.length);
@@ -98,8 +121,22 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             size: size
           };
         });
+        
+        // Add a test decor to verify image rendering works
+        const testDecor = {
+          id: 'test-decor',
+          name: 'Test Image',
+          src: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmOTgwMCIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlRlc3Q8L3RleHQ+PC9zdmc+',
+          category: 'test',
+          description: 'Test decor to verify image rendering',
+          size: { width: 100, height: 100 }
+        };
+        
+        console.log('[DecorsPanel] Added test decor with known working image');
+        console.log('[DecorsPanel] Test decor src:', testDecor.src);
+        
         // Do not filter decors here; show all decors, lock those not allowed in UI
-        setDecors(transformedDecors);
+        setDecors([...transformedDecors, testDecor]);
       } else {
         console.error('Failed to fetch decors:', data.error);
         console.error('Response status:', response.status);
@@ -167,6 +204,29 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const handleImageTimeout = (decorId) => {
     console.log('[DecorsPanel] Image timeout for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: true }));
+  };
+
+  // Test function to validate base64 data
+  const testBase64Image = (base64Data, contentType) => {
+    try {
+      if (!base64Data || !contentType) {
+        console.log('[DecorsPanel] Missing base64 data or content type');
+        return false;
+      }
+      
+      // Check if it's valid base64
+      const decoded = atob(base64Data);
+      console.log('[DecorsPanel] Base64 decoded successfully, length:', decoded.length);
+      
+      // Check if it starts with expected image header
+      const header = new Uint8Array(decoded.slice(0, 4));
+      console.log('[DecorsPanel] Image header bytes:', Array.from(header));
+      
+      return true;
+    } catch (error) {
+      console.error('[DecorsPanel] Base64 validation failed:', error.message);
+      return false;
+    }
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
@@ -308,6 +368,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                             console.log('[DecorsPanel] Image error event:', e);
                             console.log('[DecorsPanel] Failed src:', decor.src);
                             console.log('[DecorsPanel] Error target:', e.target);
+                            console.log('[DecorsPanel] Error details:', e.target.error);
                             handleImageError(decor.id);
                           }}
                           onLoad={(e) => {
