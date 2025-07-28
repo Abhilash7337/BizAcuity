@@ -98,7 +98,11 @@ export default function useWallData() {
         });
         if (!response.ok) throw new Error('Failed to upload image');
         const data = await response.json();
-        setWallImage(data.url); // Always use backend returned URL
+        if (data.image && data.image.data && data.image.contentType) {
+          setWallImage(data.image);
+        } else {
+          setErrorMsg('Failed to upload the image. Invalid response.');
+        }
       } catch (error) {
         setErrorMsg('Failed to upload the image. Please try again.');
       }
@@ -229,7 +233,7 @@ export default function useWallData() {
     const files = Array.from(e.target.files);
     if (!files.length) return;
     try {
-      const uploadedUrls = [];
+      const uploadedImages = [];
       for (const file of files) {
         const formData = new FormData();
         formData.append('image', file);
@@ -240,12 +244,14 @@ export default function useWallData() {
         });
         if (!response.ok) throw new Error('Failed to upload image');
         const data = await response.json();
-        uploadedUrls.push(data.url); // Always use backend returned URL
+        if (data.image && data.image.data && data.image.contentType) {
+          uploadedImages.push(data.image);
+        }
       }
-      setImages(prev => [...prev, ...uploadedUrls]);
+      setImages(prev => [...prev, ...uploadedImages]);
       setImageStates(prev => [
         ...prev,
-        ...uploadedUrls.map(() => ({
+        ...uploadedImages.map(() => ({
           x: 100,
           y: 100,
           width: 150,

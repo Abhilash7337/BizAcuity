@@ -15,9 +15,9 @@ const decorSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  imageUrl: {
-    type: String,
-    required: true
+  image: {
+    data: { type: String, required: true }, // base64 string
+    contentType: { type: String, required: true }
   },
   isActive: {
     type: Boolean,

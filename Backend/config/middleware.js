@@ -34,9 +34,7 @@ const multerConfig = {
     }
   }
 };
-
 module.exports = {
   corsOptions,
-  bodyParserConfig,
-  multerConfig
+  bodyParserConfig
 };

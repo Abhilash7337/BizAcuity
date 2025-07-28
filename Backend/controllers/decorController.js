@@ -1,6 +1,6 @@
 const Decor = require('../models/Decor');
 const multer = require('multer');
-const uploadToS3 = require('../utils/s3Upload');
+// Placeholder for future base64 encoding logic
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -24,13 +24,18 @@ const createDecor = async (req, res) => {
       console.error('🎯 No file received!');
       return res.status(400).json({ error: 'Image file is required' });
     }
-    // Upload to S3
-    const s3Url = await uploadToS3(req.file);
+    // Convert image to base64 and store in MongoDB
+    const imageBuffer = req.file.buffer;
+    const base64Image = imageBuffer.toString('base64');
+    const imageObj = {
+      data: base64Image,
+      contentType: req.file.mimetype
+    };
     const decor = new Decor({
       name,
       category,
       description,
-      imageUrl: s3Url,
+      image: imageObj,
       isActive: true,
       createdBy: req.user.id
     });
@@ -57,9 +62,13 @@ const updateDecor = (req, res) => {
       const updateData = { name, category, description, isActive };
       
       if (req.file) {
-        // Upload new image to S3
-        const s3Url = await uploadToS3(req.file);
-        updateData.imageUrl = s3Url;
+        // Convert new image to base64 and update
+        const imageBuffer = req.file.buffer;
+        const base64Image = imageBuffer.toString('base64');
+        updateData.image = {
+          data: base64Image,
+          contentType: req.file.mimetype
+        };
       }
 
       const decor = await Decor.findByIdAndUpdate(id, updateData, { new: true });

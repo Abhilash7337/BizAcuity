@@ -89,7 +89,8 @@ const WallCanvas = ({
           width: '100%',
           maxWidth: wallWidth,
           height: wallHeight,
-          backgroundImage: wallImage ? `url(${wallImage})` : undefined,
+          backgroundImage: wallImage && wallImage.data && wallImage.contentType ? `url(data:${wallImage.contentType};base64,${wallImage.data})` : undefined,
+          backgroundSize: 'cover',
           position: 'relative',
           flexShrink: 0,
           boxShadow: `0 25px 50px -12px rgba(234, 88, 12, 0.15),0 0 0 1px rgba(255,255,255,0.2),inset 0 1px 0 rgba(255,255,255,0.3)`
@@ -100,24 +101,32 @@ const WallCanvas = ({
           }
         }}
       >
-        {images.map((src, idx) => (
-          <DraggableImage
-            key={`${idx}-${src.substring(0, 20)}`}
-            src={src}
-            idx={idx}
-            imageState={imageStates[idx]}
-            setImageStates={setImageStates}
-            wallWidth={wallWidth}
-            wallHeight={wallHeight}
-            isSelected={selectedIdx === idx}
-            setSelectedIdx={(index) => {
-              if (!isViewOnly) {
-                setSelectedIdx(index);
-              }
-            }}
-            isViewOnly={isViewOnly}
-          />
-        ))}
+        {images.map((img, idx) => {
+          // img should be { data, contentType }
+        console.log('WallCanvas image', idx, img);
+          const safeSrc = img && img.data && img.contentType
+            ? `data:${img.contentType};base64,${img.data}`
+            : '';
+        console.log('WallCanvas safeSrc', idx, safeSrc);
+          return (
+            <DraggableImage
+              key={`${idx}-${safeSrc.substring(0, 20)}`}
+              src={safeSrc}
+              idx={idx}
+              imageState={imageStates[idx]}
+              setImageStates={setImageStates}
+              wallWidth={wallWidth}
+              wallHeight={wallHeight}
+              isSelected={selectedIdx === idx}
+              setSelectedIdx={(index) => {
+                if (!isViewOnly) {
+                  setSelectedIdx(index);
+                }
+              }}
+              isViewOnly={isViewOnly}
+            />
+          );
+        })}
       </div>
     </main>
   );

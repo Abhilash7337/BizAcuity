@@ -101,9 +101,11 @@ const UploadImagesPanel = ({
         </div>
         
         <div className="grid grid-cols-2 gap-3">
-          {images.map((src, idx) => {
-            // src is now a direct S3 URL from backend
-            const safeSrc = src;
+          {images.map((img, idx) => {
+            // img should be { data, contentType }
+            const safeSrc = img && img.data && img.contentType
+              ? `data:${img.contentType};base64,${img.data}`
+              : '';
             return (
               <div 
                 key={idx} 

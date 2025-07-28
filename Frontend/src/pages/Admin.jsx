@@ -62,7 +62,7 @@ useEffect(() => {
       navigate('/login');
       return;
     }
-    if (registeredUser.userType !== 'admin' && registeredUser.email !== 'admin@gmail.com') {
+    if (registeredUser.userType !== 'admin' && registeredUser.email !== 'abhilashpodisetty@gmail.com') {
       navigate('/dashboard');
       return;
     }
@@ -177,7 +177,7 @@ useEffect(() => {
     }
   };
 
-  if (!registeredUser || (registeredUser.userType !== 'admin' && registeredUser.email !== 'admin@gmail.com')) {
+  if (!registeredUser || (registeredUser.userType !== 'admin' && registeredUser.email !== 'abhilashpodisetty@gmail.com')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 flex items-center justify-center">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">

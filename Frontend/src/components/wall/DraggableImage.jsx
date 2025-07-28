@@ -197,78 +197,47 @@ function DraggableImage({
     >
       {Object.keys(wrapperStyle).length > 0 ? (
         <div style={wrapperStyle}>
-          {(() => {
-            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-            // If src is not absolute, ensure it uses /uploads/images/
-            let safeSrc = src;
-            if (src && !src.startsWith('http')) {
-              if (src.startsWith('/uploads/')) {
-                safeSrc = `${API_BASE}${src}`;
-              } else if (src.startsWith('/')) {
-                safeSrc = `${API_BASE}/uploads/images${src}`;
-              } else {
-                safeSrc = `${API_BASE}/uploads/images/${src}`;
-              }
-            }
-            return (
-              <img
-                src={safeSrc}
-                alt=""
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
-                  objectFit: 'cover',
-                  transform: `rotate(${imageState.rotation || 0}deg)`,
-                  transition: 'transform 0.2s ease-in-out',
-                }}
-                draggable={false}
-              />
-            );
-          })()}
+          <img
+            src={src}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+              objectFit: 'cover',
+              transform: `rotate(${imageState.rotation || 0}deg)`,
+              transition: 'transform 0.2s ease-in-out',
+            }}
+            draggable={false}
+          />
         </div>
       ) : (
         <div className="relative">
           {/* Use VITE_API_BASE_URL for uploads if not absolute URL */}
-          {(() => {
-            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-            let safeSrc = src;
-            if (src && !src.startsWith('http')) {
-              if (src.startsWith('/uploads/')) {
-                safeSrc = `${API_BASE}${src}`;
-              } else if (src.startsWith('/')) {
-                safeSrc = `${API_BASE}/uploads/images${src}`;
-              } else {
-                safeSrc = `${API_BASE}/uploads/images/${src}`;
-              }
-            }
-            return (
-              <img
-                src={safeSrc}
-                alt=""
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  pointerEvents: 'none',
-                  objectFit: 'cover',
-                  transform: `rotate(${imageState.rotation || 0}deg)`,
-                  transition: 'transform 0.2s ease-in-out',
-                  ...styleOverrides,
-                }}
-                draggable={false}
-                onLoad={() => {
-                  console.log(`✅ Image ${idx} loaded successfully: ${safeSrc}`);
-                  setImageLoading(false);
-                  setImageLoadError(false);
-                }}
-                onError={(e) => {
-                  console.error(`❌ Image ${idx} failed to load: ${safeSrc}`, e);
-                  setImageLoading(false);
-                  setImageLoadError(true);
-                }}
-              />
-            );
-          })()}
+          <img
+            src={src}
+            alt=""
+            style={{
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+              objectFit: 'cover',
+              transform: `rotate(${imageState.rotation || 0}deg)`,
+              transition: 'transform 0.2s ease-in-out',
+              ...styleOverrides,
+            }}
+            draggable={false}
+            onLoad={() => {
+              console.log(`✅ Image ${idx} loaded successfully: ${src}`);
+              setImageLoading(false);
+              setImageLoadError(false);
+            }}
+            onError={(e) => {
+              console.error(`❌ Image ${idx} failed to load: ${src}`, e);
+              setImageLoading(false);
+              setImageLoadError(true);
+            }}
+          />
           {imageLoadError && (
             <div className="absolute inset-0 bg-red-100 border-2 border-red-300 rounded flex items-center justify-center text-red-600 text-xs p-2">
               <div className="text-center">

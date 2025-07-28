@@ -50,49 +50,46 @@ const SaveDraftModal = ({
   };
 
   const captureWallPreview = async () => {
-    if (!wallRef.current) return null;
-    
+    if (!wallRef.current) {
+      setSaveError('Wall preview is not ready. Please make sure your design is visible.');
+      return null;
+    }
     try {
       // Wait for images to load
+      const imgs = Array.from(wallRef.current.getElementsByTagName('img'));
       await Promise.all(
-        Array.from(wallRef.current.getElementsByTagName('img')).map(img => {
+        imgs.map(img => {
           if (img.complete) return Promise.resolve();
           return new Promise((resolve) => {
             img.onload = resolve;
-            img.onerror = resolve; // Handle error case as well
+            img.onerror = resolve;
           });
         })
       );
-
+      // Check if wallRef is visible
+      const rect = wallRef.current.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        setSaveError('Wall preview area is not visible. Please check your design.');
+        return null;
+      }
+      // Try to capture
       const canvas = await html2canvas(wallRef.current, {
         useCORS: true,
-        scale: 0.25, // Reduce size more aggressively
+        scale: 0.25,
         backgroundColor: null,
         logging: false,
         allowTaint: true,
         foreignObjectRendering: true
       });
-      
-      // Convert canvas to blob
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.5));
-      
-      // Upload preview image
-      const formData = new FormData();
-      formData.append('image', blob, 'preview.jpg');
-      
-      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to upload preview image');
-      }
-      
-      const data = await response.json();
-      return data.url;
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+      const base64 = dataUrl.replace(/^data:image\/jpeg;base64,/, '');
+      return {
+        data: base64,
+        contentType: 'image/jpeg'
+      };
     } catch (error) {
-      console.error('Failed to capture wall preview:', error);
+      setSaveError('Failed to capture wall preview. Please try again or check your design.');
+      console.error('Failed to capture wall preview:', error, wallRef.current);
       return null;
     }
   };
@@ -127,9 +124,9 @@ const SaveDraftModal = ({
       const url = draftId 
         ? `${import.meta.env.VITE_API_BASE_URL}/drafts/${draftId}`
         : `${import.meta.env.VITE_API_BASE_URL}/drafts`;
-      
+
       const method = draftId ? 'PUT' : 'POST';
-      
+
       const response = await authFetch(url, {
         method,
         headers: {
@@ -138,7 +135,7 @@ const SaveDraftModal = ({
         body: JSON.stringify({
           name: draftName,
           wallData,
-          previewImage
+          previewImage // { data, contentType }
         }),
       });
 
