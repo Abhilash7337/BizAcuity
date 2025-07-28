@@ -138,6 +138,5 @@ module.exports = {
   getAllDecors,
   createDecor,
   updateDecor,
-  deleteDecor,
-  upload
+  deleteDecor
 };
