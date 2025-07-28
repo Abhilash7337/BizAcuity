@@ -1,4 +1,4 @@
-const { saveUploadedFile } = require('../utils/fileUpload');
+const uploadToS3 = require('../utils/s3Upload');
 const multer = require('multer');
 
 // Handle file upload
@@ -10,16 +10,24 @@ const uploadImage = async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const fileBuffer = req.file.buffer;
-    const result = saveUploadedFile(fileBuffer, req.file.originalname, 5001);
-
-    if (result.isNew) {
-      console.log('New image uploaded:', result.url);
-    } else {
-      console.log('Duplicate image detected, returning existing URL:', result.url);
+    // Upload to S3
+    const s3Url = await uploadToS3(req.file);
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
     }
-    
-    res.json(result);
+    const User = require('../models/User');
+    const type = req.body.type || 'gallery';
+    let update = {};
+    if (type === 'profile') {
+      update.profilePhoto = s3Url;
+    } else if (type === 'background') {
+      update['wall.wallImage'] = s3Url;
+    } else if (type === 'gallery') {
+      update.$push = { 'wall.images': s3Url };
+    }
+    await User.findByIdAndUpdate(userId, update, { new: true });
+    res.json({ url: s3Url, type, message: 'Image uploaded and saved to user' });
   } catch (error) {
     console.error('Upload error:', error);
     if (error instanceof multer.MulterError) {
