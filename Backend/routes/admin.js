@@ -15,7 +15,7 @@ const checkAdmin = async (req, res, next) => {
     }
 
     // Check if user is admin
-    if (user.userType !== 'admin' && user.email !== 'admin@gmail.com') {
+    if (user.userType !== 'admin' && user.email !== 'abhilashpodisetty@gmail.com') {
       return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
     }
 

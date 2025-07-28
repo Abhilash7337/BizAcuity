@@ -103,7 +103,7 @@ const Header = () => {
             {isLoggedIn ? (
               <>
                 {/* Admin Button - Only show for admin users */}
-                {(registeredUser?.userType === 'admin' || registeredUser?.email === 'admin@gmail.com') && (
+                {(registeredUser?.userType === 'admin' || registeredUser?.email === 'abhilashpodisetty@gmail.com') && (
                   <Link
                     to="/admin"
                     className={`bg-red-600 hover:bg-red-700 text-white font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ${
@@ -189,7 +189,7 @@ const Header = () => {
                     Profile
                   </Link>
                   {/* Admin Link for Mobile - Only show for admin users */}
-                  {(registeredUser?.userType === 'admin' || registeredUser?.email === 'admin@gmail.com') && (
+                  {(registeredUser?.userType === 'admin' || registeredUser?.email === 'abhilashpodisetty@gmail.com') && (
                     <Link
                       to="/admin"
                       className={`block px-3 py-2 text-red-600 hover:text-red-700 font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-red-700 font-semibold' : ''}`}

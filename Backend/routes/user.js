@@ -16,7 +16,7 @@ const {
 } = require('../controllers/userController');
 const multer = require('multer');
 const { multerConfig } = require('../config/middleware');
-const upload = multer(multerConfig);
+const upload = multer(multerConfig); // In-memory only
 // Get latest plan upgrade request for the logged-in user
 router.get('/user/plan-upgrade-request', verifyToken, getLatestPlanUpgradeRequest);
 

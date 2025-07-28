@@ -16,8 +16,9 @@ const registerUser = async (req, res) => {
     const Plan = require('../models/Plan');
     let freePlan = await Plan.findOne({ name: 'FREE' });
     let planName = freePlan ? freePlan.name : 'FREE';
-    // Create new user (password will be hashed by the model middleware)
-    const user = new User({ name, email, password, plan: planName });
+    // Set userType to 'admin' if registering with the admin email
+    const userType = email === 'abhilashpodisetty@gmail.com' ? 'admin' : undefined;
+    const user = new User({ name, email, password, plan: planName, ...(userType && { userType }) });
     await user.save();
 
     // Generate JWT token

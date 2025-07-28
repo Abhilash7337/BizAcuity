@@ -356,9 +356,9 @@ const User = () => {
                   <div className="flex items-center space-x-6 mb-4 md:mb-0">
                     {/* Profile Photo */}
                     <div className="w-28 h-28 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white relative">
-                      {user.profilePhoto ? (
+                      {user.profilePhoto && user.profilePhoto.data && user.profilePhoto.contentType ? (
                         <img 
-                          src={user.profilePhoto} 
+                          src={`data:${user.profilePhoto.contentType};base64,${user.profilePhoto.data}`}
                           alt="Profile" 
                           className="w-full h-full object-cover"
                         />
