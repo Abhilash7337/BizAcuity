@@ -8,25 +8,16 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState({});
 
-  // Debug: log incoming allowed decors
-  console.log('[DecorsPanel] userPlanAllowedDecors:', userPlanAllowedDecors);
-
   // Fetch decors from API
   const fetchDecors = async () => {
     try {
       setLoading(true);
-      console.log('[DecorsPanel] Fetching decors from API...');
       const response = await authFetch('/decors');
-      console.log('[DecorsPanel] Response status:', response.status);
-      
       const data = await response.json();
-      console.log('[DecorsPanel] Response data length:', data.length);
-      
       if (response.ok) {
-        // Transform API data to match the component's expected format
+        // Only add id and size fields, do not flatten image
         let transformedDecors = data.map(decor => {
-          // Set appropriate sizes based on category
-          let size = { width: 150, height: 150 }; // Default size
+          let size = { width: 150, height: 150 };
           switch(decor.category) {
             case 'tables': size = { width: 200, height: 150 }; break;
             case 'plants': size = { width: 150, height: 200 }; break;
@@ -39,21 +30,16 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             case 'frames': size = { width: 180, height: 240 }; break;
             default: size = { width: 150, height: 150 };
           }
-          
           return {
             ...decor,
             id: decor._id,
-            size: size
+            size
           };
         });
-        
         setDecors(transformedDecors);
-        console.log('[DecorsPanel] Decors loaded successfully:', transformedDecors.length);
-      } else {
-        console.error('Failed to fetch decors:', data.error);
       }
     } catch (error) {
-      console.error('Error fetching decors:', error);
+      // Optionally handle error
     } finally {
       setLoading(false);
     }
@@ -68,19 +54,12 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
     const handleStorageChange = (e) => {
       if (e.key === 'refreshDecors') {
         fetchDecors();
-        localStorage.removeItem('refreshDecors'); // Clean up
+        localStorage.removeItem('refreshDecors');
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events within the same tab
-    const handleCustomRefresh = () => {
-      fetchDecors();
-    };
-    
+    const handleCustomRefresh = () => { fetchDecors(); };
     window.addEventListener('refreshDecors', handleCustomRefresh);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('refreshDecors', handleCustomRefresh);
@@ -100,24 +79,21 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   }, {});
 
   const handleImageError = (decorId) => {
-    console.log('[DecorsPanel] Image error for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: true }));
   };
 
   const handleImageLoad = (decorId) => {
-    console.log('[DecorsPanel] Image loaded successfully for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: false }));
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
   const handleDecorClick = (decor) => {
-    // If userPlanAllowedDecors is provided, restrict access
     if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id)) {
       setUpgradeMsg('This decor is not available in your current plan. Upgrade to access more decors.');
       setTimeout(() => setUpgradeMsg(''), 2500);
       return;
     }
-    if (onAddDecor && !loadError[decor.id]) {
+    if (onAddDecor) {
       onAddDecor({
         id: decor.id,
         name: decor.name,
@@ -246,11 +222,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                             : 'https://via.placeholder.com/150?text=No+Image'}
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
-                          onError={(e) => {
-                            console.log('[DecorsPanel] Image error for decor:', decor.id);
-                            e.target.src = 'https://via.placeholder.com/150?text=No+Image';
-                            handleImageError(decor.id);
-                          }}
+                          onError={() => handleImageError(decor.id)}
                           onLoad={() => handleImageLoad(decor.id)}
                           style={{ display: loadError[decor.id] ? 'none' : 'block' }}
                           loading="lazy"
