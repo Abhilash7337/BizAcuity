@@ -102,12 +102,13 @@ const WallCanvas = ({
         }}
       >
         {images.map((img, idx) => {
-          // img should be { data, contentType }
-        console.log('WallCanvas image', idx, img);
-          const safeSrc = img && img.data && img.contentType
-            ? `data:${img.contentType};base64,${img.data}`
-            : '';
-        console.log('WallCanvas safeSrc', idx, safeSrc);
+          // img for decors: { src }, for uploads: { data, contentType }
+          let safeSrc = '';
+          if (img.src) {
+            safeSrc = img.src;
+          } else if (img.data && img.contentType) {
+            safeSrc = `data:${img.contentType};base64,${img.data}`;
+          }
           return (
             <DraggableImage
               key={`${idx}-${safeSrc.substring(0, 20)}`}
@@ -118,11 +119,7 @@ const WallCanvas = ({
               wallWidth={wallWidth}
               wallHeight={wallHeight}
               isSelected={selectedIdx === idx}
-              setSelectedIdx={(index) => {
-                if (!isViewOnly) {
-                  setSelectedIdx(index);
-                }
-              }}
+              setSelectedIdx={setSelectedIdx}
               isViewOnly={isViewOnly}
             />
           );

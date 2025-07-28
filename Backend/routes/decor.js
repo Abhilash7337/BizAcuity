@@ -6,7 +6,7 @@ const {
   createDecor,
   updateDecor,
   deleteDecor,
-  upload
+  decorUpload
 } = require('../controllers/decorController');
 
 // Get all decors (public endpoint)
@@ -14,6 +14,7 @@ router.get('/decors', getAllDecors);
 
 // Admin protected routes
 router.post('/admin/decors', verifyToken, upload.single('image'), createDecor);
+router.post('/', decorUpload.single('image'), createDecor);
 router.put('/admin/decors/:id', verifyToken, updateDecor);
 router.delete('/admin/decors/:id', verifyToken, deleteDecor);
 

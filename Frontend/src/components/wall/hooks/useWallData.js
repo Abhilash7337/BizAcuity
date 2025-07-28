@@ -208,19 +208,10 @@ export default function useWallData() {
   const handleAddDecor = async (decorImage) => {
     try {
       const newIndex = images.length;
-      // Extract base64 and contentType from src
-      let base64Data = '';
-      let contentType = 'image/png';
-      if (decorImage.src && decorImage.src.startsWith('data:')) {
-        const match = decorImage.src.match(/^data:(.*);base64,(.*)$/);
-        if (match) {
-          contentType = match[1];
-          base64Data = match[2];
-        }
-      }
+      // For decors, src is now a static URL
       setImages(prevImages => [
         ...prevImages,
-        { data: base64Data, contentType }
+        { src: decorImage.src }
       ]);
       setImageStates(prevStates => [
         ...prevStates,
