@@ -108,7 +108,6 @@ const subscriptionSchema = new mongoose.Schema({
 });
 
 // Indexes for performance
-subscriptionSchema.index({ userId: 1 });
 subscriptionSchema.index({ status: 1, plan: 1 });
 subscriptionSchema.index({ endDate: 1 });
 subscriptionSchema.index({ nextBillingDate: 1 });

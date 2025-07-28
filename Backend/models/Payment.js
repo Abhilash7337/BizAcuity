@@ -50,7 +50,6 @@ const paymentSchema = new mongoose.Schema({
 });
 
 // Index for efficient queries
-paymentSchema.index({ userId: 1, status: 1 });
 paymentSchema.index({ transactionId: 1 });
 paymentSchema.index({ paymentDate: -1 });
 
