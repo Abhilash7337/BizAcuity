@@ -102,16 +102,8 @@ const UploadImagesPanel = ({
         
         <div className="grid grid-cols-2 gap-3">
           {images.map((src, idx) => {
-            // Use VITE_API_BASE_URL from environment variables
-            const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-            let safeSrc = src;
-            if (src && !src.startsWith('http')) {
-              if (src.startsWith('/uploads/')) {
-                safeSrc = `${API_BASE}${src}`;
-              } else {
-                safeSrc = `${API_BASE}/uploads/images/${src.replace(/^images\//, '').replace(/^\/+/, '')}`;
-              }
-            }
+            // src is now a direct S3 URL from backend
+            const safeSrc = src;
             return (
               <div 
                 key={idx} 

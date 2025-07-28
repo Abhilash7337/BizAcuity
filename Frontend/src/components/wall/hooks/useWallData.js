@@ -91,6 +91,7 @@ export default function useWallData() {
       try {
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('type', 'background');
         const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
           method: 'POST',
           body: formData,
@@ -232,6 +233,7 @@ export default function useWallData() {
       for (const file of files) {
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('type', 'gallery');
         const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/upload`, {
           method: 'POST',
           body: formData,
