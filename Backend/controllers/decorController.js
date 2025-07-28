@@ -36,28 +36,19 @@ const getAllDecors = async (req, res) => {
 const createDecor = async (req, res) => {
   try {
     const { name, category, description } = req.body;
-    
     if (!req.file) {
       return res.status(400).json({ error: 'Image file is required' });
     }
-    
-    // Convert image to base64 and store in MongoDB
-    const imageBuffer = req.file.buffer;
-    const base64Image = imageBuffer.toString('base64');
-    const imageObj = {
-      data: base64Image,
-      contentType: req.file.mimetype
-    };
-    
+    // Use static file path for imageUrl
+    const imageUrl = `/uploads/decors/${req.file.filename}`;
     const decor = new Decor({
       name,
       category,
       description,
-      image: imageObj,
+      imageUrl,
       isActive: true,
       createdBy: req.user.id
     });
-    
     await decor.save();
     res.status(201).json(decor);
   } catch (error) {
