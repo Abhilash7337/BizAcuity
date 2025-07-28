@@ -6,7 +6,7 @@ const subscriptionSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
     unique: true,
-    index: true
+    // ...existing code...
   },
   plan: {
     type: String,
@@ -18,7 +18,7 @@ const subscriptionSchema = new mongoose.Schema({
     required: true,
     enum: ['active', 'inactive', 'suspended', 'cancelled', 'expired', 'trial'],
     default: 'active',
-    index: true
+    // ...existing code...
   },
   billingCycle: {
     type: String,
