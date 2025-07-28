@@ -1,6 +1,5 @@
 const Decor = require('../models/Decor');
 const multer = require('multer');
-// Placeholder for future base64 encoding logic
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -9,6 +8,7 @@ const upload = multer({ storage });
 const getAllDecors = async (req, res) => {
   try {
     const decors = await Decor.find({ isActive: true });
+    
     // Ensure image object is always present and well-formed
     const decorsWithImage = decors.map(decor => {
       let image = { data: '', contentType: '' };
@@ -23,6 +23,7 @@ const getAllDecors = async (req, res) => {
         image
       };
     });
+    
     res.json(decorsWithImage);
   } catch (error) {
     console.error('Error fetching decors:', error);
@@ -34,10 +35,11 @@ const getAllDecors = async (req, res) => {
 const createDecor = async (req, res) => {
   try {
     const { name, category, description } = req.body;
+    
     if (!req.file) {
-      console.error('🎯 No file received!');
       return res.status(400).json({ error: 'Image file is required' });
     }
+    
     // Convert image to base64 and store in MongoDB
     const imageBuffer = req.file.buffer;
     const base64Image = imageBuffer.toString('base64');
@@ -45,6 +47,7 @@ const createDecor = async (req, res) => {
       data: base64Image,
       contentType: req.file.mimetype
     };
+    
     const decor = new Decor({
       name,
       category,
@@ -53,11 +56,11 @@ const createDecor = async (req, res) => {
       isActive: true,
       createdBy: req.user.id
     });
+    
     await decor.save();
-    console.log('🎯 Decor saved successfully:', decor);
     res.status(201).json(decor);
   } catch (error) {
-    console.error('🎯 Error creating decor:', error);
+    console.error('Error creating decor:', error);
     res.status(500).json({ error: 'Failed to create decor' });
   }
 };
@@ -83,6 +86,15 @@ const updateDecor = (req, res) => {
           data: base64Image,
           contentType: req.file.mimetype
         };
+      } else {
+        // If no new image, preserve the existing image data
+        const existingDecor = await Decor.findById(id);
+        if (existingDecor && existingDecor.image) {
+          updateData.image = {
+            data: existingDecor.image.data,
+            contentType: existingDecor.image.contentType
+          };
+        }
       }
 
       const decor = await Decor.findByIdAndUpdate(id, updateData, { new: true });

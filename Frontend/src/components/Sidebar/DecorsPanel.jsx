@@ -8,8 +8,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState({});
 
-  // Debug: log incoming allowed decors
-  console.log('[DecorsPanel] userPlanAllowedDecors:', userPlanAllowedDecors);
   // Fetch decors from API
   const fetchDecors = async () => {
     try {
@@ -17,12 +15,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       const response = await authFetch('/decors');
       const data = await response.json();
       if (response.ok) {
-        // Transform API data to match the component's expected format
+        // Only add id and size fields, do not flatten image
         let transformedDecors = data.map(decor => {
-          // Debug: log each decor id
-          console.log('[DecorsPanel] decor._id:', decor._id);
-          // Set appropriate sizes based on category
-          let size = { width: 150, height: 150 }; // Default size
+          let size = { width: 150, height: 150 };
           switch(decor.category) {
             case 'tables': size = { width: 200, height: 150 }; break;
             case 'plants': size = { width: 150, height: 200 }; break;
@@ -36,23 +31,15 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             default: size = { width: 150, height: 150 };
           }
           return {
+            ...decor,
             id: decor._id,
-            name: decor.name,
-            src: decor.image && decor.image.data && decor.image.contentType
-              ? `data:${decor.image.contentType};base64,${decor.image.data}`
-              : '',
-            category: decor.category,
-            description: decor.description,
-            size: size
+            size
           };
         });
-        // Do not filter decors here; show all decors, lock those not allowed in UI
         setDecors(transformedDecors);
-      } else {
-        console.error('Failed to fetch decors:', data.error);
       }
     } catch (error) {
-      console.error('Error fetching decors:', error);
+      // Optionally handle error
     } finally {
       setLoading(false);
     }
@@ -67,19 +54,12 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
     const handleStorageChange = (e) => {
       if (e.key === 'refreshDecors') {
         fetchDecors();
-        localStorage.removeItem('refreshDecors'); // Clean up
+        localStorage.removeItem('refreshDecors');
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events within the same tab
-    const handleCustomRefresh = () => {
-      fetchDecors();
-    };
-    
+    const handleCustomRefresh = () => { fetchDecors(); };
     window.addEventListener('refreshDecors', handleCustomRefresh);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('refreshDecors', handleCustomRefresh);
@@ -108,17 +88,18 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
   const handleDecorClick = (decor) => {
-    // If userPlanAllowedDecors is provided, restrict access
     if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id)) {
       setUpgradeMsg('This decor is not available in your current plan. Upgrade to access more decors.');
       setTimeout(() => setUpgradeMsg(''), 2500);
       return;
     }
-    if (onAddDecor && !loadError[decor.id]) {
+    if (onAddDecor) {
       onAddDecor({
         id: decor.id,
         name: decor.name,
-        src: decor.src,
+        src: decor.image && decor.image.data && decor.image.contentType
+          ? `data:${decor.image.contentType};base64,${decor.image.data}`
+          : '',
         size: decor.size
       });
     }
@@ -228,8 +209,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
               <div className="grid grid-cols-2 gap-3">
                 {category.items.map((decor) => {
                   const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id);
-                  // Debug: log src for each decor
-                  console.log('[DecorsPanel] Render decor:', decor.id, decor.name, decor.src);
                   return (
                     <div
                       key={decor.id}
@@ -238,18 +217,23 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                     >
                       <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
                         <img
-                          src={decor.src || 'https://via.placeholder.com/150?text=No+Image'}
+
+                          src={decor.image && decor.image.data && decor.image.contentType
+                            ? `data:${decor.image.contentType};base64,${decor.image.data}`
+                            : decor.src || 'https://via.placeholder.com/150?text=No+Image'}
+
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={() => handleImageError(decor.id)}
                           onLoad={() => handleImageLoad(decor.id)}
                           style={{ display: loadError[decor.id] ? 'none' : 'block' }}
+                          loading="lazy"
                         />
                         {loadError[decor.id] && (
                           <div className="flex flex-col items-center justify-center text-orange-400">
                             <Flower2 className="w-8 h-8 mb-2" />
                             <span className="text-xs">No image</span>
-                            <span className="text-xs break-all">{decor.src && decor.src.length > 40 ? decor.src.substring(0, 40) + '...' : decor.src}</span>
+                            <span className="text-xs text-red-500">Image not available</span>
                           </div>
                         )}
                         {isLocked && (
