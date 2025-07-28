@@ -9,7 +9,7 @@ const decorSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['clocks', 'tables', 'plants', 'fruits', 'garlands', 'lamps', 'chairs', 'flowers', 'frames', 'other']
+    trim: true
   },
   description: {
     type: String,
