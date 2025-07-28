@@ -9,7 +9,21 @@ const upload = multer({ storage });
 const getAllDecors = async (req, res) => {
   try {
     const decors = await Decor.find({ isActive: true });
-    res.json(decors);
+    // Ensure image object is always present and well-formed
+    const decorsWithImage = decors.map(decor => {
+      let image = { data: '', contentType: '' };
+      if (decor.image && decor.image.data && decor.image.contentType) {
+        image = {
+          data: decor.image.data,
+          contentType: decor.image.contentType
+        };
+      }
+      return {
+        ...decor.toObject(),
+        image
+      };
+    });
+    res.json(decorsWithImage);
   } catch (error) {
     console.error('Error fetching decors:', error);
     res.status(500).json({ error: 'Failed to fetch decors' });
