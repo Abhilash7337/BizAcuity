@@ -42,6 +42,19 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
         console.log('[DecorsPanel] - Content type:', data[0].image?.contentType || 'none');
         console.log('[DecorsPanel] - Image data preview:', data[0].image?.data?.substring(0, 100) || 'none');
         console.log('[DecorsPanel] - Full first decor object:', JSON.stringify(data[0], null, 2));
+        
+        // Check all decors for image data
+        console.log('[DecorsPanel] Checking all decors for image data:');
+        data.forEach((decor, index) => {
+          console.log(`[DecorsPanel] Decor ${index + 1}:`, {
+            id: decor._id,
+            name: decor.name,
+            hasImage: !!decor.image,
+            hasImageData: !!decor.image?.data,
+            hasContentType: !!decor.image?.contentType,
+            imageDataLength: decor.image?.data?.length || 0
+          });
+        });
       }
       
       console.log('[DecorsPanel] All decors data:', data);
@@ -56,6 +69,13 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
           console.log('[DecorsPanel] decor.image.contentType exists:', !!decor.image?.contentType);
           if (decor.image?.contentType) {
             console.log('[DecorsPanel] decor.image.contentType:', decor.image.contentType);
+          }
+          
+          // Log detailed image information
+          if (decor.image && decor.image.data) {
+            console.log('[DecorsPanel] Decor', decor._id, 'has image data, length:', decor.image.data.length);
+          } else {
+            console.log('[DecorsPanel] Decor', decor._id, 'has NO image data');
           }
           
           // Set appropriate sizes based on category
@@ -83,6 +103,27 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
         
         // Do not filter decors here; show all decors, lock those not allowed in UI
         setDecors(transformedDecors);
+        
+        // Add a test decor to verify image rendering works
+        const testDecor = {
+          _id: 'test-decor',
+          id: 'test-decor',
+          name: 'Test Image',
+          category: 'test',
+          description: 'Test decor to verify image rendering',
+          image: {
+            data: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+            contentType: 'image/png'
+          },
+          size: { width: 100, height: 100 },
+          isActive: true
+        };
+        
+        console.log('[DecorsPanel] Added test decor with known working image');
+        console.log('[DecorsPanel] Test decor image data length:', testDecor.image.data.length);
+        
+        // Add test decor to the list
+        setDecors([...transformedDecors, testDecor]);
       } else {
         console.error('Failed to fetch decors:', data.error);
         console.error('Response status:', response.status);
