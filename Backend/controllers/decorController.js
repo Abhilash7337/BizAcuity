@@ -12,6 +12,17 @@ const getAllDecors = async (req, res) => {
     const decors = await Decor.find({ isActive: true });
     console.log('🎯 getAllDecors: Found', decors.length, 'decor(s)');
     
+    // Log each decor's image status
+    decors.forEach((decor, index) => {
+      console.log(`🎯 getAllDecors: Decor ${index + 1} (${decor._id}):`, {
+        name: decor.name,
+        hasImage: !!decor.image,
+        hasImageData: !!decor.image?.data,
+        hasContentType: !!decor.image?.contentType,
+        imageDataLength: decor.image?.data?.length || 0
+      });
+    });
+    
     // Ensure image object is always present and well-formed
     const decorsWithImage = decors.map(decor => {
       let image = { data: '', contentType: '' };
@@ -122,6 +133,19 @@ const updateDecor = (req, res) => {
           data: base64Image,
           contentType: req.file.mimetype
         };
+        console.log('🎯 updateDecor: New image uploaded, contentType:', req.file.mimetype, 'data length:', base64Image.length);
+      } else {
+        // If no new image, preserve the existing image data
+        const existingDecor = await Decor.findById(id);
+        if (existingDecor && existingDecor.image) {
+          updateData.image = {
+            data: existingDecor.image.data,
+            contentType: existingDecor.image.contentType
+          };
+          console.log('🎯 updateDecor: Preserving existing image data, contentType:', existingDecor.image.contentType);
+        } else {
+          console.log('🎯 updateDecor: No existing image data to preserve');
+        }
       }
 
       const decor = await Decor.findByIdAndUpdate(id, updateData, { new: true });
@@ -130,6 +154,7 @@ const updateDecor = (req, res) => {
         return res.status(404).json({ error: 'Decor not found' });
       }
 
+      console.log('🎯 updateDecor: Decor updated successfully, ID:', decor._id);
       res.json(decor);
     } catch (error) {
       console.error('Error updating decor:', error);
@@ -160,10 +185,45 @@ const deleteDecor = async (req, res) => {
   }
 };
 
+// Check and fix decor data (admin only)
+const checkDecorData = async (req, res) => {
+  try {
+    console.log('🎯 checkDecorData: Checking all decor records...');
+    const decors = await Decor.find({});
+    
+    let fixedCount = 0;
+    for (const decor of decors) {
+      if (!decor.image || !decor.image.data || !decor.image.contentType) {
+        console.log(`🎯 checkDecorData: Fixing decor ${decor._id} - missing image data`);
+        
+        // Set default empty image data
+        decor.image = {
+          data: '',
+          contentType: 'image/png'
+        };
+        
+        await decor.save();
+        fixedCount++;
+      }
+    }
+    
+    console.log(`🎯 checkDecorData: Fixed ${fixedCount} decor records`);
+    res.json({ 
+      message: `Checked ${decors.length} decor records, fixed ${fixedCount}`,
+      totalDecors: decors.length,
+      fixedCount: fixedCount
+    });
+  } catch (error) {
+    console.error('Error checking decor data:', error);
+    res.status(500).json({ error: 'Failed to check decor data' });
+  }
+};
+
 module.exports = {
   getAllDecors,
   createDecor,
   updateDecor,
   deleteDecor,
-  upload
+  upload,
+  checkDecorData
 };
