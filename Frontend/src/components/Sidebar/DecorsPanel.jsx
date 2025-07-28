@@ -8,19 +8,9 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState({});
 
-  // Debug: check authentication
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    console.log('[DecorsPanel] Authentication check - Token exists:', !!token);
-    console.log('[DecorsPanel] Authentication check - User exists:', !!user);
-    if (user) {
-      console.log('[DecorsPanel] User data:', JSON.parse(user));
-    }
-  }, []);
-
   // Debug: log incoming allowed decors
   console.log('[DecorsPanel] userPlanAllowedDecors:', userPlanAllowedDecors);
+
   // Fetch decors from API
   const fetchDecors = async () => {
     try {
@@ -28,59 +18,13 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       console.log('[DecorsPanel] Fetching decors from API...');
       const response = await authFetch('/decors');
       console.log('[DecorsPanel] Response status:', response.status);
-      console.log('[DecorsPanel] Response headers:', response.headers);
       
       const data = await response.json();
       console.log('[DecorsPanel] Response data length:', data.length);
-      console.log('[DecorsPanel] First decor sample:', data[0]);
-      
-      // Log the raw response data to see what we're actually receiving
-      console.log('[DecorsPanel] Raw response data:', JSON.stringify(data, null, 2));
-      
-      // Check if first decor has image data
-      if (data[0]) {
-        console.log('[DecorsPanel] First decor image check:');
-        console.log('[DecorsPanel] - Has image property:', !!data[0].image);
-        console.log('[DecorsPanel] - Image data length:', data[0].image?.data?.length || 0);
-        console.log('[DecorsPanel] - Content type:', data[0].image?.contentType || 'none');
-        console.log('[DecorsPanel] - Image data preview:', data[0].image?.data?.substring(0, 100) || 'none');
-        console.log('[DecorsPanel] - Full first decor object:', JSON.stringify(data[0], null, 2));
-        
-        // Check all decors for image data
-        console.log('[DecorsPanel] Checking all decors for image data:');
-        data.forEach((decor, index) => {
-          console.log(`[DecorsPanel] Decor ${index + 1}:`, {
-            id: decor._id,
-            name: decor.name,
-            hasImage: !!decor.image,
-            hasImageData: !!decor.image?.data,
-            hasContentType: !!decor.image?.contentType,
-            imageDataLength: decor.image?.data?.length || 0
-          });
-        });
-      }
-      
-      console.log('[DecorsPanel] All decors data:', data);
       
       if (response.ok) {
-        // Use the same approach as admin panel - minimal transformation
+        // Transform API data to match the component's expected format
         let transformedDecors = data.map(decor => {
-          // Debug: log each decor id and image data
-          console.log('[DecorsPanel] decor._id:', decor._id);
-          console.log('[DecorsPanel] decor.image:', decor.image);
-          console.log('[DecorsPanel] decor.image.data exists:', !!decor.image?.data);
-          console.log('[DecorsPanel] decor.image.contentType exists:', !!decor.image?.contentType);
-          if (decor.image?.contentType) {
-            console.log('[DecorsPanel] decor.image.contentType:', decor.image.contentType);
-          }
-          
-          // Log detailed image information
-          if (decor.image && decor.image.data) {
-            console.log('[DecorsPanel] Decor', decor._id, 'has image data, length:', decor.image.data.length);
-          } else {
-            console.log('[DecorsPanel] Decor', decor._id, 'has NO image data');
-          }
-          
           // Set appropriate sizes based on category
           let size = { width: 150, height: 150 }; // Default size
           switch(decor.category) {
@@ -96,7 +40,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             default: size = { width: 150, height: 150 };
           }
           
-          // Keep the original decor object and just add the size
           return {
             ...decor,
             id: decor._id,
@@ -104,38 +47,13 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
           };
         });
         
-        // Do not filter decors here; show all decors, lock those not allowed in UI
         setDecors(transformedDecors);
-        
-        // Add a test decor to verify image rendering works
-        const testDecor = {
-          _id: 'test-decor',
-          id: 'test-decor',
-          name: 'Test Image',
-          category: 'test',
-          description: 'Test decor to verify image rendering',
-          image: {
-            data: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-            contentType: 'image/png'
-          },
-          size: { width: 100, height: 100 },
-          isActive: true
-        };
-        
-        console.log('[DecorsPanel] Added test decor with known working image');
-        console.log('[DecorsPanel] Test decor image data length:', testDecor.image.data.length);
-        
-        // Add test decor to the list
-        setDecors([...transformedDecors, testDecor]);
+        console.log('[DecorsPanel] Decors loaded successfully:', transformedDecors.length);
       } else {
         console.error('Failed to fetch decors:', data.error);
-        console.error('Response status:', response.status);
-        console.error('Response data:', data);
       }
     } catch (error) {
       console.error('Error fetching decors:', error);
-      console.error('Error details:', error.message);
-      console.error('Error stack:', error.stack);
     } finally {
       setLoading(false);
     }
@@ -189,34 +107,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   const handleImageLoad = (decorId) => {
     console.log('[DecorsPanel] Image loaded successfully for decor:', decorId);
     setLoadError(prev => ({ ...prev, [decorId]: false }));
-  };
-
-  const handleImageTimeout = (decorId) => {
-    console.log('[DecorsPanel] Image timeout for decor:', decorId);
-    setLoadError(prev => ({ ...prev, [decorId]: true }));
-  };
-
-  // Test function to validate base64 data
-  const testBase64Image = (base64Data, contentType) => {
-    try {
-      if (!base64Data || !contentType) {
-        console.log('[DecorsPanel] Missing base64 data or content type');
-        return false;
-      }
-      
-      // Check if it's valid base64
-      const decoded = atob(base64Data);
-      console.log('[DecorsPanel] Base64 decoded successfully, length:', decoded.length);
-      
-      // Check if it starts with expected image header
-      const header = new Uint8Array(decoded.slice(0, 4));
-      console.log('[DecorsPanel] Image header bytes:', Array.from(header));
-      
-      return true;
-    } catch (error) {
-      console.error('[DecorsPanel] Base64 validation failed:', error.message);
-      return false;
-    }
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
@@ -343,8 +233,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
               <div className="grid grid-cols-2 gap-3">
                 {category.items.map((decor) => {
                   const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id);
-                  // Debug: log src for each decor
-                  console.log('[DecorsPanel] Render decor:', decor.id, decor.name, decor.src);
                   return (
                     <div
                       key={decor.id}
@@ -359,37 +247,19 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                           alt={decor.name}
                           className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                           onError={(e) => {
-                            console.log('[DecorsPanel] Image error event:', e);
-                            console.log('[DecorsPanel] Failed src for decor:', decor.id);
-                            console.log('[DecorsPanel] Error details:', e.target.error);
+                            console.log('[DecorsPanel] Image error for decor:', decor.id);
                             e.target.src = 'https://via.placeholder.com/150?text=No+Image';
                             handleImageError(decor.id);
                           }}
-                          onLoad={(e) => {
-                            console.log('[DecorsPanel] Image load event:', e);
-                            console.log('[DecorsPanel] Successful src:', decor.src);
-                            console.log('[DecorsPanel] Loaded image dimensions:', e.target.naturalWidth, 'x', e.target.naturalHeight);
-                            handleImageLoad(decor.id);
-                          }}
-                          onAbort={(e) => {
-                            console.log('[DecorsPanel] Image abort event:', e);
-                            handleImageError(decor.id);
-                          }}
-                          style={{ 
-                            display: loadError[decor.id] ? 'none' : 'block',
-                            maxWidth: '100px', 
-                            maxHeight: '100px' 
-                          }}
+                          onLoad={() => handleImageLoad(decor.id)}
+                          style={{ display: loadError[decor.id] ? 'none' : 'block' }}
                           loading="lazy"
-                          crossOrigin="anonymous"
                         />
                         {loadError[decor.id] && (
                           <div className="flex flex-col items-center justify-center text-orange-400">
                             <Flower2 className="w-8 h-8 mb-2" />
                             <span className="text-xs">No image</span>
-                            <span className="text-xs break-all">
-                              {decor.image?.data ? 'Base64 data available' : 'No image data'}
-                            </span>
+                            <span className="text-xs text-red-500">Image not available</span>
                           </div>
                         )}
                         {isLocked && (
