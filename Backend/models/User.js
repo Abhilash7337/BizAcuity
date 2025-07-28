@@ -24,6 +24,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    uploadedImages: [{
+        type: String
+    }],
     userType: {
         type: String,
         enum: ['regular', 'admin'],

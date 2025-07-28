@@ -14,11 +14,12 @@ const uploadToS3 = async (file) => {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
     Body: file.buffer,
-    ContentType: file.mimetype
+    ContentType: file.mimetype,
+    ACL: 'public-read' // Make file publicly accessible
   };
 
   const data = await s3.upload(params).promise();
-  return data.Location; // S3 URL
+  return data.Location; // S3 public URL
 };
 
 module.exports = uploadToS3;
