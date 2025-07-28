@@ -14,8 +14,8 @@ const uploadToS3 = async (file) => {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileName,
     Body: file.buffer,
-    ContentType: file.mimetype,
-    ACL: 'public-read' // Make file publicly accessible
+    ContentType: file.mimetype
+    // Removed ACL: 'public-read' due to bucket policy
   };
 
   const data = await s3.upload(params).promise();
