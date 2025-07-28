@@ -16,8 +16,8 @@ const decorSchema = new mongoose.Schema({
     trim: true
   },
   image: {
-    data: { type: String, required: false }, // base64 string - made optional
-    contentType: { type: String, required: false } // made optional
+    data: { type: String, required: true }, // base64 string
+    contentType: { type: String, required: true }
   },
   isActive: {
     type: Boolean,
