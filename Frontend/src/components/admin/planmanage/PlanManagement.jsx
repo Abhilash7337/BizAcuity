@@ -168,13 +168,34 @@ const PlanManagement = () => {
       if (formData.customFeatures && Array.isArray(formData.customFeatures)) {
         featuresList.push(...formData.customFeatures.filter(f => f && f.trim() !== ''));
       }
+      // Clean categoryLimits: handle all valid inputs including empty strings
+      const cleanedCategoryLimits = {};
+      Object.entries(formData.categoryLimits || {}).forEach(([catId, value]) => {
+        if (typeof value === 'number' && !isNaN(value)) {
+          cleanedCategoryLimits[catId] = value;
+        } else if (value === '-1' || value === -1) {
+          cleanedCategoryLimits[catId] = -1;
+        } else if (value === '' || value === undefined || value === null) {
+          // For empty strings, undefined, or null, set to 0 (no decors allowed)
+          cleanedCategoryLimits[catId] = 0;
+        } else {
+          // Try to parse as number if it's a string that represents a number
+          const parsedValue = parseInt(value, 10);
+          if (!isNaN(parsedValue)) {
+            cleanedCategoryLimits[catId] = parsedValue;
+          } else {
+            // Default to 0 if parsing fails
+            cleanedCategoryLimits[catId] = 0;
+          }
+        }
+      });
       const submitData = {
         ...formData,
         features: featuresList,
         limits: formData.limits,
         exportDrafts: formData.exportDrafts,
         decors: formData.decors,
-        categoryLimits: formData.categoryLimits
+        categoryLimits: cleanedCategoryLimits
       };
       delete submitData.booleanFeatures;
       delete submitData.customFeatures;
