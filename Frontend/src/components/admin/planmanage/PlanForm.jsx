@@ -264,42 +264,8 @@ const PlanForm = ({
           )}
         </div>
         <div className="text-xs text-gray-500 mt-1">Specify how many items from each decor category are allowed for this plan. Set -1 for unlimited.</div>
-      {/* Decor Picker Section */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select Decors for this Plan</label>
-        <div className="border border-gray-200 rounded-lg p-3 max-h-64 overflow-y-auto bg-gray-50">
-          {Array.isArray(allDecors) && allDecors.length > 0 ? (
-            allDecors.map(decor => (
-              <div key={decor._id} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  checked={formData.decors && formData.decors.includes(decor._id)}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      setFormData(f => ({
-                        ...f,
-                        decors: [...(f.decors || []), decor._id]
-                      }));
-                    } else {
-                      setFormData(f => ({
-                        ...f,
-                        decors: (f.decors || []).filter(id => id !== decor._id)
-                      }));
-                    }
-                  }}
-                  className="mr-2 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                />
-                <span className="text-gray-800 font-medium mr-2">{decor.name}</span>
-                {decor.category && <span className="text-xs text-gray-500">({decor.category})</span>}
-              </div>
-            ))
-          ) : (
-            <div className="text-gray-500 text-sm">No decors found.</div>
-          )}
-        </div>
-        <div className="text-xs text-gray-500 mt-1">Check the decors to include in this plan. Leave unchecked to exclude.</div>
-      </div>
-      </div>
+      {/* End category limits section */}
+    </div>
       {/* Custom Features */}
       <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">Custom Features</label>
