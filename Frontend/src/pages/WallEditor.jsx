@@ -112,8 +112,37 @@ function WallEditor() {
         const userPlan = plans.find(p => p.name.toLowerCase() === profile.plan.toLowerCase());
         console.log('[WallEditor] userPlan:', userPlan);
         if (userPlan && Array.isArray(userPlan.decors)) {
-          console.log('[WallEditor] Setting allowed decors:', userPlan.decors);
-          setUserPlanAllowedDecors(userPlan.decors);
+          // Apply category limits
+          const allDecorsRes = await authFetch('/decors');
+          const allDecorsData = await allDecorsRes.json();
+          // Group decors by category
+          const decorsByCategory = {};
+          allDecorsData.forEach(decor => {
+            if (!decorsByCategory[decor.category]) decorsByCategory[decor.category] = [];
+            decorsByCategory[decor.category].push(decor);
+          });
+          // Build allowed decor IDs by category limit
+          let allowedDecorIds = [];
+          if (userPlan.categoryLimits) {
+            Object.entries(userPlan.categoryLimits).forEach(([catId, limit]) => {
+              // Find category name for this catId
+              const categoryObj = allDecorsData.find(d => d.categoryId === catId);
+              if (!categoryObj) return;
+              const categoryName = categoryObj.category;
+              const decorsInCat = decorsByCategory[categoryName] || [];
+              if (limit === -1) {
+                // Unlimited: add all decors in this category that are in plan.decors
+                allowedDecorIds.push(...decorsInCat.filter(d => userPlan.decors.includes(d._id)).map(d => d._id));
+              } else {
+                // Limited: add up to N decors in this category that are in plan.decors
+                allowedDecorIds.push(...decorsInCat.filter(d => userPlan.decors.includes(d._id)).slice(0, limit).map(d => d._id));
+              }
+            });
+          } else {
+            // No category limits: allow all decors in plan.decors
+            allowedDecorIds = userPlan.decors;
+          }
+          setUserPlanAllowedDecors(allowedDecorIds);
         } else {
           console.log('[WallEditor] No decors array in userPlan, setting null.');
           setUserPlanAllowedDecors(null);
