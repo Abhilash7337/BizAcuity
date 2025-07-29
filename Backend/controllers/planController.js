@@ -3,7 +3,7 @@ const Plan = require('../models/Plan');
 // Create a new subscription plan
 const createPlan = async (req, res) => {
   try {
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits, decors } = req.body;
 
     // Validate required fields
     if (!name || monthlyPrice === undefined) {
@@ -31,6 +31,7 @@ const createPlan = async (req, res) => {
         imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
       categoryLimits: categoryLimits || {},
+      decors: Array.isArray(decors) ? decors : [],
       isActive: isActive !== undefined ? isActive : true,
       exportDrafts: exportDrafts === true // default false if not provided
     });
@@ -140,7 +141,7 @@ const getPlanById = async (req, res) => {
 const updatePlan = async (req, res) => {
   try {
     const { planId } = req.params;
-    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits } = req.body;
+    const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits, decors } = req.body;
 
     const plan = await Plan.findById(planId);
     if (!plan) {
@@ -178,6 +179,9 @@ const updatePlan = async (req, res) => {
 
     if (categoryLimits !== undefined) {
       plan.categoryLimits = categoryLimits;
+    }
+    if (decors !== undefined) {
+      plan.decors = Array.isArray(decors) ? decors : [];
     }
     plan.updatedAt = new Date();
 
