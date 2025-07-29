@@ -35,7 +35,6 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
             ? `${process.env.VITE_API_BASE_URL || ''}${decor.imageUrl}`
             : 'https://via.placeholder.com/150?text=No+Image';
           // Debug log for each decor
-          console.log('Decor:', decor.name, 'src:', src, 'imageUrl:', decor.imageUrl);
           return {
             ...decor,
             id: decor._id,

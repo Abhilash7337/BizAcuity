@@ -21,7 +21,6 @@ const Login = () => {
       // Check if there's an intended destination without clearing it
       const intended = getIntendedDestination();
       if (intended) {
-        console.log('Already authenticated, redirecting to intended destination:', intended);
         clearIntendedDestination();
         navigate(intended, { replace: true });
       } else {
@@ -80,7 +79,6 @@ const Login = () => {
       setTimeout(() => {
         // Navigate to intended destination or default
         const redirectPath = getPostAuthRedirect();
-        console.log('Login successful, redirecting to:', redirectPath);
         navigate(redirectPath, { replace: true });
       }, 100);
     } catch (err) {

@@ -83,9 +83,6 @@ const DecorManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    console.log('🎯 Admin: Starting decor submit...');
-    console.log('🎯 Form data:', formData);
-    console.log('🎯 Image file:', formData.image);
     
     try {
       const submitData = new FormData();
@@ -95,9 +92,7 @@ const DecorManagement = () => {
       
       if (formData.image) {
         submitData.append('image', formData.image);
-        console.log('🎯 Image appended to FormData');
       } else {
-        console.log('❌ No image in form data!');
       }
 
       const url = editingDecor 
@@ -105,17 +100,14 @@ const DecorManagement = () => {
         : '/admin/decors';
       const method = editingDecor ? 'PUT' : 'POST';
       
-      console.log('🎯 Making request to:', url, 'with method:', method);
 
       const response = await authFetch(url, {
         method,
         body: submitData
       });
       
-      console.log('🎯 Response status:', response.status);
 
       const data = await response.json();
-      console.log('🎯 Response data:', data);
 
       if (response.ok) {
         if (editingDecor) {
@@ -355,7 +347,6 @@ const DecorManagement = () => {
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files[0];
-                      console.log('🎯 File selected:', file);
                       setFormData({ ...formData, image: file });
                     }}
                     className="w-full"

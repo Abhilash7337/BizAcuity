@@ -21,12 +21,10 @@ const ProtectedRoute = ({ children }) => {
   if (!isAuthenticated() || !registeredUser?.isLoggedIn) {
     // Store the current location as intended destination before redirecting
     const currentPath = location.pathname + location.search;
-    console.log('ProtectedRoute: Not authenticated, storing intended destination:', currentPath);
     setIntendedDestination(currentPath);
     return <Navigate to="/login" replace />;
   }
 
-  console.log('ProtectedRoute: User is authenticated, allowing access');
   return children;
 };
 

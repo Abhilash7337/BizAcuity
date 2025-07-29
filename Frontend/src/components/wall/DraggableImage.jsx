@@ -19,7 +19,7 @@ function DraggableImage({
 
   // Debug logging for image source
   useEffect(() => {
-    console.log(`🖼️ DraggableImage ${idx}: src="${src}", loading=${imageLoading}, error=${imageLoadError}`);
+    // Removed debug log
   }, [src, imageLoading, imageLoadError, idx]);
 
   const updateImageState = (updates) => {
@@ -126,25 +126,6 @@ function DraggableImage({
         bottomLeft: false,
       }}
       disableDragging={isViewOnly}
-      resizeHandleComponent={
-        isSelected && !isViewOnly
-          ? {
-              bottomRight: (
-                <div
-                  className="absolute bottom-[-8px] right-[-8px] w-4 h-4 bg-gradient-to-br from-primary to-primary-dark border-2 border-white rounded-full cursor-nw-resize z-20 shadow-md transition-all"
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.2)';
-                    e.target.style.boxShadow = '0 10px 15px -3px rgb(85 88 121 / 0.10), 0 4px 6px -4px rgb(85 88 121 / 0.10)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.boxShadow = '0 4px 6px -1px rgb(85 88 121 / 0.08), 0 2px 4px -2px rgb(85 88 121 / 0.08)';
-                  }}
-                />
-              ),
-            }
-          : undefined
-      }
       onDragStart={() => !isViewOnly && setSelectedIdx(idx)}
       onDragStop={(e, d) => {
         if (isViewOnly) return;
@@ -180,7 +161,6 @@ function DraggableImage({
         });
       }}
       style={{
-        border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
         background: 'transparent',
         zIndex: isSelected ? 100 : (imageState.zIndex || idx + 1),
         overflow: 'visible',
@@ -195,59 +175,94 @@ function DraggableImage({
         }
       }}
     >
-      {Object.keys(wrapperStyle).length > 0 ? (
-        <div style={wrapperStyle}>
-          <img
-            src={src}
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none',
-              objectFit: 'cover',
-              transform: `rotate(${imageState.rotation || 0}deg)`,
-              transition: 'transform 0.2s ease-in-out',
-            }}
-            draggable={false}
-          />
-        </div>
-      ) : (
-        <div className="relative">
-          {/* Use VITE_API_BASE_URL for uploads if not absolute URL */}
-          <img
-            src={src}
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'none',
-              objectFit: 'cover',
-              transform: `rotate(${imageState.rotation || 0}deg)`,
-              transition: 'transform 0.2s ease-in-out',
-              ...styleOverrides,
-            }}
-            draggable={false}
-            onLoad={() => {
-              console.log(`✅ Image ${idx} loaded successfully: ${src}`);
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
+          borderRadius: styleOverrides.borderRadius,
+          boxSizing: 'border-box',
+        }}
+      >
+        {Object.keys(wrapperStyle).length > 0 ? (
+          <div style={{ ...wrapperStyle, width: '100%', height: '100%' }}>
+            <img
+              src={src}
+              alt=""
+              style={{
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'none',
+                objectFit: 'cover',
+                transform: `rotate(${imageState.rotation || 0}deg)`,
+                transition: 'transform 0.2s ease-in-out',
+              }}
+              draggable={false}
+            />
+          </div>
+        ) : (
+          <div className="relative" style={{ width: '100%', height: '100%' }}>
+            <img
+              src={src}
+              alt=""
+              style={{
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'none',
+                objectFit: 'cover',
+                transform: `rotate(${imageState.rotation || 0}deg)`,
+                transition: 'transform 0.2s ease-in-out',
+                ...styleOverrides,
+              }}
+              draggable={false}
+              onLoad={() => {
               setImageLoading(false);
               setImageLoadError(false);
-            }}
-            onError={(e) => {
-              console.error(`❌ Image ${idx} failed to load: ${src}`, e);
+              }}
+              onError={(e) => {
               setImageLoading(false);
               setImageLoadError(true);
+              }}
+            />
+            {imageLoadError && (
+              <div className="absolute inset-0 bg-red-100 border-2 border-red-300 rounded flex items-center justify-center text-red-600 text-xs p-2">
+                <div className="text-center">
+                  <div>❌ Failed to load</div>
+                  <div className="mt-1 break-all">{src}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* Resize handle flush with border */}
+        {isSelected && !isViewOnly && (
+          <div
+            className="absolute"
+            style={{
+              bottom: '-10px',
+              right: '-10px',
+              width: '20px',
+              height: '20px',
+              background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+              border: '2px solid #fff',
+              borderRadius: '50%',
+              cursor: 'nwse-resize',
+              zIndex: 20,
+              boxShadow: '0 10px 15px -3px rgb(85 88 121 / 0.10), 0 4px 6px -4px rgb(85 88 121 / 0.10)',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.target.style.transform = 'scale(1.2)';
+              e.target.style.boxShadow = '0 10px 15px -3px rgb(85 88 121 / 0.20), 0 4px 6px -4px rgb(85 88 121 / 0.20)';
+            }}
+            onMouseLeave={e => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 10px 15px -3px rgb(85 88 121 / 0.10), 0 4px 6px -4px rgb(85 88 121 / 0.10)';
             }}
           />
-          {imageLoadError && (
-            <div className="absolute inset-0 bg-red-100 border-2 border-red-300 rounded flex items-center justify-center text-red-600 text-xs p-2">
-              <div className="text-center">
-                <div>❌ Failed to load</div>
-                <div className="mt-1 break-all">{src}</div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </Rnd>
   );
 }

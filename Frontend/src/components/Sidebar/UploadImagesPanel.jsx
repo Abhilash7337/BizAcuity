@@ -57,7 +57,6 @@ const UploadImagesPanel = ({
             accept="image/*"
             multiple
             onChange={(e) => {
-              console.log('📁 Direct images file input triggered');
               if (e.target.files?.length > 0 && imagesInputRef?.current) {
                 // Copy files to the hidden input to maintain existing workflow
                 const dt = new DataTransfer();
@@ -67,7 +66,6 @@ const UploadImagesPanel = ({
                 // Trigger the existing change handler
                 const changeEvent = new Event('change', { bubbles: true });
                 imagesInputRef.current.dispatchEvent(changeEvent);
-                console.log('� Files forwarded to main handler');
               }
             }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -153,13 +151,9 @@ const UploadImagesPanel = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Add More button clicked');
-                console.log('imagesInputRef.current:', imagesInputRef.current);
                 if (imagesInputRef && imagesInputRef.current) {
-                  console.log('Triggering file input click');
                   imagesInputRef.current.click();
                 } else {
-                  console.error('imagesInputRef is null or undefined');
                 }
               }}
             >
@@ -185,4 +179,4 @@ const UploadImagesPanel = ({
   </div>
 );
 
-export default UploadImagesPanel; 
+export default UploadImagesPanel;
