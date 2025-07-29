@@ -124,18 +124,38 @@ function WallEditor() {
           // Build allowed decor IDs by category limit
           let allowedDecorIds = [];
           if (userPlan.categoryLimits) {
+            // First, get all categories from the backend
+            const categoriesRes = await authFetch('/categories');
+            const categoriesData = await categoriesRes.json();
+
             Object.entries(userPlan.categoryLimits).forEach(([catId, limit]) => {
               // Find category name for this catId
-              const categoryObj = allDecorsData.find(d => d.categoryId === catId);
-              if (!categoryObj) return;
-              const categoryName = categoryObj.category;
+              // Find category name for this catId from categories API
+              const categoryObj = categoriesData.find(c => c._id === catId);
+              if (!categoryObj) {
+                console.log(`[WallEditor] Category not found for ID: ${catId}`);
+                return;
+              }
+
+              const categoryName = categoryObj.name;
+              console.log(`[WallEditor] Processing category: ${categoryName} with limit: ${limit}`);
+
               const decorsInCat = decorsByCategory[categoryName] || [];
+              console.log(`[WallEditor] Found ${decorsInCat.length} decors in category ${categoryName}`);
+
               if (limit === -1) {
                 // Unlimited: add all decors in this category that are in plan.decors
-                allowedDecorIds.push(...decorsInCat.filter(d => userPlan.decors.includes(d._id)).map(d => d._id));
-              } else {
+                const decorIdsToAdd = decorsInCat.filter(d => userPlan.decors.includes(d._id)).map(d => d._id);
+                console.log(`[WallEditor] Adding ${decorIdsToAdd.length} unlimited decors from ${categoryName}`);
+                allowedDecorIds.push(...decorIdsToAdd);
+              } else if (limit > 0) {
                 // Limited: add up to N decors in this category that are in plan.decors
-                allowedDecorIds.push(...decorsInCat.filter(d => userPlan.decors.includes(d._id)).slice(0, limit).map(d => d._id));
+                const decorIdsToAdd = decorsInCat.filter(d => userPlan.decors.includes(d._id)).slice(0, limit).map(d => d._id);
+                console.log(`[WallEditor] Adding ${decorIdsToAdd.length} limited decors from ${categoryName}`);
+                allowedDecorIds.push(...decorIdsToAdd);
+              } else {
+                // If limit is 0 or negative (except -1), don't add any decors from this category
+                console.log(`[WallEditor] Skipping category ${categoryName} with limit ${limit}`);
               }
             });
           } else {
@@ -210,11 +230,13 @@ function WallEditor() {
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 100);
-    
+
+
     const initTimer = setTimeout(() => {
       setIsInitialized(true);
     }, 800);
-    
+
+
     return () => {
       clearTimeout(timer);
       clearTimeout(initTimer);
@@ -238,7 +260,8 @@ function WallEditor() {
       if (Math.random() < 0.1) {
         console.log('Wall data updated locally (backend endpoint not implemented yet)');
       }
-      
+
+
 
     }
   }, [wallColor, wallWidth, wallHeight, wallImage, images, imageStates, registeredUser]);
@@ -284,7 +307,8 @@ function WallEditor() {
     const sharedParam = searchParams.get('shared');
     const collaborateParam = searchParams.get('collaborate');
     const permissionParam = searchParams.get('permission');
-    
+
+
     setIsSharedView(sharedParam === 'true');
     setIsCollaborating(collaborateParam === 'true');
     setLinkPermission(permissionParam || 'edit');
