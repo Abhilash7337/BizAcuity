@@ -104,10 +104,6 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
   };
 
   const handleRemovePhoto = () => {
-    console.log('🗑️ Remove photo clicked', { 
-      hasCurrentPhoto: !!user?.profilePhoto,
-      hasPreview: !!photoPreview 
-    });
     setProfilePhoto(null);
     setPhotoPreview(null);
     setProfilePhotoBase64(null);
@@ -134,17 +130,10 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
       // Handle profile photo: include it if there's a new photo OR if we're removing it
       if (profilePhotoBase64) {
         submitData.profilePhoto = profilePhotoBase64;
-        console.log('📸 Updating profile photo with new image');
       } else if (photoRemoved && user?.profilePhoto) {
         // Explicitly remove the profile photo if user had one and we're clearing it
         submitData.profilePhoto = null;
-        console.log('🗑️ Removing profile photo');
       }
-
-      console.log('📝 Profile update data:', {
-        ...submitData,
-        profilePhoto: submitData.profilePhoto ? '[Base64 Image Data]' : submitData.profilePhoto
-      });
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
         method: 'PUT',

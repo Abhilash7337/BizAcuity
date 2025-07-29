@@ -178,7 +178,6 @@ const PlanManagement = () => {
       delete submitData.booleanFeatures;
       delete submitData.customFeatures;
       // Debug log: confirm outgoing payload
-      console.log('[PlanManagement] Submitting plan payload:', submitData);
       const url = editingPlan 
         ? `${import.meta.env.VITE_API_BASE_URL}/admin/plans/${editingPlan._id}`
         : `${import.meta.env.VITE_API_BASE_URL}/admin/plans`;
@@ -313,6 +312,7 @@ const PlanManagement = () => {
           editingPlan={editingPlan}
           resetForm={resetForm}
           setShowForm={setShowForm}
+          allDecors={allDecors}
         />
       )}
       <PlanList plans={plans} handleEdit={handleEdit} handleDelete={handleDelete} />

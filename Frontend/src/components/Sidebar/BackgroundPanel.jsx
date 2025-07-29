@@ -23,7 +23,6 @@ const BackgroundPanel = ({ wallImageInputRef, wallImage, handleRemoveWallImage, 
           type="file"
           accept="image/*"
           onChange={(e) => {
-            console.log('� Direct background file input triggered');
             if (e.target.files?.[0] && wallImageInputRef?.current) {
               // Copy files to the hidden input to maintain existing workflow
               const dt = new DataTransfer();
@@ -33,7 +32,6 @@ const BackgroundPanel = ({ wallImageInputRef, wallImage, handleRemoveWallImage, 
               // Trigger the existing change handler
               const changeEvent = new Event('change', { bubbles: true });
               wallImageInputRef.current.dispatchEvent(changeEvent);
-              console.log('� File forwarded to main handler');
             }
           }}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"

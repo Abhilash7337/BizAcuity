@@ -22,7 +22,6 @@ const Register = () => {
       // Check if there's an intended destination without clearing it
       const intended = getIntendedDestination();
       if (intended) {
-        console.log('Already authenticated, redirecting to intended destination:', intended);
         clearIntendedDestination();
         navigate(intended, { replace: true });
       } else {
