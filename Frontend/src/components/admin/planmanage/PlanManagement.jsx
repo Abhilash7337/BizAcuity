@@ -173,11 +173,13 @@ const PlanManagement = () => {
         features: featuresList,
         limits: formData.limits,
         exportDrafts: formData.exportDrafts,
-        decors: formData.decors
+        decors: formData.decors,
+        categoryLimits: formData.categoryLimits
       };
       delete submitData.booleanFeatures;
       delete submitData.customFeatures;
       // Debug log: confirm outgoing payload
+      console.log('Submitting plan data:', submitData);
       const url = editingPlan 
         ? `${import.meta.env.VITE_API_BASE_URL}/admin/plans/${editingPlan._id}`
         : `${import.meta.env.VITE_API_BASE_URL}/admin/plans`;
