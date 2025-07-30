@@ -67,34 +67,25 @@ const updateDecor = (req, res) => {
     try {
       const { id } = req.params;
       const { name, category, description, isActive } = req.body;
-      
       const updateData = { name, category, description, isActive };
-      
+
       if (req.file) {
-        // Convert new image to base64 and update
-        const imageBuffer = req.file.buffer;
-        const base64Image = imageBuffer.toString('base64');
-        updateData.image = {
-          data: base64Image,
-          contentType: req.file.mimetype
-        };
-      } else {
-        // If no new image, preserve the existing image data
+        // Use static file path for imageUrl
+        updateData.imageUrl = `/uploads/decors/${req.file.filename}`;
+      }
+      // Remove legacy base64 image handling
+      // If no new image, preserve the existing imageUrl
+      if (!req.file) {
         const existingDecor = await Decor.findById(id);
-        if (existingDecor && existingDecor.image) {
-          updateData.image = {
-            data: existingDecor.image.data,
-            contentType: existingDecor.image.contentType
-          };
+        if (existingDecor && existingDecor.imageUrl) {
+          updateData.imageUrl = existingDecor.imageUrl;
         }
       }
 
       const decor = await Decor.findByIdAndUpdate(id, updateData, { new: true });
-      
       if (!decor) {
         return res.status(404).json({ error: 'Decor not found' });
       }
-
       res.json(decor);
     } catch (error) {
       console.error('Error updating decor:', error);

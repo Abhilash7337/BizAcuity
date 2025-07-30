@@ -116,14 +116,7 @@ function DraggableImage({
       maxWidth={wallWidth}
       maxHeight={wallHeight}
       enableResizing={!isViewOnly && {
-        bottomRight: true,
-        bottom: false,
-        right: false,
-        top: false,
-        left: false,
-        topLeft: false,
-        topRight: false,
-        bottomLeft: false,
+        bottomRight: true
       }}
       disableDragging={isViewOnly}
       onDragStart={() => !isViewOnly && setSelectedIdx(idx)}
@@ -138,21 +131,22 @@ function DraggableImage({
         if (y + imageState.height > wallHeight) y = wallHeight - imageState.height;
         updateImageState({ x, y });
       }}
-      onResizeStart={() => !isViewOnly && setSelectedIdx(idx)}
+      onResizeStart={(e, dir) => {
+        if (!isViewOnly && dir === 'bottomRight') setSelectedIdx(idx);
+      }}
       onResizeStop={(e, direction, ref, delta, position) => {
-        if (isViewOnly) return;
+        if (isViewOnly || direction !== 'bottomRight') return;
         let width = parseInt(ref.style.width, 10);
         let height = parseInt(ref.style.height, 10);
-        let x = position.x;
-        let y = position.y;
+        // Keep the original position fixed - don't update x, y from position
+        let x = imageState.x;
+        let y = imageState.y;
         // Clamp width/height so image stays within wall
         if (width > wallWidth) width = wallWidth;
         if (height > wallHeight) height = wallHeight;
-        // If resizing causes overflow, adjust position so image is flush with wall edge
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-        if (x + width > wallWidth) x = wallWidth - width;
-        if (y + height > wallHeight) y = wallHeight - height;
+        // If resizing causes overflow beyond wall boundaries, clamp the size
+        if (x + width > wallWidth) width = wallWidth - x;
+        if (y + height > wallHeight) height = wallHeight - y;
         updateImageState({
           width,
           height,
@@ -166,6 +160,10 @@ function DraggableImage({
         overflow: 'visible',
         cursor: isViewOnly ? 'default' : 'move',
         position: 'absolute',
+        // Move selection border to Rnd level to avoid blocking resize handle
+        border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
+        borderRadius: styleOverrides.borderRadius,
+        boxSizing: 'border-box',
         ...styleOverrides,
       }}
       onClick={(e) => {
@@ -180,13 +178,22 @@ function DraggableImage({
           position: 'relative',
           width: '100%',
           height: '100%',
-          border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
+          // Remove border from inner div as it's now on Rnd
+          // border: isSelected && !isViewOnly ? '2px dotted #1976d2' : 'none',
           borderRadius: styleOverrides.borderRadius,
           boxSizing: 'border-box',
+          // Allow pointer events to pass through to resize handle
+          pointerEvents: 'none',
         }}
       >
         {Object.keys(wrapperStyle).length > 0 ? (
-          <div style={{ ...wrapperStyle, width: '100%', height: '100%' }}>
+          <div style={{ 
+            ...wrapperStyle, 
+            width: '100%', 
+            height: '100%',
+            // Ensure pointer events work for frame wrapper
+            pointerEvents: 'auto'
+          }}>
             <img
               src={src}
               alt=""
@@ -202,7 +209,12 @@ function DraggableImage({
             />
           </div>
         ) : (
-          <div className="relative" style={{ width: '100%', height: '100%' }}>
+          <div className="relative" style={{ 
+            width: '100%', 
+            height: '100%',
+            // Enable pointer events for this container
+            pointerEvents: 'auto'
+          }}>
             <img
               src={src}
               alt=""
@@ -234,33 +246,6 @@ function DraggableImage({
               </div>
             )}
           </div>
-        )}
-        {/* Resize handle flush with border */}
-        {isSelected && !isViewOnly && (
-          <div
-            className="absolute"
-            style={{
-              bottom: '-10px',
-              right: '-10px',
-              width: '20px',
-              height: '20px',
-              background: 'linear-gradient(135deg, #1976d2, #1565c0)',
-              border: '2px solid #fff',
-              borderRadius: '50%',
-              cursor: 'nwse-resize',
-              zIndex: 20,
-              boxShadow: '0 10px 15px -3px rgb(85 88 121 / 0.10), 0 4px 6px -4px rgb(85 88 121 / 0.10)',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => {
-              e.target.style.transform = 'scale(1.2)';
-              e.target.style.boxShadow = '0 10px 15px -3px rgb(85 88 121 / 0.20), 0 4px 6px -4px rgb(85 88 121 / 0.20)';
-            }}
-            onMouseLeave={e => {
-              e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = '0 10px 15px -3px rgb(85 88 121 / 0.10), 0 4px 6px -4px rgb(85 88 121 / 0.10)';
-            }}
-          />
         )}
       </div>
     </Rnd>

@@ -87,92 +87,68 @@ function WallEditor() {
   // (registeredUser is already declared above)
 
   // Fetch allowed decors for user's plan (must come after registeredUser is defined)
+  // Always recalculate allowed decors after plan change or user login
   useEffect(() => {
+    let isMounted = true;
     async function fetchAllowedDecors() {
-      if (!registeredUser?.isLoggedIn) {
-        console.log('[WallEditor] Not logged in, skipping allowed decors fetch.');
-        return;
-      }
+      if (!registeredUser?.isLoggedIn) return;
       try {
         const profileRes = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`);
-        if (!profileRes.ok) {
-          console.log('[WallEditor] /user/profile not ok:', profileRes.status);
-          return;
-        }
+        if (!profileRes.ok) return;
         const profile = await profileRes.json();
-        console.log('[WallEditor] profile:', profile);
-        if (!profile.plan) {
-          console.log('[WallEditor] No plan in profile.');
-          return;
-        }
+        if (!profile.plan) return;
         const plansRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/plans`);
         const plansData = await plansRes.json();
         let plans = plansData.plans || plansData;
-        console.log('[WallEditor] plans:', plans);
         const userPlan = plans.find(p => p.name.toLowerCase() === profile.plan.toLowerCase());
-        console.log('[WallEditor] userPlan:', userPlan);
-        if (userPlan && Array.isArray(userPlan.decors)) {
-          // Apply category limits
+        if (userPlan) {
           const allDecorsRes = await authFetch('/decors');
           const allDecorsData = await allDecorsRes.json();
-          // Group decors by category
-          const decorsByCategory = {};
+          const decorsByCategoryId = {};
           allDecorsData.forEach(decor => {
-            if (!decorsByCategory[decor.category]) decorsByCategory[decor.category] = [];
-            decorsByCategory[decor.category].push(decor);
+            // Always use categoryId (ObjectId) for mapping
+            if (!decorsByCategoryId[decor.categoryId]) decorsByCategoryId[decor.categoryId] = [];
+            decorsByCategoryId[decor.categoryId].push(decor);
           });
-          // Build allowed decor IDs by category limit
           let allowedDecorIds = [];
-          if (userPlan.categoryLimits) {
-            // First, get all categories from the backend
+          const planDecors = Array.isArray(userPlan.decors) ? userPlan.decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : [];
+          if (userPlan.categoryLimits && Object.keys(userPlan.categoryLimits).length > 0) {
             const categoriesRes = await authFetch('/categories');
             const categoriesData = await categoriesRes.json();
-
             Object.entries(userPlan.categoryLimits).forEach(([catId, limit]) => {
-              // Find category name for this catId
-              // Find category name for this catId from categories API
-              const categoryObj = categoriesData.find(c => c._id === catId);
-              if (!categoryObj) {
-                console.log(`[WallEditor] Category not found for ID: ${catId}`);
-                return;
-              }
-
-              const categoryName = categoryObj.name;
-              console.log(`[WallEditor] Processing category: ${categoryName} with limit: ${limit}`);
-
-              const decorsInCat = decorsByCategory[categoryName] || [];
-              console.log(`[WallEditor] Found ${decorsInCat.length} decors in category ${categoryName}`);
-
+              const decorsInCat = decorsByCategoryId[catId] || [];
+              const decorIdsInCat = decorsInCat.map(d => d._id);
               if (limit === -1) {
-                // Unlimited: add all decors in this category that are in plan.decors
-                const decorIdsToAdd = decorsInCat.filter(d => userPlan.decors.includes(d._id)).map(d => d._id);
-                console.log(`[WallEditor] Adding ${decorIdsToAdd.length} unlimited decors from ${categoryName}`);
+                const decorIdsToAdd = planDecors.length > 0 
+                  ? decorsInCat.filter(d => planDecors.includes(d._id)).map(d => d._id)
+                  : decorIdsInCat;
                 allowedDecorIds.push(...decorIdsToAdd);
               } else if (limit > 0) {
-                // Limited: add up to N decors in this category that are in plan.decors
-                const decorIdsToAdd = decorsInCat.filter(d => userPlan.decors.includes(d._id)).slice(0, limit).map(d => d._id);
-                console.log(`[WallEditor] Adding ${decorIdsToAdd.length} limited decors from ${categoryName}`);
+                const decorIdsToAdd = planDecors.length > 0
+                  ? decorsInCat.filter(d => planDecors.includes(d._id)).slice(0, limit).map(d => d._id)
+                  : decorIdsInCat.slice(0, limit);
                 allowedDecorIds.push(...decorIdsToAdd);
-              } else {
-                // If limit is 0 or negative (except -1), don't add any decors from this category
-                console.log(`[WallEditor] Skipping category ${categoryName} with limit ${limit}`);
               }
+              // If limit is 0 or negative (except -1), don't add any decors from this category
             });
           } else {
-            // No category limits: allow all decors in plan.decors
-            allowedDecorIds = userPlan.decors;
+            allowedDecorIds = planDecors.length > 0 ? planDecors : allDecorsData.map(d => d._id);
           }
-          setUserPlanAllowedDecors(allowedDecorIds);
+          if (isMounted) setUserPlanAllowedDecors(allowedDecorIds);
         } else {
-          console.log('[WallEditor] No decors array in userPlan, setting null.');
-          setUserPlanAllowedDecors(null);
+          if (isMounted) setUserPlanAllowedDecors(null);
         }
       } catch (e) {
-        console.log('[WallEditor] Error fetching allowed decors:', e);
-        setUserPlanAllowedDecors(null);
+        if (isMounted) setUserPlanAllowedDecors(null);
       }
     }
     fetchAllowedDecors();
+    // Listen for admin plan changes and force refresh
+    window.addEventListener('refreshDecors', fetchAllowedDecors);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('refreshDecors', fetchAllowedDecors);
+    };
   }, [registeredUser]);
 
   // Export permission
@@ -231,11 +207,9 @@ function WallEditor() {
       setIsVisible(true);
     }, 100);
 
-
     const initTimer = setTimeout(() => {
       setIsInitialized(true);
     }, 800);
-
 
     return () => {
       clearTimeout(timer);
@@ -260,9 +234,6 @@ function WallEditor() {
       if (Math.random() < 0.1) {
         console.log('Wall data updated locally (backend endpoint not implemented yet)');
       }
-
-
-
     }
   }, [wallColor, wallWidth, wallHeight, wallImage, images, imageStates, registeredUser]);
 
@@ -307,7 +278,6 @@ function WallEditor() {
     const sharedParam = searchParams.get('shared');
     const collaborateParam = searchParams.get('collaborate');
     const permissionParam = searchParams.get('permission');
-
 
     setIsSharedView(sharedParam === 'true');
     setIsCollaborating(collaborateParam === 'true');
@@ -538,7 +508,7 @@ function WallEditor() {
 
         {/* Responsive Full-Screen Layout */}
         <main
-          className={`full-width-layout relative z-10 transition-all duration-1000 flex flex-col-reverse lg:flex-row ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} gap-4 lg:gap-0 px-2 sm:px-4 md:px-8`}
+          className={`full-width-layout relative z-10 transition-all duration-1000 flex flex-col-reverse lg:flex-row ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} gap-4 lg:gap-0 px-2 sm:px-4 md:px-8 pt-16 sm:pt-20`}
         >
           {/* Sidebar: stacks on top on mobile, left on desktop */}
           <div

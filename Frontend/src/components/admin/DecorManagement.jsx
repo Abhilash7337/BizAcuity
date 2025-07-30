@@ -156,7 +156,7 @@ const DecorManagement = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      category: 'clocks',
+      category: categories[0]?.name || '', // Use first available category, not hardcoded
       description: '',
       image: null
     });

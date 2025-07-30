@@ -93,15 +93,16 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
+  // When filtering allowed decors, always use _id
   const handleDecorClick = (decor) => {
-    if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id)) {
+    if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor._id)) {
       setUpgradeMsg('This decor is not available in your current plan. Upgrade to access more decors.');
       setTimeout(() => setUpgradeMsg(''), 2500);
       return;
     }
     if (onAddDecor) {
       onAddDecor({
-        id: decor.id,
+        id: decor._id,
         name: decor.name,
         src: decor.src,
         size: decor.size
@@ -212,10 +213,10 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
               </h4>
               <div className="grid grid-cols-2 gap-3">
                 {category.items.map((decor) => {
-                  const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor.id);
+                  const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor._id);
                   return (
                     <div
-                      key={decor.id}
+                      key={decor._id}
                       onClick={() => handleDecorClick(decor)}
                       className={`relative group cursor-pointer bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden ${isLocked ? 'opacity-85 pointer-events-auto' : ''}`}
                     >

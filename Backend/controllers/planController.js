@@ -20,6 +20,19 @@ const createPlan = async (req, res) => {
       });
     }
 
+    // Ensure categoryLimits keys are ObjectId strings, not names or 'id'
+    let cleanedCategoryLimits = {};
+    if (categoryLimits && typeof categoryLimits === 'object') {
+      Object.entries(categoryLimits).forEach(([key, value]) => {
+        // Only accept keys that look like MongoDB ObjectId (24 hex chars)
+        if (/^[a-fA-F0-9]{24}$/.test(key)) {
+          cleanedCategoryLimits[key] = typeof value === 'number' ? value : parseInt(value, 10) || 0;
+        }
+      });
+    }
+    // Ensure decors are ObjectId strings
+    let cleanedDecors = Array.isArray(decors) ? decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : [];
+
     const newPlan = new Plan({
       name: name.trim(),
       monthlyPrice: parseFloat(monthlyPrice),
@@ -30,8 +43,8 @@ const createPlan = async (req, res) => {
         designsPerMonth: limits?.designsPerMonth ?? -1,
         imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
-      categoryLimits: categoryLimits || {},
-      decors: Array.isArray(decors) ? decors : [],
+      categoryLimits: cleanedCategoryLimits,
+      decors: cleanedDecors,
       isActive: isActive !== undefined ? isActive : true,
       exportDrafts: exportDrafts === true // default false if not provided
     });
@@ -142,7 +155,6 @@ const updatePlan = async (req, res) => {
   try {
     const { planId } = req.params;
     const { name, monthlyPrice, yearlyPrice, description, features, limits, isActive, exportDrafts, categoryLimits, decors } = req.body;
-
     const plan = await Plan.findById(planId);
     if (!plan) {
       return res.status(404).json({ error: 'Subscription plan not found' });
@@ -178,10 +190,20 @@ const updatePlan = async (req, res) => {
     }
 
     if (categoryLimits !== undefined) {
-      plan.categoryLimits = categoryLimits;
+      // Ensure categoryLimits keys are ObjectId strings
+      let cleanedCategoryLimits = {};
+      if (categoryLimits && typeof categoryLimits === 'object') {
+        Object.entries(categoryLimits).forEach(([key, value]) => {
+          if (/^[a-fA-F0-9]{24}$/.test(key)) {
+            cleanedCategoryLimits[key] = typeof value === 'number' ? value : parseInt(value, 10) || 0;
+          }
+        });
+      }
+      plan.categoryLimits = cleanedCategoryLimits;
     }
     if (decors !== undefined) {
-      plan.decors = Array.isArray(decors) ? decors : [];
+      // Ensure decors are ObjectId strings
+      plan.decors = Array.isArray(decors) ? decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : [];
     }
     plan.updatedAt = new Date();
 

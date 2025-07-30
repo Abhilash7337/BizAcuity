@@ -203,23 +203,21 @@ useEffect(() => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400">
         <Header />
-        
-        <div className="flex pt-20">
-          <div className="w-96 bg-white shadow-xl border-r border-orange-300 min-h-screen">
-            <div className="p-8">
-              <div className="h-40 bg-orange-200/50 rounded-2xl animate-pulse mb-8"></div>
+        <div className="flex flex-col md:flex-row pt-8 md:pt-20">
+          <div className="w-full md:w-96 bg-white shadow-xl border-r border-orange-300 min-h-[200px] md:min-h-screen">
+            <div className="p-4 md:p-8">
+              <div className="h-24 md:h-40 bg-orange-200/50 rounded-2xl animate-pulse mb-4 md:mb-8"></div>
               <div className="text-center">
-                <div className="w-24 h-24 bg-orange-200/50 rounded-full mx-auto mb-6 animate-pulse"></div>
-                <div className="h-5 bg-orange-200/50 rounded-xl w-3/4 mx-auto mb-3 animate-pulse"></div>
-                <div className="h-4 bg-orange-200/50 rounded-xl w-1/2 mx-auto animate-pulse"></div>
+                <div className="w-16 md:w-24 h-16 md:h-24 bg-orange-200/50 rounded-full mx-auto mb-4 md:mb-6 animate-pulse"></div>
+                <div className="h-4 md:h-5 bg-orange-200/50 rounded-xl w-2/3 md:w-3/4 mx-auto mb-2 md:mb-3 animate-pulse"></div>
+                <div className="h-3 md:h-4 bg-orange-200/50 rounded-xl w-1/2 mx-auto animate-pulse"></div>
               </div>
             </div>
           </div>
-          
-          <div className="flex-1 p-8">
-            <div className="text-center py-20">
-              <div className="animate-spin rounded-full h-20 w-20 border-4 border-orange-300 border-t-orange-700 mx-auto"></div>
-              <div className="mt-6 text-orange-800 font-bold text-2xl">Loading admin panel...</div>
+          <div className="flex-1 p-4 md:p-8">
+            <div className="text-center py-10 md:py-20">
+              <div className="animate-spin rounded-full h-12 md:h-20 w-12 md:w-20 border-4 border-orange-300 border-t-orange-700 mx-auto"></div>
+              <div className="mt-4 md:mt-6 text-orange-800 font-bold text-lg md:text-2xl">Loading admin panel...</div>
             </div>
           </div>
         </div>
@@ -230,89 +228,85 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400">
       <Header />
-      <div className="flex pt-20 relative">
+      <div className="flex flex-col md:flex-row pt-4 md:pt-20 relative">
         {/* Left Sidebar */}
-        <div className="w-96 bg-white shadow-xl border-r border-orange-300 min-h-screen relative">
-          <div className="p-8">
+        <div className="w-full md:w-96 bg-white shadow-xl border-r border-orange-300 min-h-[200px] md:min-h-screen relative">
+          <div className="p-4 md:p-8">
             {/* Admin Banner */}
-            <div className="h-40 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-8 flex items-center justify-center">
+            <div className="h-24 md:h-40 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-4 md:mb-8 flex items-center justify-center">
               <div className="text-center text-white">
-                <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 md:w-12 h-8 md:h-12 mx-auto mb-1 md:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
-                <h2 className="text-xl font-bold">Admin Panel</h2>
-                <p className="text-orange-100 text-sm">System Management</p>
+                <h2 className="text-base md:text-xl font-bold">Admin Panel</h2>
+                <p className="text-orange-100 text-xs md:text-sm">System Management</p>
               </div>
             </div>
 
             {/* Admin Profile */}
-            <div className="text-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">
+            <div className="text-center mb-4 md:mb-8">
+              <div className="w-16 md:w-24 h-16 md:h-24 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full mx-auto mb-2 md:mb-4 flex items-center justify-center">
+                <span className="text-white text-lg md:text-2xl font-bold">
                   {registeredUser?.name?.charAt(0).toUpperCase() || 'A'}
                 </span>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-base md:text-xl font-bold text-gray-800 mb-1 md:mb-2">
                 {registeredUser?.name || 'Admin'}
               </h3>
-              <p className="text-orange-600 font-medium text-sm">Administrator</p>
+              <p className="text-orange-600 font-medium text-xs md:text-sm">Administrator</p>
               <p className="text-gray-500 text-xs">{registeredUser?.email}</p>
             </div>
 
             {/* Navigation */}
             <div className="space-y-2">
-            {/* Removed sidebar Send Email button */}
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
                   activeTab === 'dashboard'
                     ? 'bg-orange-100 text-orange-700 shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 <span className="font-medium">Dashboard</span>
               </button>
-
               <button
                 onClick={() => setActiveTab('plans')}
-                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
                   activeTab === 'plans'
                     ? 'bg-orange-100 text-orange-700 shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 <span className="font-medium">Plan Management</span>
               </button>
-
               <button
                 onClick={() => setActiveTab('decors')}
-                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
                   activeTab === 'decors'
                     ? 'bg-orange-100 text-orange-700 shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
                 <span className="font-medium">Decor Management</span>
               </button>
-
               <button
                 onClick={() => setActiveTab('upgradeRequests')}
-                className={`w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
                   activeTab === 'upgradeRequests'
                     ? 'bg-orange-100 text-orange-700 shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span className="font-medium">Plan Upgrade Requests</span>
@@ -322,7 +316,7 @@ useEffect(() => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           {/* Email Modal */}
           {showEmailModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
