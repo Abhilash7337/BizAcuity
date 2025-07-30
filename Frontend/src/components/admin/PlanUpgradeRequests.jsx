@@ -84,39 +84,39 @@ const PlanUpgradeRequests = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Plan Upgrade Requests</h2>
+    <div className="bg-white rounded-lg border border-gray-200 p-2 sm:p-6 shadow-sm max-w-full">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Plan Upgrade Requests</h2>
       {loading ? (
-        <div className="text-center py-8 text-orange-600">Loading...</div>
+        <div className="text-center py-8 text-orange-600 text-sm sm:text-base">Loading...</div>
       ) : error ? (
-        <div className="text-center py-8 text-red-600">{error}</div>
+        <div className="text-center py-8 text-red-600 text-sm sm:text-base">{error}</div>
       ) : latestRequests.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No plan upgrade requests found.</div>
+        <div className="text-center py-8 text-gray-500 text-sm sm:text-base">No plan upgrade requests found.</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 text-xs sm:text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested At</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delete</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Current Plan</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Requested Plan</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Requested At</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                <th className="px-2 sm:px-6 py-2 sm:py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Delete</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {latestRequests.map((req) => (
                 <tr key={req._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-900">
                     {req.user?.name || req.user?.email || req.user?._id || 'Deleted User'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-gray-600">
                     {req.user?.plan || (req.user ? '-' : 'N/A')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-700 font-semibold">{req.requestedPlan}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-orange-700 font-semibold">{req.requestedPlan}</td>
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${STATUS_COLORS[req.status]}`}>{req.status}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(req.createdAt).toLocaleString()}</td>

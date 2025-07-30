@@ -247,6 +247,17 @@ const PlanForm = ({
                   />
                   <button
                     type="button"
+                    className="ml-2 px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium border border-gray-200"
+                    onClick={() => setFormData(f => {
+                      const updated = { ...f.categoryLimits };
+                      delete updated[category._id];
+                      return { ...f, categoryLimits: updated };
+                    })}
+                  >
+                    Remove Limit
+                  </button>
+                  <button
+                    type="button"
                     className="ml-2 px-2 py-1 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded text-xs font-medium border border-orange-200"
                     onClick={() => setFormData(f => ({
                       ...f,
@@ -257,6 +268,9 @@ const PlanForm = ({
                   </button>
                   {val === '-1' && (
                     <span className="text-xs text-green-600 ml-2">Unlimited</span>
+                  )}
+                  {val === '' && (
+                    <span className="text-xs text-red-600 ml-2">No decors allowed</span>
                   )}
                 </div>
               );

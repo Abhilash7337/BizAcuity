@@ -52,18 +52,20 @@ const PlanManagement = () => {
     const customFeatures = (plan.features || []).filter(f => !predefinedFeatures.includes(f));
     let categoryLimits = {};
     if (plan.categoryLimits && typeof plan.categoryLimits === 'object' && Object.keys(plan.categoryLimits).length > 0) {
-      categoryLimits = { ...plan.categoryLimits };
+      categoryLimits = {};
+      Object.entries(plan.categoryLimits).forEach(([catId, value]) => {
+        categoryLimits[catId] = value === null || value === undefined ? '' : String(value);
+      });
     } else if (plan.decors && Array.isArray(plan.decors)) {
       if (Array.isArray(allDecors) && allDecors.length > 0) {
         allDecors.forEach(decor => {
           if (plan.decors.includes(decor._id)) {
-            // Always use ObjectId as key
-            let catId = decor.categoryId;
+            let catId = decor.categoryId || decor.category_id || decor.category?._id;
             if (!catId && decor.category && Array.isArray(categories)) {
               const catObj = categories.find(c => c.name === decor.category);
               if (catObj) catId = catObj._id;
             }
-            if (catId) {
+            if (catId && /^[a-fA-F0-9]{24}$/.test(catId)) {
               categoryLimits[catId] = (categoryLimits[catId] || 0) + 1;
             }
           }
@@ -72,7 +74,6 @@ const PlanManagement = () => {
     } else {
       categoryLimits = {};
     }
-    // Ensure all categories have a value (default to empty string if missing)
     if (Array.isArray(categories) && categories.length > 0) {
       categories.forEach(cat => {
         if (!Object.prototype.hasOwnProperty.call(categoryLimits, cat._id)) {
@@ -89,7 +90,8 @@ const PlanManagement = () => {
       booleanFeatures,
       customFeatures,
       exportDrafts: plan.exportDrafts === true,
-      categoryLimits
+      categoryLimits,
+      decors: Array.isArray(plan.decors) ? plan.decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : []
     });
     setShowForm(true);
   }, [allDecors, categories]);
@@ -100,6 +102,7 @@ const PlanManagement = () => {
     fetchCategories();
   }, []);
 
+  // When building categoryLimits and decors, always use _id
   const fetchAllDecors = async () => {
     try {
       const response = await authFetch('/decors');
@@ -171,30 +174,26 @@ const PlanManagement = () => {
       // Clean categoryLimits: handle all valid inputs including empty strings
       const cleanedCategoryLimits = {};
       Object.entries(formData.categoryLimits || {}).forEach(([catId, value]) => {
-        if (typeof value === 'number' && !isNaN(value)) {
-          cleanedCategoryLimits[catId] = value;
-        } else if (value === '-1' || value === -1) {
-          cleanedCategoryLimits[catId] = -1;
-        } else if (value === '' || value === undefined || value === null) {
-          // For empty strings, undefined, or null, set to 0 (no decors allowed)
-          cleanedCategoryLimits[catId] = 0;
-        } else {
-          // Try to parse as number if it's a string that represents a number
-          const parsedValue = parseInt(value, 10);
-          if (!isNaN(parsedValue)) {
-            cleanedCategoryLimits[catId] = parsedValue;
-          } else {
-            // Default to 0 if parsing fails
+        if (/^[a-fA-F0-9]{24}$/.test(catId)) {
+          if (typeof value === 'number' && !isNaN(value)) {
+            cleanedCategoryLimits[catId] = value;
+          } else if (value === '-1' || value === -1) {
+            cleanedCategoryLimits[catId] = -1;
+          } else if (value === '' || value === undefined || value === null) {
             cleanedCategoryLimits[catId] = 0;
+          } else {
+            const parsedValue = parseInt(value, 10);
+            cleanedCategoryLimits[catId] = isNaN(parsedValue) ? 0 : parsedValue;
           }
         }
       });
+      const cleanedDecors = Array.isArray(formData.decors) ? formData.decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : [];
       const submitData = {
         ...formData,
         features: featuresList,
         limits: formData.limits,
         exportDrafts: formData.exportDrafts,
-        decors: formData.decors,
+        decors: cleanedDecors,
         categoryLimits: cleanedCategoryLimits
       };
       delete submitData.booleanFeatures;
@@ -303,25 +302,25 @@ const PlanManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Plan Management</h2>
-          <p className="text-gray-600 mt-1">Create and manage subscription plans</p>
+    <div className="space-y-6 p-2 sm:p-6  max-w-4xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+        <div className="w-full sm:w-auto">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Plan Management</h2>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Create and manage subscription plans</p>
         </div>
         <button
           onClick={() => {
             resetForm();
             setShowForm(true);
           }}
-          className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+          className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
         >
           Add New Plan
         </button>
       </div>
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-          <p className="text-red-700">{error}</p>
+        <div className="bg-red-50 border-l-4 border-red-400 p-2 sm:p-4 rounded-md">
+          <p className="text-red-700 text-xs sm:text-base">{error}</p>
         </div>
       )}
       {showForm && (
@@ -338,7 +337,9 @@ const PlanManagement = () => {
           allDecors={allDecors}
         />
       )}
-      <PlanList plans={plans} handleEdit={handleEdit} handleDelete={handleDelete} />
+      <div className="w-full">
+        <PlanList plans={plans} handleEdit={handleEdit} handleDelete={handleDelete} />
+      </div>
       <DeleteModal show={showDeleteModal} onCancel={cancelDelete} onConfirm={confirmDelete} />
     </div>
   );
