@@ -54,9 +54,13 @@ const BackgroundPanel = ({ wallImageInputRef, wallImage, handleRemoveWallImage, 
       
       {wallImage && (
         <div className="relative group rounded-xl overflow-hidden border-2 border-white/40 shadow-lg animate-fade-in-up">
-          {wallImage && (
-            <img src={wallImage} alt="background preview" className="w-full h-32 object-cover" />
-          )}
+          <img 
+            src={wallImage.data && wallImage.contentType 
+              ? `data:${wallImage.contentType};base64,${wallImage.data}` 
+              : wallImage} 
+            alt="background preview" 
+            className="w-full h-32 object-cover" 
+          />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <button
               type="button"

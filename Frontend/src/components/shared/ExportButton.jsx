@@ -84,7 +84,7 @@ const ExportButton = ({ wallRef, canExport = true }) => {
       <button
         onClick={() => canExport && setShowDropdown(!showDropdown)}
         disabled={exporting || !canExport}
-        className={`w-14 h-14 ${canExport ? 'bg-orange-600 hover:bg-orange-700' : 'bg-gray-300 cursor-not-allowed'} text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle transform hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-300/40`}
+        className={`w-14 h-14 ${canExport ? 'bg-orange-600 hover:bg-orange-700' : 'bg-slate-600 cursor-not-allowed'} text-white rounded-full shadow-lg transition-all duration-300 animate-bounce-subtle transform hover:scale-110 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-orange-300/40`}
         title={canExport ? 'Export Design' : 'Export not allowed for your plan'}
         aria-label="Export Design"
       >
@@ -108,14 +108,14 @@ const ExportButton = ({ wallRef, canExport = true }) => {
       {showDropdown && canExport && (
         <div 
           ref={dropdownRef}
-          className="absolute right-0 mt-3 w-40 rounded-xl shadow-xl bg-white ring-1 ring-orange-200 ring-opacity-50 z-50 animate-fade-in-up"
+          className="absolute right-0 mt-3 w-40 rounded-xl shadow-xl bg-slate-800 ring-1 ring-orange-500/50 ring-opacity-50 z-50 animate-fade-in-up"
         >
           <div className="py-2 flex flex-col gap-1" role="menu">
             {['PNG', 'JPEG', 'PDF'].map((format) => (
               <button
                 key={format}
                 onClick={() => handleExport(format.toLowerCase())}
-                className="flex items-center gap-2 w-full px-4 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-50 hover:text-orange-800 rounded-lg transition-all duration-200"
+                className="flex items-center gap-2 w-full px-4 py-2 text-sm font-semibold text-orange-400 hover:bg-slate-700/50 hover:text-orange-300 rounded-lg transition-all duration-200"
                 role="menuitem"
               >
                 <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

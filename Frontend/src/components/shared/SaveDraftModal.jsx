@@ -179,25 +179,25 @@ const SaveDraftModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 1000 }}>
-      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 transform transition-all">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+      <div className="bg-slate-800 rounded-lg p-8 max-w-md w-full mx-4 transform transition-all border border-orange-500/20">
+        <h2 className="text-2xl font-semibold text-white mb-4">
           {draftId ? 'Update Design' : 'Save Design'}
         </h2>
         
         {/* Draft Status Display */}
         {!draftId && draftStatus && !statusLoading && (
-          <div className={`mb-4 p-3 rounded-lg ${draftStatus.canSaveMore ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+          <div className={`mb-4 p-3 rounded-lg ${draftStatus.canSaveMore ? 'bg-green-900/20 border border-green-500/30' : 'bg-red-900/20 border border-red-500/30'}`}>
             <div className="text-sm">
-              <span className="font-medium text-gray-700">Draft Usage: </span>
-              <span className={draftStatus.canSaveMore ? 'text-green-600' : 'text-red-600'}>
+              <span className="font-medium text-slate-300">Draft Usage: </span>
+              <span className={draftStatus.canSaveMore ? 'text-green-400' : 'text-red-400'}>
                 {draftStatus.currentDrafts}/{draftStatus.unlimited ? '∞' : draftStatus.limit}
               </span>
-              <span className="text-gray-600 ml-1">
+              <span className="text-slate-400 ml-1">
                 ({draftStatus.planName} plan)
               </span>
             </div>
             {!draftStatus.canSaveMore && (
-              <div className="text-xs text-red-600 mt-1">
+              <div className="text-xs text-red-400 mt-1">
                 Upgrade your plan to save more drafts
               </div>
             )}
@@ -205,8 +205,8 @@ const SaveDraftModal = ({
         )}
         
         {statusLoading && !draftId && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-            <div className="text-sm text-gray-600">Checking draft limits...</div>
+          <div className="mb-4 p-3 bg-slate-700/50 rounded-lg">
+            <div className="text-sm text-slate-400">Checking draft limits...</div>
           </div>
         )}
         
@@ -215,23 +215,23 @@ const SaveDraftModal = ({
           value={draftName}
           onChange={(e) => setDraftName(e.target.value)}
           placeholder="Enter a name for your design"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-slate-600 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-slate-700 text-white placeholder-slate-400"
           disabled={!draftId && draftStatus && !draftStatus.canSaveMore}
         />
         {saveError && (
-          <p className="text-red-600 mb-4">{saveError}</p>
+          <p className="text-red-400 mb-4">{saveError}</p>
         )}
         <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition duration-300"
+            className="px-4 py-2 text-slate-400 hover:text-slate-200 transition duration-300"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveDraft}
             disabled={loading || (!draftId && draftStatus && !draftStatus.canSaveMore)}
-            className="bg-primary-dark text-secondary px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:bg-primary transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-gradient-to-r from-orange-600 to-orange-400 text-white px-4 py-2 rounded-lg text-base font-semibold shadow-md hover:from-orange-500 hover:to-orange-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Saving...' : draftId ? 'Update' : 'Save'}
           </button>

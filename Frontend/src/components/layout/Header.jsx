@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { User, Home, Settings, Info, HelpCircle, BookOpen } from 'lucide-react';
 import { UserContext } from '../../App';
 import { isAuthenticated } from '../../utils/auth';
 
@@ -8,7 +9,17 @@ const Header = () => {
   const navigate = useNavigate();
   const { registeredUser, handleLogout } = useContext(UserContext);
   const isLoggedIn = isAuthenticated();
+  const isAdmin = registeredUser && (registeredUser.userType === 'admin' || registeredUser.email === 'abhilashpodisetty@gmail.com');
+  const [isSticky, setIsSticky] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const onLogout = () => {
     handleLogout();
@@ -28,252 +39,187 @@ const Header = () => {
   };
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-lg px-0">
-      <div className="w-full">
-
-        <div className="flex items-center py-4 w-full">
-          {/* Navigation Links - Far Left */}
-          <div className="hidden md:flex items-center space-x-8">
-            {isLoggedIn ? (
-              <>
-                <Link
-                  to="/dashboard" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/wall" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
-                >
-                  Wall Designer
-                </Link>
-                <Link
-                  to="/user" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
-                >
-                  Profile
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link 
-                  to="/" 
-                  className={`text-orange-700 hover:text-orange-600 font-medium font-inter text-xl transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
-                >
-                  Home
-                </Link>
-                <Link 
-                  to="#about" 
-                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                >
-                  About Us
-                </Link>
-                <Link 
-                  to="#faq" 
-                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                >
-                  FAQ
-                </Link>
-                <Link 
-                  to="#blog" 
-                  className="text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                >
-                  Blog
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Logo - Centered */}
-          <div className="flex items-center flex-shrink-0 mx-auto">
-            <Link to="/home" className="flex items-center group">
-              <img
-                src="/mialtar-logo.png"
-                alt="MIALTAR Logo"
-                className="h-16 w-auto mr-4 select-none transition-transform duration-200 group-hover:scale-110"
-                style={{userSelect:'none'}}
-              />
-              <span className="text-4xl font-bold font-poppins text-orange-700 group-hover:text-orange-600 transition-colors duration-300 tracking-wide" style={{letterSpacing:'0.04em'}}>MIALTAR</span>
-            </Link>
-          </div>
-
-          {/* Desktop Action Buttons - Far Right */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isLoggedIn ? (
-              <>
-                {/* Admin Button - Only show for admin users */}
-                {(registeredUser?.userType === 'admin' || registeredUser?.email === 'abhilashpodisetty@gmail.com') && (
-                  <Link
-                    to="/admin"
-                    className={`bg-red-600 hover:bg-red-700 text-white font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 ${
-                      location.pathname === '/admin' ? 'bg-red-700 shadow-lg' : ''
-                    }`}
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    Admin
-                  </Link>
-                )}
-                <span className="text-orange-700 font-medium font-inter">
-                  Hi, {registeredUser?.name}
-                </span>
-                <button
-                  onClick={onLogout}
-                  className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-50"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleLogin}
-                  className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-50"
-                >
-                  Log in
-                </button>
-                <button
-                  onClick={handleCreateWall}
-                  className="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  Create Wall
-                </button>
-              </>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-orange-700 hover:text-orange-600 focus:outline-none focus:text-orange-600 transition-colors duration-300"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {isMobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
+    <header
+      className={`sticky top-0 left-0 right-0 z-50 border-b border-orange-500/20 transition-all duration-500 bg-slate-900/95 backdrop-blur-md shadow-lg`}
+      style={{ minHeight: '84px' }}
+    >
+      <div className="flex items-center justify-between px-6 md:px-8 py-6">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <Link
+            to={isLoggedIn ? "/" : "/"}
+            className="flex items-center gap-3 group"
+          >
+            <img src="/mialtar-logo.png" alt="MIALTAR Logo" className="h-16 w-16 rounded-lg select-none group-hover:scale-105 transition-transform duration-200" />
+            <span className="text-3xl font-bold font-sans text-orange-400 tracking-wide group-hover:text-orange-300 transition-colors">MIALTAR</span>
+          </Link>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg">
-              {isLoggedIn ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/dashboard' ? 'text-orange-600 font-semibold' : ''}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/wall"
-                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/wall' ? 'text-orange-600 font-semibold' : ''}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Wall Designer
-                  </Link>
-                  <Link
-                    to="/user"
-                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/user' ? 'text-orange-600 font-semibold' : ''}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  {/* Admin Link for Mobile - Only show for admin users */}
-                  {(registeredUser?.userType === 'admin' || registeredUser?.email === 'abhilashpodisetty@gmail.com') && (
-                    <Link
-                      to="/admin"
-                      className={`block px-3 py-2 text-red-600 hover:text-red-700 font-medium font-inter transition-colors duration-300 ${location.pathname === '/admin' ? 'text-red-700 font-semibold' : ''}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      Admin Panel
-                    </Link>
-                  )}
-                  <div className="border-t border-gray-200 pt-3 mt-3">
-                    <div className="px-3 py-2 text-orange-700 font-medium font-inter">
-                      Hi, {registeredUser?.name}
-                    </div>
-                    <button
-                      onClick={() => {
-                        onLogout();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/"
-                    className={`block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300 ${location.pathname === '/' || location.pathname === '/home' ? 'text-orange-600 font-semibold' : ''}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    to="#about"
-                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    About Us
-                  </Link>
-                  <Link
-                    to="#faq"
-                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    FAQ
-                  </Link>
-                  <Link
-                    to="#blog"
-                    className="block px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Blog
-                  </Link>
-                  <div className="border-t border-gray-200 pt-3 mt-3">
-                    <button
-                      onClick={() => {
-                        handleLogin();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left px-3 py-2 text-orange-700 hover:text-orange-600 font-medium font-inter transition-colors duration-300"
-                    >
-                      Log in
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleCreateWall();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-3 py-2 rounded-lg transition-all duration-300"
-                    >
-                      Create Wall
-                    </button>
-                  </div>
-                </>
+        {/* Hamburger for mobile */}
+        <button
+          className="md:hidden flex items-center justify-center p-2 rounded-lg border border-orange-400/30 bg-slate-800/50 text-orange-400 hover:bg-slate-700/50 hover:text-orange-300 transition-all"
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          aria-label="Toggle menu"
+        >
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><rect y="5" width="24" height="2" rx="1" fill="currentColor"/><rect y="11" width="24" height="2" rx="1" fill="currentColor"/><rect y="17" width="24" height="2" rx="1" fill="currentColor"/></svg>
+        </button>
+        {/* Navigation Desktop */}
+        <nav className="hidden md:flex items-center gap-8">
+          {isLoggedIn ? (
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className={`flex items-center gap-2 font-bold text-2xl transition-colors text-orange-400 hover:text-orange-300 ${location.pathname === '/admin' ? 'underline underline-offset-4 text-orange-300 font-bold' : ''}`}
+                >
+                  <Home className="w-5 h-5" /> Admin Dashboard
+                </Link>
               )}
-            </div>
-          </div>
-        )}
+              <Link
+                to="/dashboard"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-orange-400 hover:text-orange-300 ${location.pathname === '/dashboard' ? 'underline underline-offset-4 text-orange-300 font-bold' : ''}`}
+              >
+                <Home className="w-5 h-5" /> Dashboard
+              </Link>
+              <Link
+                to="/wall"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-orange-400 hover:text-orange-300 ${location.pathname === '/wall' ? 'underline underline-offset-4 text-orange-300 font-bold' : ''}`}
+              >
+                <Settings className="w-5 h-5" /> Wall Designer
+              </Link>
+              <Link
+                to="/user"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-orange-400 hover:text-orange-300 ${location.pathname === '/user' ? 'underline underline-offset-4 text-orange-300 font-bold' : ''}`}
+              >
+                <User className="w-5 h-5" /> Profile
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="#about"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-slate-300 hover:text-white ${location.hash === '#about' ? 'underline underline-offset-4 text-white font-bold' : ''}`}
+              >
+                <Info className="w-5 h-5" /> About Us
+              </Link>
+              <Link
+                to="#faq"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-slate-300 hover:text-white ${location.hash === '#faq' ? 'underline underline-offset-4 text-white font-bold' : ''}`}
+              >
+                <HelpCircle className="w-5 h-5" /> FAQ
+              </Link>
+              <Link
+                to="#blog"
+                className={`flex items-center gap-2 font-medium text-2xl transition-colors text-slate-300 hover:text-white ${location.hash === '#blog' ? 'underline underline-offset-4 text-white font-bold' : ''}`}
+              >
+                <BookOpen className="w-5 h-5" /> Blog
+              </Link>
+            </>
+          )}
+        </nav>
+        {/* Right Side: Auth Buttons (Desktop only) */}
+        <div className="hidden md:flex items-center gap-4">
+          {!isLoggedIn ? (
+            <button
+              onClick={handleCreateWall}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-xl text-lg shadow-lg border border-orange-500/20 transition-all duration-300 transform hover:scale-105"
+            >
+              Create Wall
+            </button>
+          ) : (
+            <button
+              onClick={onLogout}
+              className="bg-slate-800 text-orange-400 font-bold py-3 px-6 rounded-xl text-lg shadow-lg border border-orange-500/30 hover:bg-slate-700 hover:text-orange-300 transition-all duration-300 transform hover:scale-105"
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
-    </nav>
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      {/* Mobile Menu Drawer */}
+      <nav
+        className={`fixed top-0 right-0 z-50 h-full w-64 bg-slate-800 shadow-lg border-l border-orange-500/20 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden flex flex-col items-center pt-24 px-6 gap-6`}
+        style={{ minHeight: '100vh' }}
+      >
+        {isLoggedIn ? (
+          <>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`flex items-center justify-center gap-2 font-bold text-2xl text-orange-400 hover:text-orange-300 py-3 px-2 rounded-lg w-full text-center ${location.pathname === '/admin' ? 'bg-slate-700 text-orange-300 font-bold' : ''}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Home className="w-5 h-5" /> Admin Dashboard
+              </Link>
+            )}
+            <Link
+              to="/dashboard"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-orange-400 hover:text-orange-300 py-3 px-2 rounded-lg w-full text-center ${location.pathname === '/dashboard' ? 'bg-slate-700 text-orange-300 font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Home className="w-5 h-5" /> Dashboard
+            </Link>
+            <Link
+              to="/wall"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-orange-400 hover:text-orange-300 py-3 px-2 rounded-lg w-full text-center ${location.pathname === '/wall' ? 'bg-slate-700 text-orange-300 font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Settings className="w-5 h-5" /> Wall Designer
+            </Link>
+            <Link
+              to="/user"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-orange-400 hover:text-orange-300 py-3 px-2 rounded-lg w-full text-center ${location.pathname === '/user' ? 'bg-slate-700 text-orange-300 font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <User className="w-5 h-5" /> Profile
+            </Link>
+            <button
+              onClick={() => { onLogout(); setIsMobileMenuOpen(false); }}
+              className="w-full bg-slate-700 text-orange-400 font-bold py-3 px-2 rounded-xl text-lg shadow-lg border border-orange-500/30 hover:bg-slate-600 hover:text-orange-300 transition-all duration-300 mt-4"
+              style={{ textAlign: 'center' }}
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              to="#about"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-slate-300 hover:text-white py-3 px-2 rounded-lg w-full text-center ${location.hash === '#about' ? 'bg-slate-700 text-white font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Info className="w-5 h-5" /> About Us
+            </Link>
+            <Link
+              to="#faq"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-slate-300 hover:text-white py-3 px-2 rounded-lg w-full text-center ${location.hash === '#faq' ? 'bg-slate-700 text-white font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <HelpCircle className="w-5 h-5" /> FAQ
+            </Link>
+            <Link
+              to="#blog"
+              className={`flex items-center justify-center gap-2 font-medium text-2xl text-slate-300 hover:text-white py-3 px-2 rounded-lg w-full text-center ${location.hash === '#blog' ? 'bg-slate-700 text-white font-bold' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <BookOpen className="w-5 h-5" /> Blog
+            </Link>
+            <button
+              onClick={() => { handleCreateWall(); setIsMobileMenuOpen(false); }}
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-2 rounded-xl text-lg shadow-lg border border-orange-500/20 transition-all duration-300 mt-4"
+              style={{ textAlign: 'center' }}
+            >
+              Create Wall
+            </button>
+          </>
+        )}
+      </nav>
+    </header>
   );
-};
+}
 
 export default Header; 
