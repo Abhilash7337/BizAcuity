@@ -196,26 +196,26 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
           {/* User Information Display */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#ff9800] uppercase tracking-wide">Full Name</label>
-              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                <p className="text-[#625d8c] font-semibold text-lg">{user?.name || 'Not set'}</p>
+              <label className="text-sm font-medium text-orange-400 uppercase tracking-wide">Full Name</label>
+              <div className="bg-slate-800/90 rounded-xl p-4 border border-orange-500/20">
+                <p className="text-white font-semibold text-lg">{user?.name || 'Not set'}</p>
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#ff9800] uppercase tracking-wide">Email Address</label>
-              <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                <p className="text-[#625d8c] font-semibold text-lg">{user?.email || 'Not set'}</p>
+              <label className="text-sm font-medium text-orange-400 uppercase tracking-wide">Email Address</label>
+              <div className="bg-slate-800/90 rounded-xl p-4 border border-orange-500/20">
+                <p className="text-white font-semibold text-lg">{user?.email || 'Not set'}</p>
               </div>
             </div>
           </div>
 
           {/* Current Plan Display */}
           <div className="space-y-3">
-            <label className="text-base font-bold text-[#625d8c] uppercase tracking-wide">Current Plan</label>
-            <div className="bg-gradient-to-r from-orange-100 to-orange-200 rounded-xl p-5 border border-orange-100">
+            <label className="text-base font-bold text-white uppercase tracking-wide">Current Plan</label>
+            <div className="bg-slate-800/90 rounded-xl p-5 border border-orange-500/20">
               <div className="flex items-center justify-between">
-                <p className="text-[#ff9800] font-bold text-xl">
+                <p className="text-orange-400 font-bold text-xl">
                   {user?.plan ? user.plan.charAt(0).toUpperCase() + user.plan.slice(1) + ' Plan' : 'No plan selected'}
                 </p>
                 <button
@@ -252,25 +252,25 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-black uppercase tracking-wide">Full Name</label>
+              <label className="text-sm font-medium text-orange-400 uppercase tracking-wide">Full Name</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-4 rounded-2xl border-2 border-primary-light/30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300 bg-white/80 backdrop-blur-sm font-medium text-primary-dark"
+                className="w-full px-4 py-4 rounded-2xl border-2 border-slate-600 focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10 transition-all duration-300 bg-slate-800/80 backdrop-blur-sm font-medium text-white"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-black uppercase tracking-wide">Email Address</label>
+              <label className="text-sm font-medium text-orange-400 uppercase tracking-wide">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-4 rounded-2xl border-2 border-primary-light/30 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-300 bg-white/80 backdrop-blur-sm font-medium text-primary-dark"
+                className="w-full px-4 py-4 rounded-2xl border-2 border-slate-600 focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10 transition-all duration-300 bg-slate-800/80 backdrop-blur-sm font-medium text-white"
                 required
               />
             </div>
@@ -278,7 +278,7 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
 
           {/* Profile Photo Controls */}
           <div className="flex flex-col items-center mt-4">
-            <div className="w-24 h-24 rounded-full border-2 border-orange-300 shadow overflow-hidden mb-2 bg-orange-100 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full border-2 border-orange-400 shadow overflow-hidden mb-2 bg-slate-800 flex items-center justify-center">
               {photoPreview ? (
                 <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
               ) : (
@@ -293,7 +293,7 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
               onChange={handlePhotoChange}
             />
             <button
-              className="text-xs text-orange-700 underline hover:text-orange-900"
+              className="text-xs text-orange-400 underline hover:text-orange-300"
               onClick={() => fileInputRef.current && fileInputRef.current.click()}
               type="button"
               disabled={loading}
@@ -351,7 +351,7 @@ const UserProfileForm = ({ user, onProfileUpdate }) => {
                   }
                 }
               }}
-              className="flex-1 bg-orange-100 text-orange-700 py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-orange-200 transition-all duration-300"
+              className="flex-1 bg-slate-700 text-slate-300 py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-slate-600 transition-all duration-300"
             >
               Cancel
             </button>

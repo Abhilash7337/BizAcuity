@@ -191,7 +191,7 @@ const DecorManagement = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Decor Management</h1>
+        <h1 className="text-2xl font-bold text-white">Decor Management</h1>
         <div className="flex gap-2">
           <button
             onClick={() => setIsCategoryModalOpen(true)}
@@ -213,7 +213,7 @@ const DecorManagement = () => {
       {/* Category Filter (removed per-category number input and Set all -1) */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
-          <Filter size={20} className="text-gray-600" />
+          <Filter size={20} className="text-slate-400" />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}

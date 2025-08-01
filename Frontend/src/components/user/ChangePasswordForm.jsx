@@ -96,7 +96,7 @@ const ChangePasswordForm = () => {
       {isUpdatingPassword && (
         <form onSubmit={handleUpdatePassword} className="pt-4 space-y-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-orange-400">
               Current Password
             </label>
             <input
@@ -104,16 +104,16 @@ const ChangePasswordForm = () => {
               name="currentPassword"
               value={passwordForm.currentPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
-                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+              className="w-full px-4 py-3 rounded-2xl border border-slate-600 
+                       focus:outline-none focus:ring-2 focus:ring-orange-400/20 
                        focus:border-orange-400 transition-all duration-300
-                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
+                       bg-slate-800/80 backdrop-blur-sm text-white font-medium"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-orange-400">
               New Password
             </label>
             <input
@@ -121,16 +121,16 @@ const ChangePasswordForm = () => {
               name="newPassword"
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
-              className="w-half px-4 py-3 rounded-2xl border border-orange-200 
-                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+              className="w-half px-4 py-3 rounded-2xl border border-slate-600 
+                       focus:outline-none focus:ring-2 focus:ring-orange-400/20 
                        focus:border-orange-400 transition-all duration-300
-                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
+                       bg-slate-800/80 backdrop-blur-sm text-white font-medium"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-orange-400">
               Confirm New Password
             </label>
             <input
@@ -138,22 +138,22 @@ const ChangePasswordForm = () => {
               name="confirmPassword"
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
-              className="w-full px-4 py-3 rounded-2xl border border-orange-200 
-                       focus:outline-none focus:ring-2 focus:ring-orange-300/20 
+              className="w-full px-4 py-3 rounded-2xl border border-slate-600 
+                       focus:outline-none focus:ring-2 focus:ring-orange-400/20 
                        focus:border-orange-400 transition-all duration-300
-                       bg-white/80 backdrop-blur-sm text-orange-900 font-medium"
+                       bg-slate-800/80 backdrop-blur-sm text-white font-medium"
               required
             />
           </div>
 
           {updateError && (
-            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm">
+            <div className="p-4 rounded-2xl bg-red-900/20 border border-red-500/30 text-red-400 text-sm">
               {updateError}
             </div>
           )}
 
           {updateSuccess && (
-            <div className="p-4 rounded-2xl bg-orange-50 border border-orange-200 text-orange-900 text-sm font-medium flex items-center gap-2">
+            <div className="p-4 rounded-2xl bg-green-900/20 border border-green-500/30 text-green-400 text-sm font-medium flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>

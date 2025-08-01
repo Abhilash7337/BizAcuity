@@ -50,7 +50,6 @@ const Landing = () => {
         const data = await response.json();
         setDrafts(data);
       } catch (err) {
-        console.error('Fetch drafts error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -65,7 +64,6 @@ const Landing = () => {
         const data = await response.json();
         setSharedDrafts(data);
       } catch (err) {
-        console.error('Fetch shared drafts error:', err);
         setSharedError(err.message);
       } finally {
         setSharedLoading(false);
@@ -130,7 +128,6 @@ const Landing = () => {
       setShowDeleteModal(false);
       setDraftToDelete(null);
     } catch (error) {
-      console.error('Delete draft error:', error);
       alert('Failed to delete draft. Please try again.');
     }
   };
@@ -147,18 +144,13 @@ const Landing = () => {
     let draftId = null;
     if (typeof sharedDraftToRemove === 'string') {
       draftId = sharedDraftToRemove;
-      console.info('Removing shared draft using string ID:', draftId);
     } else if (sharedDraftToRemove.draftId && sharedDraftToRemove.draftId._id) {
       draftId = sharedDraftToRemove.draftId._id;
-      console.info('Removing shared draft using draftId._id:', draftId);
     } else if (sharedDraftToRemove._id) {
       draftId = sharedDraftToRemove._id;
-      console.info('Removing shared draft using _id:', draftId);
     }
 
     if (!draftId) {
-      // Log the problematic draft object for debugging
-      console.warn('SharedDraft missing both draftId._id and _id:', sharedDraftToRemove);
       alert('Unable to remove: missing draft ID.');
       return;
     }
@@ -175,7 +167,6 @@ const Landing = () => {
       setShowSharedDeleteModal(false);
       setSharedDraftToRemove(null);
     } catch (error) {
-      console.error('Remove shared draft error:', error);
       alert('Failed to remove from shared drafts. Please try again.');
     }
   };
@@ -267,22 +258,22 @@ const Landing = () => {
         }
       `}</style>
 
-    <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 overflow-hidden">
+    <div className="min-h-screen bg-slate-900 overflow-hidden">
       {/* Subtle Background Animation Layer */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         {/* Main background container */}
         <div className="absolute top-0 left-0 w-full h-full">
           {/* Abstract morphing shapes */}
           <div 
-            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-300 to-orange-500 opacity-15 blur-xl"
+            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-orange-600/30 opacity-15 blur-xl"
             style={{animation: 'abstractMorph 45s ease-in-out infinite'}}
           ></div>
           <div 
-            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 opacity-12 blur-xl"
+            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400/20 to-orange-500/30 opacity-12 blur-xl"
             style={{animation: 'abstractMorph 60s ease-in-out infinite reverse', animationDelay: '-20s'}}
           ></div>
           <div 
-            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-white to-orange-300 opacity-10 blur-lg"
+            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-orange-300/15 to-orange-400/25 opacity-10 blur-lg"
             style={{animation: 'abstractMorph 35s ease-in-out infinite', animationDelay: '-15s'}}
           ></div>
           

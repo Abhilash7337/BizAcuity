@@ -40,7 +40,7 @@ const ChoosePlan = () => {
         const formattedPlans = data.plans.map(plan => ({
           id: plan.name.toLowerCase().replace(/\s+/g, ''),
           name: plan.name,
-          price: plan.monthlyPrice === 0 ? 'Free' : `₹${plan.monthlyPrice}/month`,
+          price: plan.monthlyPrice === 0 ?  `₹${plan.monthlyPrice}/month` : `₹${plan.monthlyPrice}/month`,
           features: plan.features || [],
           description: plan.description,
           limits: plan.limits
@@ -163,7 +163,7 @@ const ChoosePlan = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-100 via-orange-300 to-orange-300 overflow-hidden relative">
+    <div className="min-h-screen flex flex-col bg-slate-900 overflow-hidden relative">
       {/* Animated SVG lines and gradient overlay above the gradient background */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
         {/* Flowing lines effect with SVG */}
@@ -209,12 +209,12 @@ const ChoosePlan = () => {
           {/* Waiting for approval state */}
           {waitingApproval ? (
             <div className="flex flex-col items-center justify-center py-24">
-              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-orange-600 mb-8"></div>
-              <h2 className="text-3xl font-bold text-orange-800 mb-4">Waiting for Admin Approval</h2>
-              <p className="text-lg text-orange-700 mb-2">Your plan change request has been submitted and is pending admin approval.</p>
-              <p className="text-base text-orange-600 mb-6">This page will automatically update once your request is approved or rejected.</p>
-              {pollError && <div className="text-red-600 font-semibold mb-4">{pollError}</div>}
-              <div className="text-orange-500 text-sm">You can close this tab and return later if you wish.</div>
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-orange-500 mb-8"></div>
+              <h2 className="text-3xl font-bold text-white mb-4">Waiting for Admin Approval</h2>
+              <p className="text-lg text-slate-300 mb-2">Your plan change request has been submitted and is pending admin approval.</p>
+              <p className="text-base text-slate-400 mb-6">This page will automatically update once your request is approved or rejected.</p>
+              {pollError && <div className="text-red-400 font-semibold mb-4">{pollError}</div>}
+              <div className="text-orange-400 text-sm">You can close this tab and return later if you wish.</div>
             </div>
           ) : (
             <>
@@ -223,7 +223,7 @@ const ChoosePlan = () => {
                 <h1 className="text-5xl sm:text-6xl font-bold font-poppins mb-4 leading-tight text-white drop-shadow-lg animate-fade-in-rotate">
                   {getAuthUser()?.plan ? 'Change Your Plan' : 'Choose Your Plan'}
                 </h1>
-                <p className="text-xl sm:text-2xl text-white/90 font-inter mb-6 animate-fade-in">
+                <p className="text-xl sm:text-2xl text-slate-300 font-inter mb-6 animate-fade-in">
                   {getAuthUser()?.plan 
                     ? 'Select a new plan to change your current subscription'
                     : 'Select the plan that best fits your needs'
@@ -234,8 +234,8 @@ const ChoosePlan = () => {
               {/* Loading State */}
               {plansLoading ? (
                 <div className="text-center py-16">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-600 mx-auto mb-6"></div>
-                  <p className="text-orange-700 text-xl font-semibold">Loading subscription plans...</p>
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500 mx-auto mb-6"></div>
+                  <p className="text-orange-400 text-xl font-semibold">Loading subscription plans...</p>
                 </div>
               ) : (
                 <>
@@ -248,8 +248,8 @@ const ChoosePlan = () => {
                           key={plan.id}
                           className={`relative p-10 rounded-3xl border-4 transition-all duration-200 cursor-pointer shadow-xl hover:shadow-2xl transform ${
                             selectedPlan === plan.id
-                              ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 scale-105'
-                              : 'border-white/40 bg-white/80 hover:border-orange-300 hover:scale-102'
+                              ? 'border-orange-500 bg-gradient-to-br from-slate-700 to-slate-800 scale-105'
+                              : 'border-slate-600 bg-slate-800/90 hover:border-orange-400 hover:scale-102'
                           } group`}
                           style={{ minHeight: 440 }}
                           onClick={() => handlePlanSelect(plan.id)}
@@ -265,22 +265,22 @@ const ChoosePlan = () => {
 
                           {/* Plan Header */}
                           <div className="text-center mb-8">
-                            <h3 className="text-4xl font-extrabold mb-2 text-orange-900 group-hover:text-orange-700 transition-colors duration-200 drop-shadow-md">
+                            <h3 className="text-4xl font-extrabold mb-2 text-white group-hover:text-orange-400 transition-colors duration-200 drop-shadow-md">
                               {plan.name}
                             </h3>
-                            <div className="text-5xl font-extrabold text-orange-600 mb-2 drop-shadow-lg">
+                            <div className="text-5xl font-extrabold text-orange-400 mb-2 drop-shadow-lg">
                               {plan.price}
                             </div>
-                            <p className="text-lg text-gray-700 font-medium">
+                            <p className="text-lg text-slate-300 font-medium">
                               {plan.description}
                             </p>
                           </div>
 
                           {/* Plan Limits */}
                           {plan.limits && (
-                            <div className="mb-8 p-5 bg-orange-50 border border-orange-200 rounded-2xl flex flex-col items-center shadow-sm">
-                              <h4 className="text-lg font-semibold text-orange-700 mb-2">Plan Limits</h4>
-                              <ul className="text-lg text-orange-900 space-y-1 font-medium">
+                            <div className="mb-8 p-5 bg-slate-700/50 border border-orange-500/30 rounded-2xl flex flex-col items-center shadow-sm">
+                              <h4 className="text-lg font-semibold text-orange-400 mb-2">Plan Limits</h4>
+                              <ul className="text-lg text-slate-300 space-y-1 font-medium">
                                 <li>
                                   <span className="inline-flex items-center gap-2"><svg className="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>Saved Drafts: {plan.limits.designsPerMonth === -1 ? 'Unlimited' : `${plan.limits.designsPerMonth} draft${plan.limits.designsPerMonth !== 1 ? 's' : ''}`}</span>
                                 </li>
@@ -294,7 +294,7 @@ const ChoosePlan = () => {
                           {/* Features List */}
                           <ul className="space-y-4 mt-6">
                             {plan.features.map((feature, index) => (
-                              <li key={index} className="flex items-center text-xl font-semibold text-green-700 bg-green-50 rounded-xl px-5 py-3 shadow-sm">
+                              <li key={index} className="flex items-center text-xl font-semibold text-green-400 bg-green-900/20 rounded-xl px-5 py-3 shadow-sm border border-green-500/30">
                                 <svg className="w-7 h-7 text-green-500 mr-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
@@ -308,7 +308,7 @@ const ChoosePlan = () => {
 
                     {/* Error Message */}
                     {error && (
-                      <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-center text-lg font-semibold">
+                      <div className="p-4 rounded-xl bg-red-900/20 border border-red-500/50 text-red-400 text-center text-lg font-semibold">
                         {error}
                       </div>
                     )}
@@ -318,7 +318,7 @@ const ChoosePlan = () => {
                       <button
                         type="submit"
                         disabled={loading || !selectedPlan}
-                        className="group px-12 py-5 rounded-2xl text-white font-bold text-2xl bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="group px-12 py-5 rounded-2xl text-slate-900 font-bold text-2xl bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-400 hover:to-orange-300 shadow-xl hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                       >
                         {loading ? (
                           <div className="flex items-center justify-center">

@@ -89,95 +89,95 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
       {/* Animated Background Elements - morphing shapes and flowing lines */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-0 left-0 w-full h-full">
           {/* Abstract morphing shapes */}
           <div 
-            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-300 to-orange-500 opacity-15 blur-xl"
+            className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-orange-600/30 opacity-15 blur-xl"
             style={{animation: 'abstractMorph 45s ease-in-out infinite'}}
           ></div>
           <div 
-            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 opacity-12 blur-xl"
+            className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gradient-to-br from-orange-400/20 to-orange-500/30 opacity-12 blur-xl"
             style={{animation: 'abstractMorph 60s ease-in-out infinite reverse', animationDelay: '-20s'}}
           ></div>
           <div 
-            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-white to-orange-300 opacity-10 blur-lg"
+            className="absolute top-1/2 left-1/3 w-20 h-20 bg-gradient-to-br from-orange-300/15 to-orange-400/25 opacity-10 blur-lg"
             style={{animation: 'abstractMorph 35s ease-in-out infinite', animationDelay: '-15s'}}
           ></div>
           {/* Flowing SVG lines */}
           <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path 
               d="M0,50 Q25,25 50,50 T100,50" 
-              stroke="url(#flowGradient)" 
+              stroke="url(#darkFlowGradient)" 
               strokeWidth="0.5" 
               fill="none"
               style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
             />
             <path 
               d="M0,30 Q25,5 50,30 T100,30" 
-              stroke="url(#flowGradient)" 
+              stroke="url(#darkFlowGradient)" 
               strokeWidth="0.3" 
               fill="none"
               style={{animation: 'backgroundFlow 50s ease-in-out infinite reverse', animationDelay: '-10s'}}
             />
             <path 
               d="M0,70 Q25,95 50,70 T100,70" 
-              stroke="url(#flowGradient)" 
+              stroke="url(#darkFlowGradient)" 
               strokeWidth="0.4" 
               fill="none"
               style={{animation: 'backgroundFlow 35s ease-in-out infinite', animationDelay: '-25s'}}
             />
             <defs>
-              <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.6)" />
-                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.8)" />
-                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.6)" />
+              <linearGradient id="darkFlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.4)" />
+                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.6)" />
+                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.4)" />
               </linearGradient>
             </defs>
           </svg>
         </div>
-        {/* Floating picture frames in orange/cream/white palette */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-32 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-12 animate-float">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+        {/* Floating picture frames in dark theme */}
+        <div className="absolute inset-0 opacity-15">
+          <div className="absolute top-20 left-10 w-32 h-24 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform rotate-12 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute top-32 left-32 w-20 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-6 animate-drift">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute top-32 left-32 w-20 h-28 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform -rotate-6 animate-drift">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute top-40 right-20 w-28 h-20 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-6 animate-float">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute top-40 right-20 w-28 h-20 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform rotate-6 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute top-16 right-40 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-12 animate-gentleFloat">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute top-16 right-40 w-24 h-32 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform -rotate-12 animate-gentleFloat">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute bottom-40 left-20 w-36 h-24 bg-white border-4 border-orange-600 rounded-lg shadow-md transform rotate-3 animate-drift">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute bottom-40 left-20 w-36 h-24 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform rotate-3 animate-drift">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute bottom-20 right-16 w-24 h-32 bg-white border-4 border-orange-600 rounded-lg shadow-md transform -rotate-8 animate-float">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute bottom-20 right-16 w-24 h-32 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-md transform -rotate-8 animate-float">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
-          <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-white border-4 border-orange-600 rounded-lg shadow-lg rotate-3 animate-gentleFloat">
-            <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 rounded"></div>
+          <div className="absolute top-1/3 right-1/4 w-40 h-28 bg-slate-700/50 border-4 border-orange-500 rounded-lg shadow-lg rotate-3 animate-gentleFloat">
+            <div className="w-full h-full bg-gradient-to-br from-orange-100/20 to-orange-200/20 rounded"></div>
           </div>
         </div>
       </div>
       {/* Navigation */}
-      <nav className="relative z-50 bg-white/95 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl font-bold font-poppins text-orange-700 hover:text-orange-600 transition-colors duration-300">
-              MIALTAR
+      <nav className="relative z-50 bg-slate-900/95 backdrop-blur-sm shadow-lg min-h-[84px] border-b border-orange-500/20">
+        <div className="mx-auto">
+          <div className="flex flex-wrap flex-col xs:flex-row items-center xs:justify-between px-3 sm:px-6 md:px-8 py-4 sm:py-6 gap-2 sm:gap-0 w-full">
+            <Link to="/" className="flex items-center gap-2 sm:gap-3 w-full xs:w-auto justify-center xs:justify-start">
+              <img src="/mialtar-logo.png" alt="MIALTAR Logo" className="h-12 w-12 sm:h-16 sm:w-16 rounded-lg select-none group-hover:scale-105 transition-transform duration-200" />
+              <span className="text-2xl sm:text-3xl font-bold font-sans text-orange-400 tracking-wide group-hover:text-orange-300 transition-colors">MIALTAR</span>
             </Link>
-            <div className="flex items-center space-x-4">
-              <Link 
-                to="/" 
-                className="text-orange-700 hover:text-orange-600 font-medium font-inter px-4 py-2 rounded-lg transition-all duration-300 hover:bg-orange-100"
-              >
-                ← Back to Home
-              </Link>
-            </div>
+            <Link 
+              to="/" 
+              className="text-orange-400 hover:text-orange-300 font-semibold font-sans px-3 sm:px-5 py-2 rounded-lg transition-all duration-300 hover:bg-slate-700/50 text-base sm:text-lg w-full xs:w-auto text-center xs:text-right"
+              style={{wordBreak: 'keep-all', whiteSpace: 'nowrap'}}
+            >
+              ← Back to Home
+            </Link>
           </div>
         </div>
       </nav>
@@ -186,23 +186,18 @@ const Login = () => {
         <div className="w-full max-w-md">
           {/* Welcome Section with Animation */}
           <div className={`text-center mb-8 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-600 to-orange-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold font-poppins text-orange-700 mb-2">
+            <h1 className="text-3xl font-bold font-poppins text-white mb-2">
               Welcome Back!
             </h1>
-            <p className="text-orange-900 font-inter">
+            <p className="text-slate-300 font-inter">
               Sign in to continue creating amazing wall layouts
             </p>
           </div>
           {/* Login Form with Enhanced Styling */}
-          <div className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50 transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <div className={`bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-orange-500/20 transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             {/* Success Message */}
             {successMessage && (
-              <div className="mb-6 p-4 rounded-2xl bg-green-50 border-2 border-green-200 text-green-700 text-sm animate-slide-in-up">
+              <div className="mb-6 p-4 rounded-2xl bg-green-900/20 border-2 border-green-500/50 text-green-400 text-sm animate-slide-in-up">
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -214,12 +209,12 @@ const Login = () => {
             <form onSubmit={handleLogin} className="space-y-6">
               {/* Email Field with Enhanced Styling */}
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold text-orange-700 font-inter">
+                <label htmlFor="email" className="block text-sm font-semibold text-slate-300 font-inter">
                   Email Address
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange-400/60 group-focus-within:text-orange-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                     </svg>
                   </div>
@@ -229,11 +224,11 @@ const Login = () => {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-orange-200 
-                             focus:outline-none focus:ring-4 focus:ring-orange-300/20 
-                             focus:border-orange-400 transition-all duration-300
-                             bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
-                             text-orange-900 font-medium"
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-600 
+                             focus:outline-none focus:ring-4 focus:ring-orange-500/20 
+                             focus:border-orange-500 transition-all duration-300
+                             bg-slate-700/50 backdrop-blur-sm hover:bg-slate-700/70
+                             text-white placeholder-slate-400 font-medium"
                     required
                     disabled={isLoading}
                   />
@@ -241,12 +236,12 @@ const Login = () => {
               </div>
               {/* Password Field with Enhanced Styling */}
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-orange-700 font-inter">
+                <label htmlFor="password" className="block text-sm font-semibold text-slate-300 font-inter">
                   Password
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-orange-300 group-focus-within:text-orange-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-orange-400/60 group-focus-within:text-orange-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
@@ -256,18 +251,18 @@ const Login = () => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-orange-200 
-                             focus:outline-none focus:ring-4 focus:ring-orange-300/20 
-                             focus:border-orange-400 transition-all duration-300
-                             bg-orange-50/50 backdrop-blur-sm hover:bg-white/80
-                             text-orange-900 font-medium"
+                    className="w-full pl-12 pr-12 py-4 rounded-2xl border-2 border-slate-600 
+                             focus:outline-none focus:ring-4 focus:ring-orange-500/20 
+                             focus:border-orange-500 transition-all duration-300
+                             bg-slate-700/50 backdrop-blur-sm hover:bg-slate-700/70
+                             text-white placeholder-slate-400 font-medium"
                     required
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-orange-300 hover:text-orange-500 transition-colors duration-300"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-orange-400/60 hover:text-orange-400 transition-colors duration-300"
                   >
                     {showPassword ? (
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +279,7 @@ const Login = () => {
               </div>
               {/* Error Message */}
               {error && (
-                <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 text-sm animate-slide-in-up">
+                <div className="p-4 rounded-2xl bg-red-900/20 border-2 border-red-500/50 text-red-400 text-sm animate-slide-in-up">
                   <div className="flex items-center gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -296,9 +291,9 @@ const Login = () => {
               {/* Submit Button with Enhanced Styling */}
               <button 
                 type="submit" 
-                className="group w-full py-4 px-6 rounded-2xl text-white font-bold text-lg
-                         bg-gradient-to-r from-orange-600 to-orange-400 
-                         hover:from-orange-500 hover:to-orange-300
+                className="group w-full py-4 px-6 rounded-2xl text-slate-900 font-bold text-lg
+                         bg-gradient-to-r from-orange-500 to-orange-400 
+                         hover:from-orange-400 hover:to-orange-300
                          transition-all duration-300 shadow-xl hover:shadow-2xl
                          disabled:opacity-50 disabled:cursor-not-allowed
                          transform hover:scale-105 hover:-translate-y-1 active:scale-95
@@ -307,7 +302,7 @@ const Login = () => {
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-3">
-                    <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-6 w-6 text-slate-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -325,9 +320,9 @@ const Login = () => {
               {/* Divider */}
               <div className="relative flex items-center justify-center py-4">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-orange-200"></div>
+                  <div className="w-full border-t border-slate-600"></div>
                 </div>
-                <div className="relative bg-white px-4 text-sm text-orange-400 font-medium">
+                <div className="relative bg-slate-800 px-4 text-sm text-orange-400 font-medium">
                   Don't have an account?
                 </div>
               </div>
@@ -335,8 +330,8 @@ const Login = () => {
               <Link 
                 to="/register" 
                 className="group w-full flex items-center justify-center py-4 px-6 rounded-2xl 
-                         border-2 border-orange-600 text-orange-700 font-bold text-lg
-                         hover:bg-orange-600 hover:text-white
+                         border-2 border-orange-500 text-orange-400 font-bold text-lg
+                         hover:bg-orange-500 hover:text-slate-900
                          transition-all duration-300 shadow-lg hover:shadow-xl
                          transform hover:scale-105 hover:-translate-y-1"
               >

@@ -116,7 +116,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
 
   if (loading) {
     return (
-      <div className="h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+      <div className="h-full bg-gradient-to-br from-slate-900/95 to-slate-800/90 p-2 sm:p-4 border border-orange-500/20 rounded-2xl">
         <div className="flex items-center gap-2 mb-4">
           <Flower2 className="w-5 h-5 text-orange-600" />
           <h3 className="font-semibold text-orange-800">Decors</h3>
@@ -129,37 +129,37 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+    <div className="h-full ">
       {upgradeMsg && (
-        <div className="mb-3 p-2 bg-red-100 border border-red-300 text-red-700 text-sm rounded text-center animate-pulse">
+        <div className="mb-3 p-2 bg-red-900/30 border border-red-500/40 text-red-300 text-sm rounded text-center animate-pulse">
           {upgradeMsg}
         </div>
       )}
-      <div className="flex items-center gap-2 mb-4">
-        <Flower2 className="w-5 h-5 text-orange-600" />
-        <h3 className="font-semibold text-orange-800">Decors</h3>
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Flower2 className="w-5 h-5 text-orange-400" />
+        <h3 className="font-semibold text-orange-300 text-base sm:text-lg">Decors</h3>
       </div>
 
       {/* User Uploaded Decors Section */}
       {userDecors.length > 0 && (
         <div className="mb-6">
-          <h4 className="text-sm font-semibold text-orange-700 mb-3 px-1">Your Uploaded Decors</h4>
-          <div className="grid grid-cols-2 gap-3">
+          <h4 className="text-xs sm:text-sm font-semibold text-orange-400 mb-2 sm:mb-3 px-1">Your Uploaded Decors</h4>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {userDecors.map(({ src, state, idx }, i) => (
               <div
                 key={idx}
-                className="relative group bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden cursor-pointer"
+                className="relative group bg-slate-800/80 backdrop-blur-sm rounded-xl border border-orange-500/20 hover:border-orange-400 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden cursor-pointer text-xs sm:text-sm"
                 onClick={() => onSelectUserDecor && onSelectUserDecor(idx)}
               >
-                <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
+                <div className="aspect-square p-1 sm:p-2 flex items-center justify-center bg-gradient-to-br from-slate-900/80 to-orange-500/10">
                   <img
                     src={src}
                     alt={`User Decor ${i + 1}`}
                     className="max-w-full max-h-full object-contain filter drop-shadow-sm group-hover:drop-shadow-md transition-all duration-300"
                   />
                 </div>
-                <div className="p-3 bg-white/80 backdrop-blur-sm flex flex-col items-center">
-                  <p className="text-xs font-semibold text-orange-800 text-center mb-2">User Decor</p>
+                <div className="p-2 sm:p-3 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center">
+                  <p className="text-[10px] sm:text-xs font-semibold text-orange-300 text-center mb-1 sm:mb-2">User Decor</p>
                   <button
                     type="button"
                     className="bg-red-500 text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-red-600 transition"
@@ -172,8 +172,8 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                   </button>
                 </div>
                 {/* Size indicator */}
-                <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span className="text-xs font-medium text-orange-700">
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-slate-900/80 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1">
+                  <span className="text-[10px] sm:text-xs font-medium text-orange-300">
                     {state.width}×{state.height}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full px-3 py-2 border border-orange-200 rounded-lg bg-white/80 backdrop-blur-sm text-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
+          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-orange-500/20 rounded-lg bg-slate-900/80 backdrop-blur-sm text-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-sm"
         >
           <option value="all">All Categories</option>
           {Object.keys(decorCategories).map(category => (
@@ -202,25 +202,25 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       {/* Decor Items */}
       <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
         {filteredCategories.length === 0 ? (
-          <div className="text-center py-8 text-orange-600">
+          <div className="text-center py-6 sm:py-8 text-orange-400 text-xs sm:text-base">
             <p>No decors available</p>
           </div>
         ) : (
           filteredCategories.map(([categoryKey, category]) => (
             <div key={categoryKey}>
-              <h4 className="text-sm font-semibold text-orange-700 mb-3 px-1">
+              <h4 className="text-xs sm:text-sm font-semibold text-orange-400 mb-2 sm:mb-3 px-1">
                 {category.name}
               </h4>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {category.items.map((decor) => {
                   const isLocked = userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor._id);
                   return (
                     <div
                       key={decor._id}
                       onClick={() => handleDecorClick(decor)}
-                      className={`relative group cursor-pointer bg-white/60 backdrop-blur-sm rounded-xl border border-white/40 hover:border-orange-300 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden ${isLocked ? 'opacity-85 pointer-events-auto' : ''}`}
+                    className={`relative group cursor-pointer bg-slate-800/80 backdrop-blur-sm rounded-xl border border-orange-500/20 hover:border-orange-400 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden text-xs sm:text-sm ${isLocked ? 'opacity-85 pointer-events-auto' : ''}`}
                     >
-                      <div className="aspect-square p-2 flex items-center justify-center bg-gradient-to-br from-white/50 to-orange-50/30">
+                      <div className="aspect-square p-1 sm:p-2 flex items-center justify-center bg-gradient-to-br from-slate-900/80 to-orange-500/10">
                         <img
                           src={decor.src}
                           alt={decor.name}
@@ -238,23 +238,23 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                           </div>
                         )}
                         {isLocked && (
-                          <div className="absolute inset-0 bg-white/20 flex items-center justify-center z-10">
+                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center z-10">
                             <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 17v1m-6 4h12a2 2 0 002-2v-7a2 2 0 00-2-2H6a2 2 0 00-2 2v7a2 2 0 002 2zm6-4a2 2 0 11-4 0 2 2 0 014 0zm-2-6V7a4 4 0 118 0v2" /></svg>
                           </div>
                         )}
                       </div>
-                      <div className="p-3 bg-white/80 backdrop-blur-sm">
-                        <p className="text-sm font-semibold text-orange-800 text-center">
+                      <div className="p-2 sm:p-3 bg-slate-900/80 backdrop-blur-sm">
+                        <p className="text-[10px] sm:text-sm font-semibold text-orange-300 text-center">
                           {decor.name}
                         </p>
                         {loadError[decor.id] && (
-                          <p className="text-xs text-red-500 text-center mt-1">Image not available</p>
+                          <p className="text-[10px] sm:text-xs text-red-500 text-center mt-1">Image not available</p>
                         )}
                       </div>
                       {/* Size indicator */}
                       {!loadError[decor.id] && (
-                        <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-                          <span className="text-xs font-medium text-orange-700">
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-slate-900/80 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1">
+                          <span className="text-[10px] sm:text-xs font-medium text-orange-300">
                             {decor.size.width}×{decor.size.height}
                           </span>
                         </div>

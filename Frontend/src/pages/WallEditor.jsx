@@ -191,13 +191,9 @@ function WallEditor() {
 
   // Load user wall data
   useEffect(() => {
-    console.log('WallEditor: registeredUser:', registeredUser);
     if (registeredUser && registeredUser.isLoggedIn) {
       // TODO: Implement wall API endpoint when needed
       // For now, use default values
-      console.log('User is logged in, ready to load wall data');
-    } else {
-      console.log('User is not logged in, uploads may not work without authentication');
     }
   }, [registeredUser]);
 
@@ -221,7 +217,7 @@ function WallEditor() {
   useEffect(() => {
     // Only log once when component is initialized
     if (isInitialized && wallImageInputRef.current && imagesInputRef.current) {
-      console.log('✅ File upload refs are ready');
+      // File upload refs are ready
     }
   }, [isInitialized]);
 
@@ -232,7 +228,7 @@ function WallEditor() {
       // For now, we'll save locally or skip this step
       // Only log occasionally to avoid spam
       if (Math.random() < 0.1) {
-        console.log('Wall data updated locally (backend endpoint not implemented yet)');
+        // Wall data updated locally (backend endpoint not implemented yet)
       }
     }
   }, [wallColor, wallWidth, wallHeight, wallImage, images, imageStates, registeredUser]);
@@ -304,7 +300,7 @@ function WallEditor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wallData }),
       }).catch(error => {
-        console.error('Error updating shared wall:', error);
+        // Error updating shared wall
       });
     }
   }, [wallColor, wallWidth, wallHeight, wallImage, images, imageStates, isCollaborating, draftId]);
@@ -394,7 +390,23 @@ function WallEditor() {
   } else if (activeTab === 'decors') {
     // Find user-uploaded decors (isDecor: true)
     const userDecors = images
-      .map((src, idx) => ({ src, state: imageStates[idx], idx }))
+      .map((img, idx) => {
+        // Convert image object to proper src URL
+        let src = '';
+        if (img && typeof img === 'object') {
+          if (img.data && img.contentType) {
+            // Uploaded image format
+            src = `data:${img.contentType};base64,${img.data}`;
+          } else if (img.src) {
+            // Decor format
+            src = img.src;
+          }
+        } else if (typeof img === 'string') {
+          // Direct URL
+          src = img;
+        }
+        return { src, state: imageStates[idx], idx };
+      })
       .filter(item => item.state && item.state.isDecor);
 
     // Handler to remove a decor by its index in images/imageStates
@@ -431,7 +443,7 @@ function WallEditor() {
       <ErrorBanner errorMsg={errorMsg} />
 
       <div
-        className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400"
+        className="min-h-screen relative overflow-hidden bg-slate-900"
         onClick={(e) => {
           const clickedElement = e.target;
           // Define what counts as a button, input, sidebar, canvas, modal, interactive
@@ -493,10 +505,10 @@ function WallEditor() {
         <div className="absolute inset-0 opacity-20">
           {/* ...existing code... */}
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.1) 0%, transparent 40%),
-                             radial-gradient(circle at 80% 20%, rgba(251, 146, 60, 0.08) 0%, transparent 50%),
-                             radial-gradient(circle at 40% 70%, rgba(234, 88, 12, 0.06) 0%, transparent 60%),
-                             radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 45%)`
+            backgroundImage: `radial-gradient(circle at 20% 30%, rgba(249, 115, 22, 0.05) 0%, transparent 40%),
+                             radial-gradient(circle at 80% 20%, rgba(251, 146, 60, 0.04) 0%, transparent 50%),
+                             radial-gradient(circle at 40% 70%, rgba(234, 88, 12, 0.03) 0%, transparent 60%),
+                             radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.05) 0%, transparent 45%)`
           }}></div>
           {/* ...existing code... */}
         </div>
@@ -529,7 +541,7 @@ function WallEditor() {
               MAX_SIZE={MAX_SIZE}
               selectedIdx={selectedIdx}
               isViewOnly={isViewOnly}
-              className="animate-slide-in-left delay-200 w-full lg:w-80 bg-white/90 border-t-2 border-orange-300 shadow-2xl rounded-t-3xl backdrop-blur-md p-2 sm:p-4 lg:fixed lg:left-4 lg:top-24 lg:bottom-4 lg:rounded-2xl lg:p-6 lg:flex-col lg:gap-6 lg:bg-none lg:border-none lg:shadow-none lg:rounded-none"
+              className="animate-slide-in-left delay-200 w-full lg:w-80 bg-slate-800/90 border-t-2 border-orange-500/50 shadow-2xl rounded-t-3xl backdrop-blur-md p-2 sm:p-4 lg:fixed lg:left-4 lg:top-24 lg:bottom-4 lg:rounded-2xl lg:p-6 lg:flex-col lg:gap-6 lg:bg-none lg:border-none lg:shadow-none lg:rounded-none"
             />
           </div>
 
