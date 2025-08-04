@@ -11,5 +11,6 @@ export const predefinedFeatures = [
   'Custom Fonts',
   'Team Collaboration Tools',
   'Team Collaboration',
-  'Remove Watermark'
+  'Remove Watermark',
+  'Export Drafts'
 ];

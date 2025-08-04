@@ -294,33 +294,49 @@ const PlanManagement = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading subscription plans...</p>
+      <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-orange-500/20 p-8 text-center shadow-xl">
+        <div className="relative mx-auto mb-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-600 border-t-orange-500"></div>
+          <div className="absolute inset-0 animate-ping rounded-full h-12 w-12 border-2 border-orange-400 opacity-20"></div>
+        </div>
+        <p className="text-slate-300 font-medium">Loading subscription plans...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 p-2 sm:p-6  max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-        <div className="w-full sm:w-auto">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Plan Management</h2>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">Create and manage subscription plans</p>
+    <div className="space-y-6 animate-fade-in-up">
+      <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 shadow-xl">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2" style={{textShadow: '0 2px 8px rgba(0,0,0,0.3)'}}>
+              Plan Management
+            </h2>
+            <p className="text-slate-300 text-sm sm:text-base">Create and manage subscription plans</p>
+          </div>
+          <button
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl w-full sm:w-auto"
+            style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
+          >
+            Add New Plan
+          </button>
         </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
-          className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
-        >
-          Add New Plan
-        </button>
       </div>
+      
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-2 sm:p-4 rounded-md">
-          <p className="text-red-700 text-xs sm:text-base">{error}</p>
+        <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-red-300 font-medium">{error}</p>
+          </div>
         </div>
       )}
       {showForm && (

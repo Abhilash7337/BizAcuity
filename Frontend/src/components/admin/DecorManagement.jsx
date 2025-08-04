@@ -33,6 +33,7 @@ const DecorManagement = () => {
       const response = await authFetch('/categories');
       const data = await response.json();
       if (response.ok) {
+        console.log('Categories fetched:', data); // Debug log
         setCategories(data);
         // Set default for form
         if (data.length > 0 && !formData.category) {
@@ -45,9 +46,11 @@ const DecorManagement = () => {
         });
         setCategoryNumbers(numbers);
       } else {
+        console.error('Failed to fetch categories:', data);
         setCategoryError(data.error || 'Failed to fetch categories');
       }
     } catch (error) {
+      console.error('Error fetching categories:', error);
       setCategoryError('Failed to fetch categories');
     } finally {
       setCategoryLoading(false);
@@ -154,9 +157,10 @@ const DecorManagement = () => {
   };
 
   const resetForm = () => {
+    const defaultCategory = categories.length > 0 ? categories[0].name : '';
     setFormData({
       name: '',
-      category: categories[0]?.name || '', // Use first available category, not hardcoded
+      category: defaultCategory,
       description: '',
       image: null
     });
@@ -181,28 +185,41 @@ const DecorManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      <div className="flex justify-center items-center h-64 bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-orange-500/20">
+        <div className="text-center">
+          <div className="relative mx-auto mb-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-600 border-t-orange-500"></div>
+            <div className="absolute inset-0 animate-ping rounded-full h-12 w-12 border-2 border-orange-400 opacity-20"></div>
+          </div>
+          <p className="text-slate-300 font-medium">Loading decors...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-white">Decor Management</h1>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 shadow-xl">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2" style={{textShadow: '0 2px 8px rgba(0,0,0,0.3)'}}>
+            Decor Management
+          </h1>
+          <p className="text-slate-300">Manage decorative elements for wall designs</p>
+        </div>
+        <div className="flex gap-3">
           <button
             onClick={() => setIsCategoryModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+            style={{boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)'}}
           >
             <Plus size={20} />
             Add Category
           </button>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 flex items-center gap-2"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+            style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
           >
             <Plus size={20} />
             Add New Decor
@@ -210,56 +227,81 @@ const DecorManagement = () => {
         </div>
       </div>
 
-      {/* Category Filter (removed per-category number input and Set all -1) */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4">
-          <Filter size={20} className="text-slate-400" />
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          >
-            <option value="all">All Categories</option>
-            {categories.map(category => (
-              <option key={category._id} value={category.name}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <span className="text-gray-600">
-            {filteredDecors.length} decor{filteredDecors.length !== 1 ? 's' : ''}
-          </span>
+      {/* Category Filter */}
+      <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center">
+              <Filter size={20} className="text-orange-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">Filter Decors</h3>
+              <p className="text-slate-400 text-sm">Browse by category</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 flex-1">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+            >
+              <option value="all">All Categories</option>
+              {categories.map(category => (
+                <option key={category._id} value={category.name}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+            <div className="bg-slate-700/50 rounded-xl px-4 py-2 border border-slate-600">
+              <span className="text-orange-400 font-semibold">
+                {filteredDecors.length}
+              </span>
+              <span className="text-slate-300 ml-1">
+                decor{filteredDecors.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Decors Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredDecors.map(decor => (
-          <div key={decor._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-48 bg-gray-100 flex items-center justify-center">
+        {filteredDecors.map((decor, index) => (
+          <div 
+            key={decor._id} 
+            className="bg-slate-800/60 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-orange-500/20 transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 group"
+            style={{
+              animationDelay: `${index * 0.1}s`,
+              animation: 'fadeInUp 0.6s ease-out'
+            }}
+          >
+            <div className="h-48 bg-slate-700/50 flex items-center justify-center relative overflow-hidden">
               <img
                 src={decor.imageUrl ? `${import.meta.env.VITE_API_BASE_URL || ''}${decor.imageUrl}` : 'https://via.placeholder.com/150?text=No+Image'}
                 alt={decor.name}
-                className="max-h-full max-w-full object-contain"
+                className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
                 onError={e => { e.target.src = 'https://via.placeholder.com/150?text=No+Image'; }}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div className="p-4">
-              <h3 className="font-semibold text-gray-800 mb-1">{decor.name}</h3>
-              <p className="text-sm text-orange-600 mb-2 capitalize">{decor.category}</p>
+              <h3 className="font-bold text-white mb-1 group-hover:text-orange-300 transition-colors duration-300">{decor.name}</h3>
+              <p className="text-sm text-orange-400 mb-2 capitalize font-medium">{decor.category}</p>
               {decor.description && (
-                <p className="text-sm text-gray-600 mb-3">{decor.description}</p>
+                <p className="text-sm text-slate-300 mb-3 leading-relaxed">{decor.description}</p>
               )}
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center pt-2 border-t border-slate-700/50">
                 <button
                   onClick={() => openEditModal(decor)}
-                  className="text-orange-500 hover:text-orange-600 p-2"
+                  className="text-orange-400 hover:text-orange-300 p-2 rounded-xl hover:bg-orange-500/20 transition-all duration-300 transform hover:scale-110"
+                  title="Edit decor"
                 >
                   <Edit size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(decor._id)}
-                  className="text-red-500 hover:text-red-600 p-2"
+                  className="text-red-400 hover:text-red-300 p-2 rounded-xl hover:bg-red-500/20 transition-all duration-300 transform hover:scale-110"
+                  title="Delete decor"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -270,50 +312,66 @@ const DecorManagement = () => {
       </div>
 
       {filteredDecors.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          No decors found in this category.
+        <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl p-12 text-center border border-orange-500/20 shadow-xl">
+          <div className="w-16 h-16 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m8-8h.01M12 13h.01M16 9h.01" />
+            </svg>
+          </div>
+          <h3 className="text-white font-bold text-lg mb-2">No decors found</h3>
+          <p className="text-slate-400">
+            {selectedCategory === 'all' 
+              ? 'No decors available. Add some decorative elements to get started.' 
+              : `No decors found in the "${selectedCategory}" category.`
+            }
+          </p>
         </div>
       )}
 
       {/* Add/Edit Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
-                {editingDecor ? 'Edit Decor' : 'Add New Decor'}
-              </h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md border border-orange-500/20 shadow-2xl transform animate-modal-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">
+                  {editingDecor ? 'Edit Decor' : 'Add New Decor'}
+                </h2>
+                <p className="text-slate-400 text-sm">
+                  {editingDecor ? 'Update decor information' : 'Add a new decorative element'}
+                </p>
+              </div>
               <button
                 onClick={resetForm}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-slate-400 hover:text-slate-200 p-2 rounded-xl hover:bg-slate-700/50 transition-all duration-300"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-white mb-2">
                   Name
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  placeholder="Enter decor name"
                   required
                 />
               </div>
 
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-white mb-2">
                   Category
                 </label>
                 <select
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   required
                 >
                   {categories.length === 0 && <option value="">No categories found</option>}
@@ -326,22 +384,23 @@ const DecorManagement = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-white mb-2">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 resize-none"
                   rows="3"
+                  placeholder="Enter description (optional)"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image {!editingDecor && <span className="text-red-500">*</span>}
+                <label className="block text-sm font-semibold text-white mb-2">
+                  Image {!editingDecor && <span className="text-red-400">*</span>}
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="border-2 border-dashed border-slate-600 rounded-xl p-6 bg-slate-700/30 hover:border-orange-500/50 transition-all duration-300">
                   <input
                     type="file"
                     accept="image/*"
@@ -349,26 +408,27 @@ const DecorManagement = () => {
                       const file = e.target.files[0];
                       setFormData({ ...formData, image: file });
                     }}
-                    className="w-full"
+                    className="w-full text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 file:transition-all file:duration-300"
                     required={!editingDecor}
                   />
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-slate-400 mt-2 text-center">
                     Upload PNG, JPG, or GIF (max 5MB)
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-6">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
+                  className="flex-1 bg-slate-700/50 border border-slate-600 text-slate-300 py-3 rounded-xl font-semibold hover:bg-slate-600/50 transition-all duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600"
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105"
+                  style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
                 >
                   {editingDecor ? 'Update' : 'Add'} Decor
                 </button>
@@ -378,30 +438,69 @@ const DecorManagement = () => {
         </div>
       )}
 
-      {/* Add Category Modal (moved outside decor modal) */}
+      {/* Add Category Modal */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Manage Categories</h2>
-              <button
-                onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={24} />
-              </button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800/95 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md border border-orange-500/20 shadow-2xl transform animate-modal-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">Manage Categories</h2>
+                <p className="text-slate-400 text-sm">Add or remove decor categories</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    fetchCategories();
+                  }}
+                  className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-700/50 transition-all duration-300"
+                  title="Refresh categories"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
+                  className="text-slate-400 hover:text-slate-200 p-2 rounded-xl hover:bg-slate-700/50 transition-all duration-300"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
-            {/* List existing categories with delete buttons */}
-            <div className="mb-4 max-h-40 overflow-y-auto">
+            
+            {/* List existing categories */}
+            <div className="mb-6 max-h-48 overflow-y-auto">
+              <h3 className="text-white font-semibold mb-3 flex items-center">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-2">
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                </div>
+                Existing Categories
+              </h3>
               {categories.length === 0 ? (
-                <div className="text-gray-500 text-sm">No categories found.</div>
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 bg-slate-700/50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <p className="text-slate-400 text-sm">No categories found.</p>
+                </div>
               ) : (
-                <ul>
-                  {categories.map(category => (
-                    <li key={category._id} className="flex items-center justify-between py-1 group">
-                      <span className="capitalize text-gray-800">{category.name}</span>
+                <div className="space-y-2">
+                  {categories.map((category, index) => (
+                    <div 
+                      key={category._id} 
+                      className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg border border-slate-600/50 hover:border-blue-500/50 transition-all duration-300 group animate-slideIn"
+                      style={{animationDelay: `${index * 0.1}s`}}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                        <span className="capitalize text-white font-medium">{category.name}</span>
+                      </div>
                       <button
-                        className="text-red-500 hover:text-red-700 p-1 ml-2 opacity-70 group-hover:opacity-100"
+                        className="text-red-400 hover:text-red-300 p-2 rounded-lg hover:bg-red-500/20 transition-all duration-300 transform hover:scale-110 opacity-70 group-hover:opacity-100"
                         title="Delete category"
                         onClick={async () => {
                           if (!window.confirm(`Delete category '${category.name}'? This cannot be undone.`)) return;
@@ -429,70 +528,101 @@ const DecorManagement = () => {
                       >
                         <Trash2 size={16} />
                       </button>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
             {/* Add new category form */}
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setCategoryLoading(true);
-                setCategoryError('');
-                try {
-                  const response = await authFetch('/admin/categories', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: newCategory })
-                  });
-                  const data = await response.json();
-                  if (response.ok) {
-                    setCategories([...categories, data]);
-                    setNewCategory('');
-                    setCategoryError('');
-                  } else {
-                    setCategoryError(data.error || 'Failed to add category');
+            <div className="border-t border-slate-700/50 pt-6">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setCategoryLoading(true);
+                  setCategoryError('');
+                  try {
+                    const response = await authFetch('/admin/categories', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ name: newCategory })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                      const updatedCategories = [...categories, data];
+                      setCategories(updatedCategories);
+                      setNewCategory('');
+                      setCategoryError('');
+                      // Update form data if this is the first category
+                      if (categories.length === 0) {
+                        setFormData(f => ({ ...f, category: data.name }));
+                      }
+                    } else {
+                      setCategoryError(data.error || 'Failed to add category');
+                    }
+                  } catch (error) {
+                    setCategoryError('Failed to add category');
+                  } finally {
+                    setCategoryLoading(false);
                   }
-                } catch (error) {
-                  setCategoryError('Failed to add category');
-                } finally {
-                  setCategoryLoading(false);
-                }
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Add New Category</label>
-                <input
-                  type="text"
-                  value={newCategory}
-                  onChange={e => setNewCategory(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                  maxLength={50}
-                  disabled={categoryLoading}
-                />
-              </div>
-              {categoryError && <div className="text-red-500 text-sm">{categoryError}</div>}
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
-                  className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
-                  disabled={categoryLoading}
-                >
-                  Close
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-                  disabled={categoryLoading}
-                >
-                  {categoryLoading ? 'Adding...' : 'Add Category'}
-                </button>
-              </div>
-            </form>
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-semibold text-white mb-2 flex items-center">
+                    <div className="w-5 h-5 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-2">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    Add New Category
+                  </label>
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={e => setNewCategory(e.target.value)}
+                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300"
+                    placeholder="Enter category name"
+                    required
+                    maxLength={50}
+                    disabled={categoryLoading}
+                  />
+                </div>
+                {categoryError && (
+                  <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
+                    <p className="text-red-300 text-sm flex items-center">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {categoryError}
+                    </p>
+                  </div>
+                )}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsCategoryModalOpen(false); setNewCategory(''); setCategoryError(''); }}
+                    className="flex-1 bg-slate-700/50 border border-slate-600 text-slate-300 py-3 rounded-xl font-semibold hover:bg-slate-600/50 hover:text-white transition-all duration-300"
+                    disabled={categoryLoading}
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    disabled={categoryLoading}
+                  >
+                    {categoryLoading ? (
+                      <span className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        Adding...
+                      </span>
+                    ) : (
+                      'Add Category'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -179,18 +179,39 @@ useEffect(() => {
 
   if (!registeredUser || (registeredUser.userType !== 'admin' && registeredUser.email !== 'abhilashpodisetty@gmail.com')) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400 flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center relative overflow-hidden">
+        {/* Background animation */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path 
+              d="M0,50 Q25,25 50,50 T100,50" 
+              stroke="url(#errorFlowGradient)" 
+              strokeWidth="0.5" 
+              fill="none"
+              style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
+            />
+            <defs>
+              <linearGradient id="errorFlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.4)" />
+                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.6)" />
+                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.4)" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        
+        <div className="bg-slate-800/60 backdrop-blur-xl rounded-2xl shadow-2xl p-8 text-center max-w-md mx-4 border border-orange-500/20 transform hover:scale-105 transition-all duration-500" style={{boxShadow: '0 20px 40px rgba(0,0,0,0.3), 0 8px 25px rgba(249,115,22,0.1)'}}>
+          <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 transform hover:scale-110 transition-all duration-300" style={{boxShadow: '0 8px 25px rgba(239, 68, 68, 0.3)'}}>
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">You don't have admin privileges to access this page.</p>
+          <h1 className="text-2xl font-bold text-white mb-4" style={{textShadow: '0 2px 8px rgba(0,0,0,0.3)'}}>Access Denied</h1>
+          <p className="text-slate-300 mb-6 leading-relaxed">You don't have admin privileges to access this page.</p>
           <button 
             onClick={() => navigate('/dashboard')}
-            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+            style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
           >
             Go to Dashboard
           </button>
@@ -201,23 +222,51 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400">
+      <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path 
+              d="M0,50 Q25,25 50,50 T100,50" 
+              stroke="url(#loadingFlowGradient)" 
+              strokeWidth="0.5" 
+              fill="none"
+              style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
+            />
+            <defs>
+              <linearGradient id="loadingFlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.4)" />
+                <stop offset="50%" stopColor="rgba(251, 146, 60, 0.6)" />
+                <stop offset="100%" stopColor="rgba(234, 88, 12, 0.4)" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        
         <Header />
         <div className="flex flex-col md:flex-row pt-8 md:pt-20">
-          <div className="w-full md:w-96 bg-white shadow-xl border-r border-orange-300 min-h-[200px] md:min-h-screen">
+          <div className="w-full md:w-96 bg-slate-800/60 backdrop-blur-xl shadow-2xl border-r border-orange-500/20 min-h-[200px] md:min-h-screen">
             <div className="p-4 md:p-8">
-              <div className="h-24 md:h-40 bg-orange-200/50 rounded-2xl animate-pulse mb-4 md:mb-8"></div>
+              <div className="h-24 md:h-40 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-2xl animate-pulse mb-4 md:mb-8 border border-orange-500/10"></div>
               <div className="text-center">
-                <div className="w-16 md:w-24 h-16 md:h-24 bg-orange-200/50 rounded-full mx-auto mb-4 md:mb-6 animate-pulse"></div>
-                <div className="h-4 md:h-5 bg-orange-200/50 rounded-xl w-2/3 md:w-3/4 mx-auto mb-2 md:mb-3 animate-pulse"></div>
-                <div className="h-3 md:h-4 bg-orange-200/50 rounded-xl w-1/2 mx-auto animate-pulse"></div>
+                <div className="w-16 md:w-24 h-16 md:h-24 bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-full mx-auto mb-4 md:mb-6 animate-pulse border border-orange-500/10"></div>
+                <div className="h-4 md:h-5 bg-slate-700/60 rounded-xl w-2/3 md:w-3/4 mx-auto mb-2 md:mb-3 animate-pulse"></div>
+                <div className="h-3 md:h-4 bg-slate-700/60 rounded-xl w-1/2 mx-auto animate-pulse"></div>
               </div>
             </div>
           </div>
-          <div className="flex-1 p-4 md:p-8">
+          <div className="flex-1 p-4 md:p-8 bg-slate-900/50">
             <div className="text-center py-10 md:py-20">
-              <div className="animate-spin rounded-full h-12 md:h-20 w-12 md:w-20 border-4 border-orange-300 border-t-orange-700 mx-auto"></div>
-              <div className="mt-4 md:mt-6 text-orange-800 font-bold text-lg md:text-2xl">Loading admin panel...</div>
+              <div className="relative mx-auto mb-6">
+                <div className="animate-spin rounded-full h-12 md:h-20 w-12 md:w-20 border-4 border-slate-700 border-t-orange-500 mx-auto"></div>
+                <div className="absolute inset-0 animate-ping rounded-full h-12 md:h-20 w-12 md:w-20 border-2 border-orange-400 opacity-20"></div>
+              </div>
+              <div className="mt-4 md:mt-6 text-white font-bold text-lg md:text-2xl" style={{textShadow: '0 2px 8px rgba(0,0,0,0.3)'}}>
+                Loading admin panel...
+              </div>
+              <div className="mt-2 text-slate-400 text-sm">
+                Preparing your dashboard
+              </div>
             </div>
           </div>
         </div>
@@ -226,16 +275,39 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-200 via-orange-300 to-orange-400">
+    <div className="min-h-screen bg-slate-900 overflow-hidden">
+      {/* Subtle Background Animation Layer */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="hidden sm:block">
+            <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path 
+                d="M0,50 Q25,25 50,50 T100,50" 
+                stroke="url(#adminFlowGradient)" 
+                strokeWidth="0.5" 
+                fill="none"
+                style={{animation: 'backgroundFlow 40s ease-in-out infinite'}}
+              />
+              <defs>
+                <linearGradient id="adminFlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="rgba(249, 115, 22, 0.4)" />
+                  <stop offset="50%" stopColor="rgba(251, 146, 60, 0.6)" />
+                  <stop offset="100%" stopColor="rgba(234, 88, 12, 0.4)" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
       <Header />
       <div className="flex flex-col md:flex-row pt-4 md:pt-20 relative">
         {/* Left Sidebar */}
-        <div className="w-full md:w-96 bg-white shadow-xl border-r border-orange-300 min-h-[200px] md:min-h-screen relative">
+        <div className="w-full md:w-96 bg-slate-800/50 backdrop-blur-sm shadow-xl border-r border-orange-500/20 min-h-[200px] md:min-h-screen relative">
           <div className="p-4 md:p-8">
             {/* Admin Banner */}
-            <div className="h-24 md:h-40 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl mb-4 md:mb-8 flex items-center justify-center">
+            <div className="h-24 md:h-40 bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl mb-4 md:mb-8 flex items-center justify-center transform hover:scale-105 transition-all duration-300 shadow-lg shadow-orange-500/25">
               <div className="text-center text-white">
-                <svg className="w-8 md:w-12 h-8 md:h-12 mx-auto mb-1 md:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 md:w-12 h-8 md:h-12 mx-auto mb-1 md:mb-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 <h2 className="text-base md:text-xl font-bold">Admin Panel</h2>
@@ -245,26 +317,26 @@ useEffect(() => {
 
             {/* Admin Profile */}
             <div className="text-center mb-4 md:mb-8">
-              <div className="w-16 md:w-24 h-16 md:h-24 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full mx-auto mb-2 md:mb-4 flex items-center justify-center">
+              <div className="w-16 md:w-24 h-16 md:h-24 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-2 md:mb-4 flex items-center justify-center transform hover:scale-110 transition-all duration-300 shadow-lg shadow-orange-500/30">
                 <span className="text-white text-lg md:text-2xl font-bold">
                   {registeredUser?.name?.charAt(0).toUpperCase() || 'A'}
                 </span>
               </div>
-              <h3 className="text-base md:text-xl font-bold text-gray-800 mb-1 md:mb-2">
+              <h3 className="text-base md:text-xl font-bold text-white mb-1 md:mb-2">
                 {registeredUser?.name || 'Admin'}
               </h3>
-              <p className="text-orange-600 font-medium text-xs md:text-sm">Administrator</p>
-              <p className="text-gray-500 text-xs">{registeredUser?.email}</p>
+              <p className="text-orange-400 font-medium text-xs md:text-sm">Administrator</p>
+              <p className="text-slate-400 text-xs">{registeredUser?.email}</p>
             </div>
 
             {/* Navigation */}
             <div className="space-y-2">
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base ${
                   activeTab === 'dashboard'
-                    ? 'bg-orange-100 text-orange-700 shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-orange-400'
                 }`}
               >
                 <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,10 +346,10 @@ useEffect(() => {
               </button>
               <button
                 onClick={() => setActiveTab('plans')}
-                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base ${
                   activeTab === 'plans'
-                    ? 'bg-orange-100 text-orange-700 shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-orange-400'
                 }`}
               >
                 <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,10 +359,10 @@ useEffect(() => {
               </button>
               <button
                 onClick={() => setActiveTab('decors')}
-                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base ${
                   activeTab === 'decors'
-                    ? 'bg-orange-100 text-orange-700 shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-orange-400'
                 }`}
               >
                 <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,10 +372,10 @@ useEffect(() => {
               </button>
               <button
                 onClick={() => setActiveTab('upgradeRequests')}
-                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-200 text-xs md:text-base ${
+                className={`w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base ${
                   activeTab === 'upgradeRequests'
-                    ? 'bg-orange-100 text-orange-700 shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-orange-400'
                 }`}
               >
                 <svg className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,110 +424,130 @@ useEffect(() => {
             </button>
           </div>
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 mb-8 shadow-lg">
+            <div className="bg-red-900/20 border border-red-500/30 rounded-2xl p-6 mb-8 shadow-lg backdrop-blur-sm">
               <div className="flex items-center">
-                <svg className="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-red-700 font-medium">{error}</p>
+                <p className="text-red-300 font-medium">{error}</p>
               </div>
             </div>
           )}
 
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && dashboardStats && (
-            <div className="space-y-8">
-              <h1 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h1>
+            <div className="space-y-8 relative z-10">
+              <h1 className="text-3xl font-bold text-white mb-8 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">Admin Dashboard</h1>
               
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-500/20 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 group">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-sm font-medium">Total Users</p>
-                      <p className="text-3xl font-bold text-orange-600">{dashboardStats.totalUsers}</p>
+                      <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors duration-300">Total Users</p>
+                      <p className="text-3xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300">{dashboardStats.totalUsers}</p>
                     </div>
-                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-all duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                       </svg>
                     </div>
                   </div>
+                  <div className="mt-4 h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full" style={{width: '75%', animation: 'slideIn 1s ease-out'}}></div>
+                  </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-500/20 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 group">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-sm font-medium">Total Designs</p>
-                      <p className="text-3xl font-bold text-blue-600">{dashboardStats.totalDrafts}</p>
+                      <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors duration-300">Total Designs</p>
+                      <p className="text-3xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300">{dashboardStats.totalDrafts}</p>
                     </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-all duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                   </div>
+                  <div className="mt-4 h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full" style={{width: '85%', animation: 'slideIn 1.2s ease-out'}}></div>
+                  </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-500/20 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 group">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-sm font-medium">Total Plans</p>
-                      <p className="text-3xl font-bold text-green-600">{dashboardStats.totalPlans}</p>
+                      <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors duration-300">Total Plans</p>
+                      <p className="text-3xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300">{dashboardStats.totalPlans}</p>
                     </div>
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-all duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                     </div>
                   </div>
+                  <div className="mt-4 h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full" style={{width: '60%', animation: 'slideIn 1.4s ease-out'}}></div>
+                  </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-500/20 transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 group">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-500 text-sm font-medium">Active Plans</p>
-                      <p className="text-3xl font-bold text-purple-600">{dashboardStats.activePlans}</p>
+                      <p className="text-slate-400 text-sm font-medium group-hover:text-slate-300 transition-colors duration-300">Active Plans</p>
+                      <p className="text-3xl font-bold text-white group-hover:text-orange-400 transition-colors duration-300">{dashboardStats.activePlans}</p>
                     </div>
-                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-all duration-300 group-hover:scale-110">
+                      <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
+                  </div>
+                  <div className="mt-4 h-1 bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full" style={{width: '90%', animation: 'slideIn 1.6s ease-out'}}></div>
                   </div>
                 </div>
               </div>
 
               {/* Recent Users */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Users</h2>
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-orange-500/20">
+                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <span className="text-orange-400">👥</span>
+                  Recent Users
+                  <div className="ml-auto w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+                </h2>
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Name</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Email</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Plan</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Joined</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+                    <thead className="bg-slate-700/50">
+                      <tr className="border-b border-slate-600">
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">Name</th>
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">Email</th>
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">Plan</th>
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">Joined</th>
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {dashboardStats.recentUsers?.map((user) => (
-                        <tr key={user._id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4 text-gray-800">{user.name}</td>
-                          <td className="py-3 px-4 text-gray-600">{user.email}</td>
+                    <tbody className="bg-slate-800/30 divide-y divide-slate-700">
+                      {dashboardStats.recentUsers?.map((user, index) => (
+                        <tr key={user._id} className="hover:bg-slate-700/50 transition-all duration-300 transform hover:scale-[1.01]" style={{animationDelay: `${index * 0.1}s`}}>
+                          <td className="py-3 px-4 text-white font-medium">{user.name}</td>
+                          <td className="py-3 px-4 text-slate-300">{user.email}</td>
                           <td className="py-3 px-4">
-                            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-300 hover:scale-110 ${
+                              user.plan === 'Premium' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' :
+                              user.plan === 'Pro' ? 'bg-orange-400/20 text-orange-200 border border-orange-400/30' :
+                              'bg-slate-600/50 text-slate-300 border border-slate-500/30'
+                            }`}>
                               {user.plan}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-gray-500 text-sm">
+                          <td className="py-3 px-4 text-slate-400 text-sm">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </td>
                           <td className="py-3 px-4">
                             <button
-                              className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-xs font-medium shadow transition-all duration-200"
+                              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-3 py-1 rounded-lg text-xs font-medium shadow-lg transition-all duration-300 transform hover:scale-110"
                               onClick={() => handleEditUserClick(user)}
                             >
                               Edit
@@ -549,8 +641,11 @@ useEffect(() => {
 
         {/* Send Email Form - always visible at the bottom of dashboard */}
         {activeTab === 'dashboard' && dashboardStats && (
-          <div className="bg-white rounded-2xl shadow-xl p-8 mt-8">
-            <h2 className="text-2xl font-bold text-orange-700 mb-4 text-center">Send Email to Users</h2>
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 mt-8 border border-orange-500/20">
+            <h2 className="text-2xl font-bold text-white mb-4 text-center flex items-center justify-center gap-2">
+              <span className="text-orange-400">📧</span>
+              Send Email to Users
+            </h2>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -595,12 +690,12 @@ useEffect(() => {
                     id="selectAllUsers"
                     disabled={sendTestEmail}
                   />
-                  <label htmlFor="selectAllUsers" className="text-sm">Select All Users</label>
+                  <label htmlFor="selectAllUsers" className="text-sm text-slate-300">Select All Users</label>
                 </div>
                 <div className="mb-2">
                   <select
                     multiple
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 h-32"
+                    className="w-full px-4 py-2 border border-orange-400/30 bg-slate-700/50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 h-32"
                     value={selectedUserIds}
                     onChange={(e) => {
                       const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
@@ -625,15 +720,15 @@ useEffect(() => {
                     }}
                     id="sendTestEmail"
                   />
-                  <label htmlFor="sendTestEmail" className="text-sm">Send test email to self ({registeredUser?.email})</label>
+                  <label htmlFor="sendTestEmail" className="text-sm text-slate-300">Send test email to self ({registeredUser?.email})</label>
                 </div>
               </div>
               {/* Subject */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Subject</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  className="w-full px-4 py-2 border border-orange-400/30 bg-slate-700/50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
                   value={emailSubject}
                   onChange={e => setEmailSubject(e.target.value)}
                   required
@@ -642,9 +737,9 @@ useEffect(() => {
               </div>
               {/* Body */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Body</label>
                 <textarea
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 min-h-[100px]"
+                  className="w-full px-4 py-2 border border-orange-400/30 bg-slate-700/50 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 min-h-[100px]"
                   value={emailBody}
                   onChange={e => setEmailBody(e.target.value)}
                   required
@@ -652,22 +747,22 @@ useEffect(() => {
                 />
               </div>
               {emailError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-red-700 text-sm text-center">{emailError}</div>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-2 text-red-300 text-sm text-center">{emailError}</div>
               )}
               {emailSuccess && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-green-700 text-sm text-center">{emailSuccess}</div>
+                <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-2 text-green-300 text-sm text-center">{emailSuccess}</div>
               )}
               <div className="flex gap-3 mt-6">
                 <button
                   type="submit"
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-300 flex-1 transform hover:scale-105"
                   disabled={emailLoading || !emailSubject || !emailBody || (!sendTestEmail && !selectAllUsers && selectedUserIds.length === 0)}
                 >
                   {emailLoading ? 'Sending...' : 'Send Email'}
                 </button>
                 <button
                   type="button"
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-200 flex-1"
+                  className="bg-slate-600 hover:bg-slate-500 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition-all duration-300 flex-1 transform hover:scale-105"
                   onClick={() => { setEmailError(''); setEmailSuccess(''); setEmailLoading(false); setSelectedUserIds([]); setSelectAllUsers(false); setEmailSubject(''); setEmailBody(''); setSendTestEmail(false); }}
                   disabled={emailLoading}
                 >
