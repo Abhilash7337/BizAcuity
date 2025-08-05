@@ -348,16 +348,25 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
 });
 
 // Delete plan
-// Delete plan
 router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     
-    const deletedPlan = await Plan.findByIdAndDelete(id);
+    // First check if the plan exists and if it's deletable
+    const planToDelete = await Plan.findById(id);
     
-    if (!deletedPlan) {
+    if (!planToDelete) {
       return res.status(404).json({ error: 'Plan not found' });
     }
+
+    // Check if plan is deletable
+    if (planToDelete.isDeletable === false || planToDelete.isDefault === true) {
+      return res.status(400).json({ 
+        error: 'This plan cannot be deleted as it is a system default plan' 
+      });
+    }
+    
+    const deletedPlan = await Plan.findByIdAndDelete(id);
 
     res.json({
       success: true,
@@ -366,6 +375,78 @@ router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   } catch (error) {
     console.error('Delete plan error:', error);
     res.status(500).json({ error: 'Failed to delete plan' });
+  }
+});
+
+// Initialize default plan
+router.post('/plans/init-default', verifyToken, checkAdmin, async (req, res) => {
+  try {
+    // Check if default plan already exists
+    const existingDefaultPlan = await Plan.findOne({ isDefault: true });
+    
+    if (existingDefaultPlan) {
+      return res.json({
+        success: true,
+        message: 'Default plan already exists',
+        plan: existingDefaultPlan
+      });
+    }
+
+    // Check if FREE plan exists and update it, or create new one
+    let freePlan = await Plan.findOne({ name: 'FREE' });
+    
+    if (freePlan) {
+      // Update existing FREE plan to be the default
+      freePlan.isDefault = true;
+      freePlan.isDeletable = false;
+      freePlan.isActive = true;
+      freePlan.monthlyPrice = 0;
+      freePlan.yearlyPrice = 0;
+      freePlan.description = 'Basic free plan with limited features - perfect for getting started';
+      freePlan.limits = {
+        designsPerMonth: 3,
+        imageUploadsPerDesign: 2
+      };
+      freePlan.exportDrafts = false;
+      freePlan.features = ['Basic Wall Design', 'Limited Templates', '3 Saved Drafts'];
+      
+      await freePlan.save();
+      
+      res.json({
+        success: true,
+        message: 'Updated existing FREE plan to be the default plan',
+        plan: freePlan
+      });
+    } else {
+      // Create new default free plan
+      const defaultPlan = new Plan({
+        name: 'FREE',
+        monthlyPrice: 0,
+        yearlyPrice: 0,
+        description: 'Basic free plan with limited features - perfect for getting started',
+        features: ['Basic Wall Design', 'Limited Templates', '3 Saved Drafts'],
+        limits: {
+          designsPerMonth: 3,
+          imageUploadsPerDesign: 2
+        },
+        exportDrafts: false,
+        isActive: true,
+        isDefault: true,
+        isDeletable: false,
+        categoryLimits: {}
+      });
+
+      const savedPlan = await defaultPlan.save();
+      
+      res.json({
+        success: true,
+        message: 'Created new default FREE plan',
+        plan: savedPlan
+      });
+    }
+  } catch (error) {
+    console.error('Initialize default plan error:', error);
+    res.status(500).json({ error: 'Failed to initialize default plan' });
   }
 });
 

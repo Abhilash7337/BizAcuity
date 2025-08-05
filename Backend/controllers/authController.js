@@ -12,10 +12,16 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Find the correct FREE plan name from the database
+    // Find the default plan first, fallback to FREE plan by name
     const Plan = require('../models/Plan');
-    let freePlan = await Plan.findOne({ name: 'FREE' });
-    let planName = freePlan ? freePlan.name : 'FREE';
+    let defaultPlan = await Plan.findOne({ isDefault: true, isActive: true });
+    
+    if (!defaultPlan) {
+      // Fallback to finding a plan named 'FREE'
+      defaultPlan = await Plan.findOne({ name: 'FREE', isActive: true });
+    }
+    
+    let planName = defaultPlan ? defaultPlan.name : 'FREE';
     // Set userType to 'admin' if registering with the admin email
     const userType = email === 'abhilashpodisetty@gmail.com' ? 'admin' : undefined;
     const user = new User({ name, email, password, plan: planName, ...(userType && { userType }) });

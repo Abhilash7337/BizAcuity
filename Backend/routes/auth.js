@@ -106,10 +106,16 @@ router.post('/verify-otp', async (req, res) => {
         }
 
         // Create user in permanent collection
-        // Find the correct FREE plan name from the database
+        // Find the default plan first, fallback to FREE plan by name
         const Plan = require('../models/Plan');
-        let freePlan = await Plan.findOne({ name: 'FREE' });
-        let planName = freePlan ? freePlan.name : 'FREE';
+        let defaultPlan = await Plan.findOne({ isDefault: true, isActive: true });
+        
+        if (!defaultPlan) {
+            // Fallback to finding a plan named 'FREE'
+            defaultPlan = await Plan.findOne({ name: 'FREE', isActive: true });
+        }
+        
+        let planName = defaultPlan ? defaultPlan.name : 'FREE';
 
         const newUser = new User({
             name: tempUser.name,

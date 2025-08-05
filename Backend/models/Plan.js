@@ -60,6 +60,14 @@ const planSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isDefault: {
+    type: Boolean,
+    default: false
+  },
+  isDeletable: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

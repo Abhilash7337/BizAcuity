@@ -119,11 +119,21 @@ router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     
-    const deletedPlan = await Plan.findByIdAndDelete(id);
+    // First check if the plan exists and if it's deletable
+    const planToDelete = await Plan.findById(id);
     
-    if (!deletedPlan) {
+    if (!planToDelete) {
       return res.status(404).json({ error: 'Plan not found' });
     }
+
+    // Check if plan is deletable
+    if (planToDelete.isDeletable === false || planToDelete.isDefault === true) {
+      return res.status(400).json({ 
+        error: 'This plan cannot be deleted as it is a system default plan' 
+      });
+    }
+    
+    const deletedPlan = await Plan.findByIdAndDelete(id);
     
     res.json({ message: 'Plan deleted successfully' });
   } catch (error) {

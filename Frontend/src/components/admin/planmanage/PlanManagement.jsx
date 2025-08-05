@@ -39,6 +39,25 @@ const PlanManagement = () => {
   const [allDecors, setAllDecors] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  const createDefaultPlan = async () => {
+    try {
+      const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plans/init-default`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to initialize default plan');
+      }
+
+      const result = await response.json();
+      console.log('Default plan initialization:', result.message);
+    } catch (error) {
+      console.error('Error creating default plan:', error);
+      setError('Failed to initialize default plan: ' + error.message);
+    }
+  };
+
   const handleEdit = useCallback((plan) => {
     setEditingPlan(plan);
     const booleanFeatures = {
@@ -144,13 +163,24 @@ const PlanManagement = () => {
         throw new Error(`Failed to fetch plans: ${response.status} ${errorText}`);
       }
       const data = await response.json();
+      let plans = [];
       if (data.plans) {
-        setPlans(data.plans);
+        plans = data.plans;
       } else if (Array.isArray(data)) {
-        setPlans(data);
+        plans = data;
       } else {
-        setPlans([]);
+        plans = [];
       }
+      
+      // Check if there's a default plan, if not create one
+      const hasDefaultPlan = plans.some(plan => plan.isDefault === true);
+      if (!hasDefaultPlan && plans.length === 0) {
+        await createDefaultPlan();
+        // Refetch plans after creating default
+        return fetchPlans();
+      }
+      
+      setPlans(plans);
     } catch (error) {
       setError('Failed to load subscription plans: ' + error.message);
     } finally {
@@ -229,12 +259,18 @@ const PlanManagement = () => {
       const response = await authFetch(`${import.meta.env.VITE_API_BASE_URL}/admin/plans/${planToDelete}`, {
         method: 'DELETE'
       });
-      if (!response.ok) throw new Error('Failed to delete plan');
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete plan');
+      }
+      
       fetchPlans();
       setShowDeleteModal(false);
       setPlanToDelete(null);
+      setError(''); // Clear any previous errors
     } catch (error) {
-      setError('Failed to delete plan');
+      setError(error.message || 'Failed to delete plan');
       setShowDeleteModal(false);
       setPlanToDelete(null);
     }
@@ -314,16 +350,29 @@ const PlanManagement = () => {
             </h2>
             <p className="text-slate-300 text-sm sm:text-base">Create and manage subscription plans</p>
           </div>
-          <button
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl w-full sm:w-auto"
-            style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
-          >
-            Add New Plan
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={createDefaultPlan}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl text-sm"
+              style={{boxShadow: '0 8px 25px rgba(59, 130, 246, 0.3)'}}
+              title="Initialize/Reset Default FREE Plan"
+            >
+              <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Init Default
+            </button>
+            <button
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+              style={{boxShadow: '0 8px 25px rgba(249, 115, 22, 0.3)'}}
+            >
+              Add New Plan
+            </button>
+          </div>
         </div>
       </div>
       
