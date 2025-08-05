@@ -1,16 +1,17 @@
 import { useState, useRef, createContext, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import Login from './pages/ModernLogin'
+import Register from './pages/ModernRegister'
 import WallEditor from './pages/WallEditor'
 import Landing from './pages/Landing'
+import PublicLanding from './pages/PublicLanding'
 import User from './pages/User'
 import ChoosePlan from './pages/ChoosePlan'
-import AdminDashboard from './pages/AdminDashboard'
-import ProtectedRoute from './components/ProtectedRoute'
+import Admin from './pages/Admin'
+import { ProtectedRoute } from './components/user'
 import './index.css'
 import { Upload, Settings, Palette, Image as LucideImage, Ruler, Trash2, Download, X } from 'lucide-react'
-import { isAuthenticated, getAuthUser, authFetch, removeToken, removeAuthUser } from './utils/auth'
+import { isAuthenticated, getAuthUser, authFetch, removeToken, removeAuthUser, getIntendedDestination, getPostAuthRedirect } from './utils/auth'
 
 export const UserContext = createContext();
 
@@ -78,11 +79,15 @@ function App() {
       <Router>
         <Routes>
           {/* Public routes */}
+          <Route path="/" element={
+            registeredUser?.isLoggedIn ? <Navigate to="/dashboard" replace /> : <PublicLanding />
+          } />
+          <Route path="/home" element={<PublicLanding />} />
           <Route path="/login" element={
-            registeredUser?.isLoggedIn ? <Navigate to="/landing" replace /> : <Login />
+            registeredUser?.isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login />
           } />
           <Route path="/register" element={
-            registeredUser?.isLoggedIn ? <Navigate to="/landing" replace /> : <Register />
+            registeredUser?.isLoggedIn ? <Navigate to="/dashboard" replace /> : <Register />
           } />
 
           {/* Protected routes */}
@@ -91,7 +96,7 @@ function App() {
               <WallEditor />
             </ProtectedRoute>
           } />
-          <Route path="/landing" element={
+          <Route path="/dashboard" element={
             <ProtectedRoute>
               <Landing />
             </ProtectedRoute>
@@ -108,13 +113,8 @@ function App() {
           } />
           <Route path="/admin" element={
             <ProtectedRoute>
-              <AdminDashboard />
+              <Admin />
             </ProtectedRoute>
-          } />
-
-          {/* Redirect root to login for non-logged-in users, to landing for logged-in users */}
-          <Route path="/" element={
-            registeredUser?.isLoggedIn ? <Navigate to="/landing" replace /> : <Navigate to="/login" replace />
           } />
         </Routes>
       </Router>

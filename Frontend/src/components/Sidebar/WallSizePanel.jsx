@@ -1,43 +1,72 @@
 import React from 'react';
-import { Settings, Ruler } from 'lucide-react';
+import { Settings, Ruler, Maximize2 } from 'lucide-react';
 
-const WallSizePanel = ({ inputWidth, inputHeight, setInputWidth, setInputHeight, handleSetWallSize, MIN_SIZE, MAX_SIZE }) => (
-  <div className="bg-surface border border-border rounded-lg shadow-md p-6 mb-6 transition-all hover:shadow-lg">
-    <div className="flex items-center gap-2 mb-4">
-      <Ruler className="w-5 h-5 text-primary-dark" />
-      <h3 className="text-primary-dark font-bold text-lg">Wall Size</h3>
+const WallSizePanel = ({ inputWidth, inputHeight, setInputWidth, setInputHeight, handleSetWallSize, MIN_SIZE, MAX_SIZE, isViewOnly = false }) => (
+  <div className="group">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="p-2 bg-gradient-to-r from-orange-400/20 to-orange-600/20 rounded-xl">
+        <Maximize2 className="w-5 h-5 text-orange-700" />
+      </div>
+      <h3 className="text-orange-800 font-bold text-lg">Canvas Size</h3>
     </div>
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2 items-end flex-wrap">
-        <div className="flex flex-col">
-          <label className="text-primary-dark font-bold text-base mb-1">Width (px)</label>
-          <input
-            type="number"
-            min={MIN_SIZE}
-            max={MAX_SIZE}
-            value={inputWidth}
-            onChange={e => setInputWidth(e.target.value)}
-            className="bg-secondary border border-primary rounded px-2 py-1 w-16"
-          />
+    
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-orange-700">Width</label>
+          <div className="relative">
+            <input
+              type="number"
+              min={MIN_SIZE}
+              max={MAX_SIZE}
+              value={inputWidth}
+              onChange={e => !isViewOnly && setInputWidth(e.target.value)}
+              readOnly={isViewOnly}
+              className={`w-full backdrop-blur-sm border rounded-xl px-4 py-3 text-orange-800 font-medium transition-all duration-300 ${
+                isViewOnly 
+                  ? 'bg-orange-100/60 border-orange-300/40 cursor-not-allowed' 
+                  : 'bg-white/60 border-orange-200/40 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-500'
+              }`}
+              placeholder="Width"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-orange-600 font-medium">px</span>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label className="text-primary-dark font-bold text-base mb-1">Height (px)</label>
-          <input
-            type="number"
-            min={MIN_SIZE}
-            max={MAX_SIZE}
-            value={inputHeight}
-            onChange={e => setInputHeight(e.target.value)}
-            className="bg-secondary border border-primary rounded px-2 py-1 w-16"
-          />
+        
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-orange-700">Height</label>
+          <div className="relative">
+            <input
+              type="number"
+              min={MIN_SIZE}
+              max={MAX_SIZE}
+              value={inputHeight}
+              onChange={e => !isViewOnly && setInputHeight(e.target.value)}
+              readOnly={isViewOnly}
+              className={`w-full backdrop-blur-sm border rounded-xl px-4 py-3 text-orange-800 font-medium transition-all duration-300 ${
+                isViewOnly 
+                  ? 'bg-orange-100/60 border-orange-300/40 cursor-not-allowed' 
+                  : 'bg-white/60 border-orange-200/40 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-500'
+              }`}
+              placeholder="Height"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-orange-600 font-medium">px</span>
+          </div>
         </div>
+      </div>
+      
+      {!isViewOnly && (
         <button
-          className="bg-primary text-secondary rounded-md shadow-md font-semibold px-4 py-2 transition hover:bg-primary-dark min-w-[90px] text-sm flex items-center gap-1"
+          className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-xl px-6 py-3 font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2 group"
           onClick={handleSetWallSize}
         >
-          <Settings className="w-4 h-4" />
-          Set Size
+          <Settings className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+          Apply Size
         </button>
+      )}
+      
+      <div className="text-xs text-orange-600 text-center">
+        {isViewOnly ? 'Current canvas size' : `Size range: ${MIN_SIZE}px - ${MAX_SIZE}px`}
       </div>
     </div>
   </div>

@@ -1,5 +1,9 @@
 const Draft = require('../models/Draft');
 const SharedDraft = require('../models/SharedDraft');
+const User = require('../models/User');
+const Subscription = require('../models/Subscription');
+const Plan = require('../models/Plan');
+const crypto = require('crypto');
 
 // Create new draft
 const createDraft = async (req, res) => {
@@ -15,6 +19,39 @@ const createDraft = async (req, res) => {
           previewImage: !previewImage
         }
       });
+    }
+
+    // Check user's current subscription and plan limits
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let draftLimit = 1; // Default limit for free users
+    
+    if (subscription && subscription.plan) {
+      // Find the plan details to get the draft limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.designsPerMonth !== undefined) {
+        draftLimit = plan.limits.designsPerMonth;
+      }
+    }
+
+    // If unlimited drafts allowed (-1), skip limit check
+    if (draftLimit !== -1) {
+      // Count user's existing drafts
+      const existingDraftsCount = await Draft.countDocuments({ userId: req.userId });
+      
+      if (existingDraftsCount >= draftLimit) {
+        return res.status(403).json({ 
+          error: 'Draft limit exceeded',
+          message: `You have reached your plan limit of ${draftLimit} saved draft${draftLimit > 1 ? 's' : ''}. Please upgrade your plan or delete existing drafts to continue.`,
+          currentCount: existingDraftsCount,
+          limit: draftLimit
+        });
+      }
     }
 
     const draft = new Draft({
@@ -42,11 +79,7 @@ const createDraft = async (req, res) => {
 // Get user's drafts
 const getUserDrafts = async (req, res) => {
   try {
-    // Ensure user can only access their own drafts
-    if (req.userId !== req.params.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
+    // Use the userId from the authenticated token
     const drafts = await Draft.find({ userId: req.userId })
       .sort({ updatedAt: -1 })
       .select('name userId previewImage createdAt updatedAt');
@@ -61,20 +94,42 @@ const getUserDrafts = async (req, res) => {
   }
 };
 
+// Helper to generate a secure random token
+function generateShareToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+const SHARE_TOKEN_EXPIRATION_DAYS = 7;
+
 // Get specific draft
 const getDraftById = async (req, res) => {
   try {
     const draft = await Draft.findById(req.params.draftId)
-      .populate('userId', 'name email');
+      .populate('userId', 'name email')
+      .populate('sharedWith.userId', 'name email');
       
     if (!draft) {
       return res.status(404).json({ error: 'Draft not found' });
     }
 
-    // Allow access if user owns the draft or if it's shared with them
+    // Check for public access via share token (for /drafts/shared/:draftId)
+    // Allow if: draft is public (remove token restriction)
+    if (draft.isPublic) {
+      return res.json(draft);
+    }
+
+    // Only allow access for owner or users the draft is shared with (authenticated)
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
     const isOwner = draft.userId._id.toString() === req.userId;
+    // sharedWith can be array of objects with userId populated
     const isSharedWithUser = draft.sharedWith && Array.isArray(draft.sharedWith) && 
-      draft.sharedWith.some(share => share.userId && share.userId.toString() === req.userId);
+      draft.sharedWith.some(share => {
+        if (!share.userId) return false;
+        // If populated, userId is an object
+        return (typeof share.userId === 'object' ? share.userId._id.toString() : share.userId.toString()) === req.userId;
+      });
 
     if (!isOwner && !isSharedWithUser) {
       return res.status(403).json({ error: 'Access denied' });
@@ -93,19 +148,8 @@ const getDraftById = async (req, res) => {
 // Update draft
 const updateDraft = async (req, res) => {
   try {
-    const { name, wallData, previewImage } = req.body;
+    const { name, wallData, previewImage, isPublic } = req.body;
     
-    if (!name || !wallData || !previewImage) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        details: {
-          name: !name,
-          wallData: !wallData,
-          previewImage: !previewImage
-        }
-      });
-    }
-
     const draft = await Draft.findById(req.params.draftId);
     if (!draft) {
       return res.status(404).json({ error: 'Draft not found' });
@@ -116,9 +160,12 @@ const updateDraft = async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    draft.name = name;
-    draft.wallData = wallData;
-    draft.previewImage = previewImage;
+    // Update fields if provided
+    if (name !== undefined) draft.name = name;
+    if (wallData !== undefined) draft.wallData = wallData;
+    if (previewImage !== undefined) draft.previewImage = previewImage;
+    if (isPublic !== undefined) draft.isPublic = isPublic;
+    
     draft.lastModified = new Date();
     await draft.save();
     
@@ -226,24 +273,107 @@ const shareDraft = async (req, res) => {
   }
 };
 
+// Share draft via link (generate token if needed)
+const setDraftPublicWithToken = async (req, res) => {
+  try {
+    const { draftId } = req.params;
+    const { isPublic, linkPermission } = req.body;
+    const userId = req.userId;
+    const draft = await Draft.findById(draftId);
+    if (!draft) {
+      return res.status(404).json({ error: 'Draft not found' });
+    }
+    if (draft.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    // Only generate a new token if making public and no token exists
+    if (isPublic) {
+      if (!draft.shareToken) {
+        draft.shareToken = generateShareToken();
+        draft.shareTokenExpires = new Date(Date.now() + SHARE_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000);
+      }
+      draft.isPublic = true;
+    } else {
+      draft.isPublic = false;
+      draft.shareToken = null;
+      draft.shareTokenExpires = null;
+    }
+    // Optionally store linkPermission if needed
+    if (linkPermission !== undefined) {
+      draft.linkPermission = linkPermission;
+    }
+    await draft.save();
+    res.json({
+      message: 'Draft sharing updated',
+      shareToken: draft.shareToken,
+      shareTokenExpires: draft.shareTokenExpires,
+      isPublic: draft.isPublic
+    });
+  } catch (error) {
+    console.error('Set draft public with token error:', error);
+    res.status(500).json({ error: 'Failed to update sharing' });
+  }
+};
+
+// Revoke share token (owner only)
+const revokeShareToken = async (req, res) => {
+  try {
+    const { draftId } = req.params;
+    const userId = req.userId;
+    const draft = await Draft.findById(draftId);
+    if (!draft) {
+      return res.status(404).json({ error: 'Draft not found' });
+    }
+    if (draft.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    draft.shareToken = null;
+    draft.shareTokenExpires = null;
+    draft.isPublic = false;
+    // Remove all user-to-user shares
+    draft.sharedWith = [];
+    await draft.save();
+
+    // Mark all SharedDraft records for this draft as inactive
+    await SharedDraft.updateMany(
+      { draftId: draftId, isActive: true },
+      { isActive: false, unsharedAt: new Date() }
+    );
+
+    res.json({ message: 'Share link and all user shares revoked' });
+  } catch (error) {
+    console.error('Revoke share token error:', error);
+    res.status(500).json({ error: 'Failed to revoke share link' });
+  }
+};
+
+// Get drafts shared by the current user via link
+const getDraftsSharedByMe = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const drafts = await Draft.find({
+      userId,
+      isPublic: true,
+      shareToken: { $ne: null }
+    }).sort({ updatedAt: -1 });
+    res.json(drafts);
+  } catch (error) {
+    console.error('Get drafts shared by me error:', error);
+    res.status(500).json({ error: 'Failed to fetch shared drafts' });
+  }
+};
+
 // Get shared drafts for a user
 const getSharedDrafts = async (req, res) => {
   try {
-    const { userId } = req.params;
-    
-    // Ensure user can only access their own shared drafts
-    if (userId !== req.userId) {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
-    // Find all drafts that are shared with this user
-    const sharedDrafts = await Draft.find({
-      'sharedWith.userId': userId
-    })
-    .populate('userId', 'name email')
-    .sort({ createdAt: -1 });
-
-    res.json(sharedDrafts);
+    const userId = req.userId;
+    // Find all active shared drafts for this user
+    const sharedDrafts = await SharedDraft.find({ sharedWith: userId, isActive: true })
+      .populate({ path: 'draftId', populate: { path: 'userId', select: 'name email' } })
+      .populate('sharedBy', 'name email');
+    // Filter out any SharedDrafts where draftId is not populated (null or undefined)
+    const validSharedDrafts = sharedDrafts.filter(d => d.draftId && typeof d.draftId === 'object');
+    res.json(validSharedDrafts);
   } catch (error) {
     console.error('Get shared drafts error:', error);
     res.status(500).json({ 
@@ -270,7 +400,8 @@ const removeFromSharedDraft = async (req, res) => {
       draft.sharedWith.some(share => share.userId.toString() === userId);
 
     if (!isSharedWithUser) {
-      return res.status(404).json({ error: 'Draft not shared with this user' });
+      // Idempotent: return success even if user is not in sharedWith
+      return res.json({ message: 'User was not in shared draft list' });
     }
 
     // Remove user from sharedWith array
@@ -299,6 +430,78 @@ const removeFromSharedDraft = async (req, res) => {
   }
 };
 
+// Get user's draft status and limits
+const getDraftStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let draftLimit = 1; // Default limit for free users
+    let planName = 'Free';
+    
+    if (subscription && subscription.plan) {
+      planName = subscription.plan;
+      // Find the plan details to get the draft limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.designsPerMonth !== undefined) {
+        draftLimit = plan.limits.designsPerMonth;
+      }
+    }
+
+    // Count user's existing drafts
+    const currentDrafts = await Draft.countDocuments({ userId: req.userId });
+    
+    res.json({
+      currentDrafts,
+      limit: draftLimit,
+      planName,
+      canSaveMore: draftLimit === -1 || currentDrafts < draftLimit,
+      unlimited: draftLimit === -1
+    });
+  } catch (error) {
+    console.error('Get draft status error:', error);
+    res.status(500).json({ 
+      error: 'Failed to get draft status',
+      details: error.message
+    });
+  }
+};
+
+// Get image upload status and limits for user
+const getImageUploadStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get user's subscription to find their plan
+    const subscription = await Subscription.findOne({ userId: req.userId });
+    let imageUploadLimit = 1; // Default limit if no subscription found
+    
+    if (subscription && subscription.plan) {
+      // Find the plan details to get the image upload limit
+      const plan = await Plan.findOne({ name: subscription.plan });
+      if (plan && plan.limits && plan.limits.imageUploadsPerDesign !== undefined) {
+        imageUploadLimit = plan.limits.imageUploadsPerDesign;
+      }
+    }
+
+    res.json({
+      allowedLimit: imageUploadLimit,
+      isUnlimited: imageUploadLimit === -1,
+      planName: subscription?.plan || 'free'
+    });
+  } catch (error) {
+    console.error('Get image upload status error:', error);
+    res.status(500).json({ error: 'Failed to get image upload status' });
+  }
+};
+
 module.exports = {
   createDraft,
   getUserDrafts,
@@ -307,5 +510,10 @@ module.exports = {
   deleteDraft,
   shareDraft,
   getSharedDrafts,
-  removeFromSharedDraft
+  removeFromSharedDraft,
+  getDraftStatus,
+  getImageUploadStatus,
+  setDraftPublicWithToken,
+  revokeShareToken,
+  getDraftsSharedByMe
 };

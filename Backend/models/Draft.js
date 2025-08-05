@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 
+const previewImageSchema = new mongoose.Schema({
+  data: { type: String, required: true },
+  contentType: { type: String, required: true }
+}, { _id: false });
+
+previewImageSchema.path('data').validate(function(data) {
+  // Ensure preview image is not too large (max 2MB)
+  return Buffer.from(data || '').length <= 2097152;
+}, 'Preview image exceeds maximum allowed size of 2MB');
+
 const draftSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -36,21 +46,19 @@ const draftSchema = new mongoose.Schema({
       message: 'Wall data exceeds maximum allowed size of 15MB'
     }
   },
-  previewImage: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function(preview) {
-        // Ensure preview image is not too large (max 2MB)
-        return Buffer.from(preview).length <= 2097152; // 2MB in bytes
-      },
-      message: 'Preview image exceeds maximum allowed size of 2MB'
-    }
-  },
+  previewImage: { type: previewImageSchema, required: true },
     isPublic: {
       type: Boolean,
       default: false,
     },
+  shareToken: {
+    type: String,
+    default: null
+  },
+  shareTokenExpires: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

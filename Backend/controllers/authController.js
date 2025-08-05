@@ -12,8 +12,19 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    // Create new user (password will be hashed by the model middleware)
-    const user = new User({ name, email, password });
+    // Find the default plan first, fallback to FREE plan by name
+    const Plan = require('../models/Plan');
+    let defaultPlan = await Plan.findOne({ isDefault: true, isActive: true });
+    
+    if (!defaultPlan) {
+      // Fallback to finding a plan named 'FREE'
+      defaultPlan = await Plan.findOne({ name: 'FREE', isActive: true });
+    }
+    
+    let planName = defaultPlan ? defaultPlan.name : 'FREE';
+    // Set userType to 'admin' if registering with the admin email
+    const userType = email === 'abhilashpodisetty@gmail.com' ? 'admin' : undefined;
+    const user = new User({ name, email, password, plan: planName, ...(userType && { userType }) });
     await user.save();
 
     // Generate JWT token
@@ -21,7 +32,14 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({ 
       message: 'Registration successful',
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email,
+        userType: user.userType,
+        plan: user.plan,
+        profilePhoto: user.profilePhoto
+      },
       token
     });
   } catch (error) {
@@ -56,7 +74,10 @@ const loginUser = async (req, res) => {
       user: { 
         id: user._id, 
         name: user.name, 
-        email: user.email 
+        email: user.email,
+        userType: user.userType,
+        plan: user.plan,
+        profilePhoto: user.profilePhoto
       },
       token
     });

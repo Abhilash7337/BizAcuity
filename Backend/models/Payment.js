@@ -21,7 +21,6 @@ const paymentSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ['regular', 'pro'],
     required: true
   },
   paymentMethod: {
@@ -51,7 +50,6 @@ const paymentSchema = new mongoose.Schema({
 });
 
 // Index for efficient queries
-paymentSchema.index({ userId: 1, status: 1 });
 paymentSchema.index({ transactionId: 1 });
 paymentSchema.index({ paymentDate: -1 });
 
