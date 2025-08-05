@@ -9,8 +9,17 @@ const getAllDecors = async (req, res) => {
   try {
     const decors = await Decor.find({ isActive: true });
     
-    // Ensure image object is always present and well-formed
-    const decorsWithImage = decors.map(decor => {
+    // Get all categories to map category names to ObjectIds
+    const Category = require('../models/Category');
+    const categories = await Category.find({});
+    const categoryMap = {};
+    categories.forEach(cat => {
+      // Create case-insensitive mapping
+      categoryMap[cat.name.toLowerCase()] = cat._id;
+    });
+    
+    // Add categoryId field and ensure image object is always present and well-formed
+    const decorsWithCategoryId = decors.map(decor => {
       let image = { data: '', contentType: '' };
       if (decor.image && decor.image.data && decor.image.contentType) {
         image = {
@@ -20,11 +29,12 @@ const getAllDecors = async (req, res) => {
       }
       return {
         ...decor.toObject(),
+        categoryId: categoryMap[decor.category.toLowerCase()] || null,
         image
       };
     });
 
-    res.json(decorsWithImage);
+    res.json(decorsWithCategoryId);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

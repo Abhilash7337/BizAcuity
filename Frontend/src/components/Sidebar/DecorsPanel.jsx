@@ -72,7 +72,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
     };
   }, []);
 
-  // Group decors by category
+  // Group decors by category (show all decors, lock UI will indicate restrictions)
   const decorCategories = decors.reduce((acc, decor) => {
     if (!acc[decor.category]) {
       acc[decor.category] = {
@@ -93,13 +93,16 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   };
 
   const [upgradeMsg, setUpgradeMsg] = useState('');
-  // When filtering allowed decors, always use _id
+  
+  // Handle decor click with plan restriction check
   const handleDecorClick = (decor) => {
+    // Check if user has plan restrictions and this decor is not allowed
     if (userPlanAllowedDecors && !userPlanAllowedDecors.includes(decor._id)) {
-      setUpgradeMsg('This decor is not available in your current plan. Upgrade to access more decors.');
-      setTimeout(() => setUpgradeMsg(''), 2500);
+      setUpgradeMsg('This decor is not available in your current plan. Please upgrade to access more decors.');
+      setTimeout(() => setUpgradeMsg(''), 4000);
       return;
     }
+    
     if (onAddDecor) {
       onAddDecor({
         id: decor._id,
@@ -221,7 +224,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                       <div
                         key={decor._id}
                         onClick={() => handleDecorClick(decor)}
-                      className={`relative group cursor-pointer bg-slate-800/80 backdrop-blur-sm rounded-xl border border-orange-500/20 hover:border-orange-400 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden text-xs sm:text-sm ${isLocked ? 'opacity-85 pointer-events-auto' : ''}`}
+                        className={`relative group cursor-pointer bg-slate-800/80 backdrop-blur-sm rounded-xl border border-orange-500/20 hover:border-orange-400 transition-all duration-300 hover:shadow-lg hover:scale-105 overflow-hidden text-xs sm:text-sm ${isLocked ? 'opacity-85' : ''}`}
                       >
                         <div className="aspect-square p-1 sm:p-2 flex items-center justify-center bg-gradient-to-br from-slate-900/80 to-orange-500/10">
                           <img
