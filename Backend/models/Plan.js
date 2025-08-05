@@ -52,8 +52,7 @@ const planSchema = new mongoose.Schema({
 
   // Per-category decor limits: { [categoryId]: number }
   categoryLimits: {
-    type: Map,
-    of: Number,
+    type: Object,
     default: {}
   },
   isActive: {

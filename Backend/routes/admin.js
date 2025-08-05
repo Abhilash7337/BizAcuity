@@ -219,11 +219,31 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
       });
     }
 
+    // Handle categoryLimits properly
+    let cleanedCategoryLimits = {};
+    if (categoryLimits && typeof categoryLimits === 'object') {
+      Object.entries(categoryLimits).forEach(([key, value]) => {
+        if (/^[a-fA-F0-9]{24}$/.test(key)) {
+          // Handle different value types: string numbers, actual numbers, -1, etc.
+          let numValue;
+          if (value === '' || value === null || value === undefined) {
+            numValue = 0;
+          } else if (value === '-1' || value === -1) {
+            numValue = -1;
+          } else {
+            numValue = parseInt(value, 10);
+            if (isNaN(numValue)) numValue = 0;
+          }
+          cleanedCategoryLimits[key] = numValue;
+        }
+      });
+    }
+
     // Sync decors array with categoryLimits
     const Decor = require('../models/Decor');
     let allowedDecorIds = [];
-    if (categoryLimits && typeof categoryLimits === 'object' && Object.keys(categoryLimits).length > 0) {
-      for (const [catId, limit] of Object.entries(categoryLimits)) {
+    if (Object.keys(cleanedCategoryLimits).length > 0) {
+      for (const [catId, limit] of Object.entries(cleanedCategoryLimits)) {
         const Category = require('../models/Category');
         const categoryDoc = await Category.findById(catId);
         if (!categoryDoc) continue;
@@ -250,7 +270,7 @@ router.post('/plans', verifyToken, checkAdmin, async (req, res) => {
       isActive: isActive !== undefined ? isActive : true,
       exportDrafts: exportDrafts === true,
       decors: allowedDecorIds,
-      categoryLimits: categoryLimits || {}
+      categoryLimits: cleanedCategoryLimits
     });
 
     const savedPlan = await newPlan.save();
@@ -301,9 +321,31 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
         imageUploadsPerDesign: limits?.imageUploadsPerDesign ?? 3
       },
       isActive: isActive !== undefined ? isActive : true,
-      exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined,
-      categoryLimits: categoryLimits || {}
+      exportDrafts: exportDrafts !== undefined ? exportDrafts : undefined
     };
+
+    // Handle categoryLimits separately to ensure proper saving
+    if (categoryLimits !== undefined) {
+      let cleanedCategoryLimits = {};
+      if (categoryLimits && typeof categoryLimits === 'object') {
+        Object.entries(categoryLimits).forEach(([key, value]) => {
+          if (/^[a-fA-F0-9]{24}$/.test(key)) {
+            // Handle different value types: string numbers, actual numbers, -1, etc.
+            let numValue;
+            if (value === '' || value === null || value === undefined) {
+              numValue = 0;
+            } else if (value === '-1' || value === -1) {
+              numValue = -1;
+            } else {
+              numValue = parseInt(value, 10);
+              if (isNaN(numValue)) numValue = 0;
+            }
+            cleanedCategoryLimits[key] = numValue;
+          }
+        });
+      }
+      updateData.categoryLimits = cleanedCategoryLimits;
+    }
 
     // Sync decors array with categoryLimits
     const Decor = require('../models/Decor');
@@ -326,15 +368,23 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
     }
     updateData.decors = allowedDecorIds;
 
-    const updatedPlan = await Plan.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
-
-    if (!updatedPlan) {
+    // Use findById and save instead of findByIdAndUpdate to ensure markModified works
+    const plan = await Plan.findById(id);
+    if (!plan) {
       return res.status(404).json({ error: 'Plan not found' });
     }
+
+    // Update all fields
+    Object.keys(updateData).forEach(key => {
+      plan[key] = updateData[key];
+    });
+
+    // Mark categoryLimits as modified to ensure it saves properly
+    if (updateData.categoryLimits !== undefined) {
+      plan.markModified('categoryLimits');
+    }
+
+    const updatedPlan = await plan.save();
 
     res.json({
       success: true,

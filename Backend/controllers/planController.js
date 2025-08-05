@@ -20,13 +20,22 @@ const createPlan = async (req, res) => {
       });
     }
 
-    // Ensure categoryLimits keys are ObjectId strings, not names or 'id'
+        // Clean categoryLimits: handle all valid inputs including empty strings
     let cleanedCategoryLimits = {};
     if (categoryLimits && typeof categoryLimits === 'object') {
       Object.entries(categoryLimits).forEach(([key, value]) => {
-        // Only accept keys that look like MongoDB ObjectId (24 hex chars)
         if (/^[a-fA-F0-9]{24}$/.test(key)) {
-          cleanedCategoryLimits[key] = typeof value === 'number' ? value : parseInt(value, 10) || 0;
+          // Handle different value types: string numbers, actual numbers, -1, etc.
+          let numValue;
+          if (value === '' || value === null || value === undefined) {
+            numValue = 0;
+          } else if (value === '-1' || value === -1) {
+            numValue = -1;
+          } else {
+            numValue = parseInt(value, 10);
+            if (isNaN(numValue)) numValue = 0;
+          }
+          cleanedCategoryLimits[key] = numValue;
         }
       });
     }
@@ -190,16 +199,28 @@ const updatePlan = async (req, res) => {
     }
 
     if (categoryLimits !== undefined) {
-      // Ensure categoryLimits keys are ObjectId strings
+      // Ensure categoryLimits keys are ObjectId strings and values are numbers
       let cleanedCategoryLimits = {};
       if (categoryLimits && typeof categoryLimits === 'object') {
         Object.entries(categoryLimits).forEach(([key, value]) => {
           if (/^[a-fA-F0-9]{24}$/.test(key)) {
-            cleanedCategoryLimits[key] = typeof value === 'number' ? value : parseInt(value, 10) || 0;
+            // Handle different value types: string numbers, actual numbers, -1, etc.
+            let numValue;
+            if (value === '' || value === null || value === undefined) {
+              numValue = 0;
+            } else if (value === '-1' || value === -1) {
+              numValue = -1;
+            } else {
+              numValue = parseInt(value, 10);
+              if (isNaN(numValue)) numValue = 0;
+            }
+            cleanedCategoryLimits[key] = numValue;
           }
         });
       }
+      // Use markModified to ensure Mongoose knows the object changed
       plan.categoryLimits = cleanedCategoryLimits;
+      plan.markModified('categoryLimits');
     }
     if (decors !== undefined) {
       // Ensure decors are ObjectId strings
