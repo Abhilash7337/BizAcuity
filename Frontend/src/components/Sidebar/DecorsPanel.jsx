@@ -116,10 +116,10 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
 
   if (loading) {
     return (
-      <div className="h-full bg-gradient-to-br from-slate-900/95 to-slate-800/90 p-2 sm:p-4 border border-orange-500/20 rounded-2xl">
+      <div className="h-full bg-slate-800/60 backdrop-blur-xl p-2 sm:p-4 border border-orange-500/20 rounded-2xl">
         <div className="flex items-center gap-2 mb-4">
-          <Flower2 className="w-5 h-5 text-orange-600" />
-          <h3 className="font-semibold text-orange-800">Decors</h3>
+          <Flower2 className="w-5 h-5 text-orange-400" />
+          <h3 className="font-semibold text-white">Decors</h3>
         </div>
         <div className="flex justify-center items-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -129,7 +129,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
   }
 
   return (
-    <div className="h-full ">
+    <div className="h-full bg-slate-800/60 backdrop-blur-xl p-2 sm:p-4 border border-orange-500/20 rounded-2xl">
       {upgradeMsg && (
         <div className="mb-3 p-2 bg-red-900/30 border border-red-500/40 text-red-300 text-sm rounded text-center animate-pulse">
           {upgradeMsg}
@@ -137,13 +137,13 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       )}
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <Flower2 className="w-5 h-5 text-orange-400" />
-        <h3 className="font-semibold text-orange-300 text-base sm:text-lg">Decors</h3>
+        <h3 className="font-semibold text-white text-base sm:text-lg">Decors</h3>
       </div>
 
       {/* User Uploaded Decors Section */}
       {userDecors.length > 0 && (
         <div className="mb-6">
-          <h4 className="text-xs sm:text-sm font-semibold text-orange-400 mb-2 sm:mb-3 px-1">Your Uploaded Decors</h4>
+          <h4 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 px-1">Your Uploaded Decors</h4>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {userDecors.map(({ src, state, idx }, i) => (
               <div
@@ -159,7 +159,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                   />
                 </div>
                 <div className="p-2 sm:p-3 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center">
-                  <p className="text-[10px] sm:text-xs font-semibold text-orange-300 text-center mb-1 sm:mb-2">User Decor</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-slate-300 text-center mb-1 sm:mb-2">User Decor</p>
                   <button
                     type="button"
                     className="bg-red-500 text-white rounded-full px-3 py-1 text-xs font-semibold hover:bg-red-600 transition"
@@ -173,7 +173,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                 </div>
                 {/* Size indicator */}
                 <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-slate-900/80 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1">
-                  <span className="text-[10px] sm:text-xs font-medium text-orange-300">
+                  <span className="text-[10px] sm:text-xs font-medium text-slate-300">
                     {state.width}×{state.height}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-orange-500/20 rounded-lg bg-slate-900/80 backdrop-blur-sm text-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-sm"
+          className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-orange-500/20 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-400 text-xs sm:text-sm"
         >
           <option value="all">All Categories</option>
           {Object.keys(decorCategories).map(category => (
@@ -200,15 +200,15 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
       </div>
 
       {/* Decor Items */}
-      <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto wall-sidebar-container">
         {filteredCategories.length === 0 ? (
-          <div className="text-center py-6 sm:py-8 text-orange-400 text-xs sm:text-base">
+          <div className="text-center py-6 sm:py-8 text-slate-400 text-xs sm:text-base">
             <p>No decors available</p>
           </div>
         ) : (
           filteredCategories.map(([categoryKey, category]) => (
             <div key={categoryKey}>
-              <h4 className="text-xs sm:text-sm font-semibold text-orange-400 mb-2 sm:mb-3 px-1">
+              <h4 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 px-1">
                 {category.name}
               </h4>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -231,7 +231,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                           loading="lazy"
                         />
                         {loadError[decor.id] && (
-                          <div className="flex flex-col items-center justify-center text-orange-400">
+                          <div className="flex flex-col items-center justify-center text-slate-400">
                             <Flower2 className="w-8 h-8 mb-2" />
                             <span className="text-xs">No image</span>
                             <span className="text-xs text-red-500">Image not available</span>
@@ -244,7 +244,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                         )}
                       </div>
                       <div className="p-2 sm:p-3 bg-slate-900/80 backdrop-blur-sm">
-                        <p className="text-[10px] sm:text-sm font-semibold text-orange-300 text-center">
+                        <p className="text-[10px] sm:text-sm font-semibold text-slate-300 text-center">
                           {decor.name}
                         </p>
                         {loadError[decor.id] && (
@@ -254,7 +254,7 @@ const DecorsPanel = ({ onAddDecor, userDecors = [], onRemoveUserDecor, onSelectU
                       {/* Size indicator */}
                       {!loadError[decor.id] && (
                         <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-slate-900/80 backdrop-blur-sm rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1">
-                          <span className="text-[10px] sm:text-xs font-medium text-orange-300">
+                          <span className="text-[10px] sm:text-xs font-medium text-slate-300">
                             {decor.size.width}×{decor.size.height}
                           </span>
                         </div>
