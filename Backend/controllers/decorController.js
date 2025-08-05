@@ -49,6 +49,11 @@ const createDecor = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'Image file is required' });
     }
+
+    // Auto-create category if it doesn't exist
+    const { ensureCategoryExists } = require('../sync-categories');
+    const categoryId = await ensureCategoryExists(category);
+
     // Use static file path for imageUrl
     const imageUrl = `/uploads/decors/${req.file.filename}`;
     const decor = new Decor({
@@ -56,6 +61,7 @@ const createDecor = async (req, res) => {
       category,
       description,
       imageUrl,
+      categoryId, // Set the categoryId when creating
       isActive: true,
       createdBy: req.user.id
     });
