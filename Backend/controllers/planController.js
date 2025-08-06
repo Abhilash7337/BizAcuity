@@ -246,11 +246,18 @@ const updatePlan = async (req, res) => {
 // Delete a subscription plan
 const deletePlan = async (req, res) => {
   try {
-    const { planId } = req.params;
+    const { id: planId } = req.params;
 
     const plan = await Plan.findById(planId);
     if (!plan) {
       return res.status(404).json({ error: 'Subscription plan not found' });
+    }
+
+    // Check if plan is deletable (don't delete default or system plans)
+    if (plan.isDefault === true || plan.isDeletable === false) {
+      return res.status(400).json({ 
+        error: 'This plan cannot be deleted as it is a system default plan or marked as non-deletable'
+      });
     }
 
     // Check if any users are currently subscribed to this plan
@@ -266,9 +273,14 @@ const deletePlan = async (req, res) => {
 
     await Plan.findByIdAndDelete(planId);
     
+    console.log(`Deleted plan: ${plan.name} (${planId})`);
+    
     res.json({
       message: 'Subscription plan deleted successfully',
-      deletedPlan: plan
+      deletedPlan: {
+        id: plan._id,
+        name: plan.name
+      }
     });
   } catch (error) {
     console.error('Delete plan error:', error);
