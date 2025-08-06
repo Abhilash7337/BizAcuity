@@ -398,35 +398,8 @@ router.put('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
 });
 
 // Delete plan
-router.delete('/plans/:id', verifyToken, checkAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    // First check if the plan exists and if it's deletable
-    const planToDelete = await Plan.findById(id);
-    
-    if (!planToDelete) {
-      return res.status(404).json({ error: 'Plan not found' });
-    }
-
-    // Check if plan is deletable
-    if (planToDelete.isDeletable === false || planToDelete.isDefault === true) {
-      return res.status(400).json({ 
-        error: 'This plan cannot be deleted as it is a system default plan' 
-      });
-    }
-    
-    const deletedPlan = await Plan.findByIdAndDelete(id);
-
-    res.json({
-      success: true,
-      message: 'Plan deleted successfully'
-    });
-  } catch (error) {
-    console.error('Delete plan error:', error);
-    res.status(500).json({ error: 'Failed to delete plan' });
-  }
-});
+const { deletePlan } = require('../controllers/planController');
+router.delete('/plans/:id', verifyToken, checkAdmin, deletePlan);
 
 // Initialize default plan
 router.post('/plans/init-default', verifyToken, checkAdmin, async (req, res) => {
