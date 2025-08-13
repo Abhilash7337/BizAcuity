@@ -80,7 +80,7 @@ const WallSidebar = ({
 
       {/* Tab Content with Animation - Hidden in view-only mode */}
       {!isViewOnly && (
-        <div className="flex-1 min-h-0 animate-slide-in-up delay-200 w-full overflow-hidden" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="flex-1 min-h-0 animate-slide-in-up delay-200 w-full overflow-y-auto overflow-x-hidden" style={{ maxHeight: '100%' }}>
           <div className="h-full px-1 py-1 lg:px-0 lg:py-0">
             {tabContent}
           </div>
