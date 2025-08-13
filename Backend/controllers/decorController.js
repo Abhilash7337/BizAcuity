@@ -115,33 +115,17 @@ const deleteDecor = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Actually delete the decor from database
-    const decor = await Decor.findByIdAndDelete(id);
+    const decor = await Decor.findByIdAndUpdate(
+      id, 
+      { isActive: false }, 
+      { new: true }
+    );
     
     if (!decor) {
       return res.status(404).json({ error: 'Decor not found' });
     }
 
-    // Clean up any plans that reference this decor
-    const Plan = require('../models/Plan');
-    
-    // Remove the decor from any plan's decors array
-    await Plan.updateMany(
-      { decors: id },
-      { $pull: { decors: id } }
-    );
-
-    // Note: We don't automatically remove categoryLimits since they're category-based, not decor-based
-    console.log(`Deleted decor ${decor.name} (${id}) and cleaned up plan references`);
-
-    res.json({ 
-      message: 'Decor deleted successfully',
-      deletedDecor: {
-        id: decor._id,
-        name: decor.name,
-        category: decor.category
-      }
-    });
+    res.json({ message: 'Decor deleted successfully' });
   } catch (error) {
     console.error('Error deleting decor:', error);
     res.status(500).json({ error: 'Failed to delete decor' });

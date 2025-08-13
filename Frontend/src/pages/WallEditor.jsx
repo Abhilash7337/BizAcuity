@@ -111,22 +111,28 @@ function WallEditor() {
             decorsByCategoryId[decor.categoryId].push(decor);
           });
           let allowedDecorIds = [];
+          const planDecors = Array.isArray(userPlan.decors) ? userPlan.decors.filter(d => typeof d === 'string' && /^[a-fA-F0-9]{24}$/.test(d)) : [];
           if (userPlan.categoryLimits && Object.keys(userPlan.categoryLimits).length > 0) {
-            // Use category-based limits
+            const categoriesRes = await authFetch('/categories');
+            const categoriesData = await categoriesRes.json();
             Object.entries(userPlan.categoryLimits).forEach(([catId, limit]) => {
               const decorsInCat = decorsByCategoryId[catId] || [];
+              const decorIdsInCat = decorsInCat.map(d => d._id);
               if (limit === -1) {
-                // Unlimited access to this category
-                allowedDecorIds.push(...decorsInCat.map(d => d._id));
+                const decorIdsToAdd = planDecors.length > 0 
+                  ? decorsInCat.filter(d => planDecors.includes(d._id)).map(d => d._id)
+                  : decorIdsInCat;
+                allowedDecorIds.push(...decorIdsToAdd);
               } else if (limit > 0) {
-                // Limited access to this category
-                allowedDecorIds.push(...decorsInCat.slice(0, limit).map(d => d._id));
+                const decorIdsToAdd = planDecors.length > 0
+                  ? decorsInCat.filter(d => planDecors.includes(d._id)).slice(0, limit).map(d => d._id)
+                  : decorIdsInCat.slice(0, limit);
+                allowedDecorIds.push(...decorIdsToAdd);
               }
-              // If limit is 0, don't add any decors from this category
+              // If limit is 0 or negative (except -1), don't add any decors from this category
             });
           } else {
-            // No category limits, allow all decors
-            allowedDecorIds = allDecorsData.map(d => d._id);
+            allowedDecorIds = planDecors.length > 0 ? planDecors : allDecorsData.map(d => d._id);
           }
           if (isMounted) setUserPlanAllowedDecors(allowedDecorIds);
         } else {
