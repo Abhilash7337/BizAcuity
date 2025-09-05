@@ -76,13 +76,6 @@ health-check.sh  # Health check script
 
 ---
 
-## 📡 API Endpoints
-- `/api/categories` — Manage categories
-- `/api/decors` — Manage decor items
-- `/api/auth` — User authentication
-- `/api/upload` — Image uploads
-
----
 
 ## 🛠️ Technologies Used
 - React, Vite, Tailwind CSS
