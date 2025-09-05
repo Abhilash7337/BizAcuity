@@ -72,7 +72,7 @@ health-check.sh  # Health check script
   cd Frontend
   npm run dev
   ```
-- Access the app at `http://localhost:5173`
+
 
 ---
 
