@@ -29,7 +29,6 @@ A modern full-stack web app for wall decor management. Users and admins can crea
 Backend/         # Node.js/Express server, API, models, controllers
 Frontend/        # React app, UI components, pages, assets
 uploads/         # Uploaded images and decor files
-health-check.sh  # Health check script
 ```
 
 ---
