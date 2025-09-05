@@ -43,12 +43,22 @@ const deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-    // Check if any decor uses this category
-    const decorUsing = await Decor.findOne({ category: category.name });
+    
+    // Check if any decor uses this category (case-insensitive)
+    const decorUsing = await Decor.findOne({ 
+      category: { $regex: new RegExp(`^${category.name}$`, 'i') } 
+    });
+    
     if (decorUsing) {
-      return res.status(400).json({ error: 'Cannot delete: Category is in use by one or more decors.' });
+      console.log(`Cannot delete category "${category.name}" - used by decor: ${decorUsing.name}`);
+      return res.status(400).json({ 
+        error: 'Cannot delete: Category is in use by one or more decors.',
+        details: `Used by: ${decorUsing.name}`
+      });
     }
+    
     await Category.findByIdAndDelete(id);
+    console.log(`Category "${category.name}" deleted successfully`);
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
     console.error('Error deleting category:', error);

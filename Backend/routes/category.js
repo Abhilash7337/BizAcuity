@@ -9,7 +9,7 @@ router.get('/categories', getCategories);
 // Add new category (admin only)
 router.post('/admin/categories', verifyToken, addCategory);
 
-module.exports = router;
-
 // Delete category (admin only)
 router.delete('/admin/categories/:id', verifyToken, deleteCategory);
+
+module.exports = router;
