@@ -1,9 +1,9 @@
 
 # 🖼️ Wall Decor Management Website
 
-![GitHub repo size](https://img.shields.io/github/repo-size/Abhilash7337/BizAcuity)
-![GitHub stars](https://img.shields.io/github/stars/Abhilash7337/BizAcuity?style=social)
-![GitHub forks](https://img.shields.io/github/forks/Abhilash7337/BizAcuity?style=social)
+![GitHub repo size](https://img.shields.io/github/repo-size/Abhilash7337/Mialtar)
+![GitHub stars](https://img.shields.io/github/stars/Abhilash7337/Mialtar?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Abhilash7337/Mialtar?style=social)
 ![MIT License](https://img.shields.io/badge/license-MIT-green)
 
 ---
@@ -44,7 +44,7 @@ health-check.sh  # Health check script
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Abhilash7337/BizAcuity.git
+   git clone https://github.com/Abhilash7337/Mialtar.git
    ```
 2. Install backend dependencies:
    ```bash
